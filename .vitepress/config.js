@@ -104,53 +104,64 @@ module.exports = {
         ],
       },
       {
-        text: 'External Deployment',
+        text: 'TIP-3 Token Deployment',
         collapsable: false,
-        link: '/Deployments/External/ToC.md',
         items: [
           {
-            text: 'Deploy Token Root',
+            text: 'Prerequisites',
             collapsable: false,
-            link: '/Deployments/External/TokenRoot.md',
+            link: '/Deployments/EIP.md',
           },
           {
-            text: 'Deploy Token Wallet',
+            text: 'Using Account',
             collapsable: false,
-            link: '/Deployments/External/TokenWallet.md',
+            link: '/Deployments/External/ToC.md',
+            items: [
+              {
+                text: 'Deploy Token Root',
+                collapsable: false,
+                link: '/Deployments/External/TokenRoot.md',
+              },
+              {
+                text: 'Deploy Token Wallet',
+                collapsable: false,
+                link: '/Deployments/External/TokenWallet.md',
+              },
+              {
+                text: 'Transfer TIP-3 Tokens',
+                collapsable: false,
+                link: '/Deployments/External/Transfer.md',
+              },
+            ],
           },
           {
-            text: 'Transfer TIP-3 Tokens',
+            text: 'Using Smart-Contract',
             collapsable: false,
-            link: '/Deployments/External/Transfer.md',
+            link: '/Deployments/Internal/ToC.md',
+            items: [
+              {
+                text: 'Deploy Token Root',
+                collapsable: false,
+                link: '/Deployments/Internal/TokenRoot.md',
+              },
+              {
+                text: 'Deploy Token Wallet',
+                collapsable: false,
+                link: '/Deployments/Internal/TokenWallet.md',
+              },
+              {
+                text: 'Transfer TIP-3 Tokens',
+                collapsable: false,
+                link: '/Deployments/Internal/Transfer.md',
+              },
+            ],
+          },
+          {
+            text: 'On-Chain Interaction',
+            collapsable: false,
+            link: '/Deployments/Get.md',
           },
         ],
-      },
-      {
-        text: 'Internal Deployment',
-        collapsable: false,
-        link: '/Deployments/Internal/ToC.md',
-        items: [
-          {
-            text: 'Deploy Token Root',
-            collapsable: false,
-            link: '/Deployments/Internal/TokenRoot.md',
-          },
-          {
-            text: 'Deploy Token Wallet',
-            collapsable: false,
-            link: '/Deployments/Internal/TokenWallet.md',
-          },
-          {
-            text: 'Transfer TIP-3 Tokens',
-            collapsable: false,
-            link: '/Deployments/Internal/Transfer.md',
-          },
-        ],
-      },
-      {
-        text: 'References',
-        collapsable: false,
-        link: '/api-reference/sample-page.md',
       },
     ],
 

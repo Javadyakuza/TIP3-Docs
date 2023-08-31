@@ -64,7 +64,7 @@ If you need a permanent address for testing, then set the `_randomNonce` constan
 
 Use this command and deploy account:
 
-```shell-session
+```shell
 npx locklift run -s ./scripts/00-deploy-account.js -n local
 ```
 

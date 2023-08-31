@@ -1,5 +1,5 @@
 ::: tip
-In this section we will use the an Account smart contract to deploy the following contracts.
+In this section we will use an Account smart contract to deploy the TIP-3 token contracts.
 :::
 
 Here are the articles in this sections:

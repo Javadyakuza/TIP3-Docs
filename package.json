@@ -10,7 +10,9 @@
     "dev": "npx vitepress dev"
   },
   "dependencies": {
-    "locklift": "^2.7.4"
+    "ethers": "^6.7.1",
+    "locklift": "^2.7.4",
+    "tip3-docs-artifacts": "^1.0.0"
   },
   "devDependencies": {
     "@algolia/client-search": "^4.17.2",
