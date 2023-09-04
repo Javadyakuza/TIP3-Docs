@@ -130,7 +130,7 @@ module.exports = {
               {
                 text: 'Mint TIP-3 Tokens',
                 collapsable: false,
-                link: '/Deployments/External/Transfer.md',
+                link: '/Deployments/External/Mint.md',
               },
               {
                 text: 'Transfer TIP-3 Tokens',
@@ -140,7 +140,7 @@ module.exports = {
               {
                 text: 'Burn TIP-3 Tokens',
                 collapsable: false,
-                link: '/Deployments/External/Transfer.md',
+                link: '/Deployments/External/Burn.md',
               },
             ],
           },
@@ -150,29 +150,51 @@ module.exports = {
             link: '/Deployments/Internal/ToC.md',
             items: [
               {
-                text: 'Deploy Token Root',
+                text: 'Smart Contracts',
                 collapsable: false,
-                link: '/Deployments/Internal/TokenRoot.md',
+                items: [
+                  {
+                    text: 'Root Deployer',
+                    collapsable: false,
+                    link: '/Deployments/Contracts/RootDeployer.md',
+                  },
+                  {
+                    text: 'Multi Wallet Tip3',
+                    collapsable: false,
+                    link: '/Deployments/Contracts/MultiWalletTIP3.md',
+                  },
+                ],
               },
               {
-                text: 'Deploy Token Wallet',
+                text: 'Code Samples',
                 collapsable: false,
-                link: '/Deployments/Internal/TokenWallet.md',
-              },
-              {
-                text: 'Mint TIP-3 Tokens',
-                collapsable: false,
-                link: '/Deployments/Internal/Transfer.md',
-              },
-              {
-                text: 'Transfer TIP-3 Tokens',
-                collapsable: false,
-                link: '/Deployments/Internal/Transfer.md',
-              },
-              {
-                text: 'Burn TIP-3 Tokens',
-                collapsable: false,
-                link: '/Deployments/Internal/Transfer.md',
+                items: [
+                  {
+                    text: 'Deploy Token Root',
+                    collapsable: false,
+                    link: '/Deployments/Internal/TokenRoot.md',
+                  },
+                  {
+                    text: 'Deploy Token Wallet',
+                    collapsable: false,
+                    link: '/Deployments/Internal/TokenWallet.md',
+                  },
+                  {
+                    text: 'Mint TIP-3 Tokens',
+                    collapsable: false,
+                    link: '/Deployments/Internal/Mint.md',
+                  },
+                  {
+                    text: 'Transfer TIP-3 Tokens',
+                    collapsable: false,
+                    link: '/Deployments/Internal/Transfer.md',
+                  },
+                  {
+                    text: 'Burn TIP-3 Tokens',
+                    collapsable: false,
+                    link: '/Deployments/Internal/Burn.md',
+                  },
+                ],
               },
             ],
           },

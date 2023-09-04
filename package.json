@@ -12,7 +12,7 @@
   "dependencies": {
     "ethers": "^6.7.1",
     "locklift": "^2.7.4",
-    "tip3-docs-artifacts": "^3.0.3"
+    "tip3-docs-artifacts": "^3.0.5"
   },
   "devDependencies": {
     "@algolia/client-search": "^4.17.2",
