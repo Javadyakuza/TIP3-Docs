@@ -135,8 +135,8 @@ export async function deployTokenRootEip(
     // returning the tx response as a string if aborted
     if (deployRes.aborted) {
       toast(`Transaction aborted ! ${deployRes.exitCode}`, 0);
-      
-return `Failed ${deployRes.exitCode}`;
+
+      return `Failed ${deployRes.exitCode}`;
     }
 
     // checking if the token root is deployed successfully by calling one of its methods
@@ -145,16 +145,16 @@ return `Failed ${deployRes.exitCode}`;
       .value0;
     if (retrievedTokenName == params.name) {
       toast(`${params.symbol} Token deployed successfully`, 1);
-      
-return `${params.symbol} deployed to ${expectedAddress.toString()}`;
+
+      return `${params.symbol} deployed to ${expectedAddress.toString()}`;
     } else {
       toast(`${params.symbol} Token deployment failed !${deployRes.exitCode}`, 0);
-      
-return `Failed ${deployRes.exitCode}`;
+
+      return `Failed ${deployRes.exitCode}`;
     }
   } catch (e: any) {
     toast(e.message, 0);
-    
-return 'Failed';
+
+    return 'Failed';
   }
 }

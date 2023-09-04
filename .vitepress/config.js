@@ -128,7 +128,17 @@ module.exports = {
                 link: '/Deployments/External/TokenWallet.md',
               },
               {
+                text: 'Mint TIP-3 Tokens',
+                collapsable: false,
+                link: '/Deployments/External/Transfer.md',
+              },
+              {
                 text: 'Transfer TIP-3 Tokens',
+                collapsable: false,
+                link: '/Deployments/External/Transfer.md',
+              },
+              {
+                text: 'Burn TIP-3 Tokens',
                 collapsable: false,
                 link: '/Deployments/External/Transfer.md',
               },
@@ -150,7 +160,17 @@ module.exports = {
                 link: '/Deployments/Internal/TokenWallet.md',
               },
               {
+                text: 'Mint TIP-3 Tokens',
+                collapsable: false,
+                link: '/Deployments/Internal/Transfer.md',
+              },
+              {
                 text: 'Transfer TIP-3 Tokens',
+                collapsable: false,
+                link: '/Deployments/Internal/Transfer.md',
+              },
+              {
+                text: 'Burn TIP-3 Tokens',
                 collapsable: false,
                 link: '/Deployments/Internal/Transfer.md',
               },

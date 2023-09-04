@@ -61,10 +61,10 @@ Let's add bounce handling to our code
 onBounce(TvmSlice body) external {
     tvm.rawReserve(_reserve(), 2);
 
-    uint32 functionId = body.decode(uint32);
+    uint32 functionId = body.load(uint32);
 
     if (functionId == tvm.functionId(ITokenWallet.transfer)) {
-        uint128 amount = body.decode(uint128);
+        uint128 amount = body.load(uint128);
         require(tokenRoots.exists(msg.sender), Errors.NOT_TOKEN_WALLET);
 
         address tokenRoot = tokenRoots[msg.sender];
@@ -107,10 +107,10 @@ And in the original TIP-3 repository, we can observe that the wallet token calls
 onBounce(TvmSlice body) external {
     tvm.rawReserve(_reserve(), 2);
 
-    uint32 functionId = body.decode(uint32);
+    uint32 functionId = body.load(uint32);
 
     if (functionId == tvm.functionId(ITokenWallet.acceptTransfer)) {
-        uint128 amount = body.decode(uint128);
+        uint128 amount = body.load(uint128);
         balance_ += amount;
         IBounceTokensTransferCallback(owner_).onBounceTokensTransfer{
             value: 0,
@@ -291,10 +291,10 @@ contract MultiWalletTIP3 is CheckPubKey, ExternalOwner, RandomNonce {
     onBounce(TvmSlice body) external {
         tvm.rawReserve(_reserve(), 2);
 
-        uint32 functionId = body.decode(uint32);
+        uint32 functionId = body.load(uint32);
 
         if (functionId == tvm.functionId(ITokenWallet.transfer)) {
-            uint128 amount = body.decode(uint128);
+            uint128 amount = body.load(uint128);
             require(tokenRoots.exists(msg.sender), Errors.NOT_TOKEN_WALLET);
 
             address tokenRoot = tokenRoots[msg.sender];

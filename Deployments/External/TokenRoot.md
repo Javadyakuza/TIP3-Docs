@@ -6,7 +6,6 @@ Great! Now we write scripts to deploy Token Root:
 
 ::: tip
 Before we start to write our scripts we need to make a file named `01-deploy-token.ts` in the `script` folder in the project root.
-
 :::
 
 <br/>
