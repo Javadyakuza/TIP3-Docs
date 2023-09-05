@@ -61,7 +61,7 @@ contract RootDeployer {
     }
 
 
-    function deployTokenRoot(
+    function DeployRootDeployer(
         string name,
         string symbol,
         uint8 decimals,
@@ -111,7 +111,7 @@ contract RootDeployer {
 
 ## Deploy
 
-<div class="DeployTokenRoot">
+<div class="DeployRootDeployer">
 
 Now we write scripts to deploy the Root Deployer contract :
 
@@ -335,7 +335,7 @@ Congratulations, you have deployed a Root Deployer contract 🎉
 
 ### Deploy Root Deployer
 
-<button @click="deployRootDeployer" class="deployTokenRootBut" >Deploy root deployer</button>
+<button @click="deployRootDeployer" class="DeployRootDeployerBut" >Deploy root deployer</button>
 
 <p id="output-p" :class="EIPdis" ref="deployRootDeployerOutput"></p>
 
@@ -343,7 +343,7 @@ Congratulations, you have deployed a Root Deployer contract 🎉
 
 </div>
 
-<p id="output-p" :class="EIPdis" ref="deployTokenRootOutput"></p>
+<p id="output-p" :class="EIPdis" ref="DeployRootDeployerOutput"></p>
 
 </div>
 
@@ -355,7 +355,7 @@ import {toast} from "/src/helpers/toast";
 import {deployRootDeployerEip} from  "../Scripts/Contract/RootDeployer";
 
 export default defineComponent({
-  name: "DeployTokenRoot",
+  name: "DeployRootDeployer",
   data(){
     return{
         LLdis: "cbShow",
@@ -409,7 +409,7 @@ export default defineComponent({
 </script>
 
 <style>
-.DeployTokenRoot{
+.DeployRootDeployer{
   font-size: 1.1rem;
 }
 .action{
@@ -420,7 +420,7 @@ export default defineComponent({
     font-size: .9rem;
 }
 
-.deployTokenRootBut, .switcherContainer, .codeBlockContainer, .Ain
+.DeployRootDeployerBut, .switcherContainer, .codeBlockContainer, .Ain
 {
   background-color: var(--vp-c-bg-mute);
   transition: background-color 0.1s;
@@ -433,15 +433,19 @@ export default defineComponent({
     padding-left : 10px;
     margin : 0;
 }
-.deployTokenRootBut{
+.DeployRootDeployerBut{
     cursor:pointer;
     padding: 5px 12px;
     display: flex;
     transition: all ease .3s;
 }
 
-.deployTokenRootBut:hover{
+.DeployRootDeployerBut:hover{
       border: 1px solid var(--light-color-ts-class);
+}
+
+.llSwitcher:hover, .eipSwitcher:hover{
+      border-color: var(--light-color-ts-class);
 }
 
 #output-p{
@@ -477,8 +481,9 @@ export default defineComponent({
 }
 .llSwitcher{
     padding: 5px 10px;
-    border: 1px solid var(--vp-c-divider);
-    border-bottom: none;
+    border:  0 solid var(--vp-c-divider);
+    border-width: 1px ;
+    border-color: var(--vp-c-divider);
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
     font-weight: 600;
@@ -486,8 +491,9 @@ export default defineComponent({
 }
 .eipSwitcher{
     padding: 5px 10px;
-    border: 1px solid var(--vp-c-divider);
-    border-bottom: none;
+    border:  0 solid var(--vp-c-divider);
+    border-width: 1px;
+    border-color: var(--vp-c-divider);
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
     font-weight: 600;

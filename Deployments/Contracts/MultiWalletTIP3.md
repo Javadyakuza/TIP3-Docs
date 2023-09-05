@@ -653,18 +653,23 @@ contract MultiWalletTIP3 is CheckPubKey, ExternalOwner, RandomNonce {
 
 ## Deploy  
 
-<div class="DeployTokenWallet">
+<div class="DeployMultiWalletTip3">
 
 <span  :class="LLdis" style="font-size: 1.1rem;">
 
 we can utilize the code sample below to deploy a `MultiWalletTIP3` contract:
 
 ::: info
-Before we start to write our scripts we need to make sure that there is file named `01-deploy-root-deployer.ts` in the `script` folder in the project root.
+Before we start to write our scripts we need to make sure that there is file named `02-deploy-multi-wallet-tip3.ts` in the `script` folder in the project root.
 :::
 
 </span>
 
+<span  :class="EIPdis" style="font-size: 1.1rem;">
+
+The code samples below demonstrate how to deploy a Multi Wallet TIP3 contract using `everscale-inpage-provider` tool.
+
+</span>
 <br/>
 
 <div class="switcherContainer">
@@ -784,7 +789,8 @@ export async function main(){
       stateInit: stateInit.stateInit,
     });
 
-    toast('Fund sent to the Calculated address !', 2);
+    console.log('Fund sent to the Calculated address !');
+
     // Create a contract instance
     const MVcon: Contract<tip3Artifacts.FactorySource['MultiWalletTIP3']> = new provider.Contract(
       MV,
@@ -792,6 +798,7 @@ export async function main(){
     );
 
     console.log('Sending stateInit to the Calculated address ...');
+
     // Call the contract constructor
     const { transaction: deployRes } = await MVcon.methods
       .constructor({
@@ -846,10 +853,10 @@ export async function main(){
 Use this command and deploy MultiWalletTIP3 contract
 
 ```shell
-npx locklift run -s ./scripts/02-deploy-multi-wallet-tip3.js -n local
+npx locklift run -s ./scripts/02-deploy-multi-wallet-tip3.ts -n local
 ```
 
-![](</image(17).png>)
+![](</deployMVTip3.png>)
 
 Congratulations, you have deployed a Multi Wallet TIP3 contract 🎉
 </div>
@@ -859,13 +866,13 @@ Congratulations, you have deployed a Multi Wallet TIP3 contract 🎉
 ### Deploy Multi Wallet Tip3
 
 
-<button @click="deployTokenWallet" class="deployTokenWalletBut" >Deploy Multi Wallet Tip3</button>
+<button @click="deployMultiWallet" class="DeployMultiWalletTip3But" >Deploy Multi Wallet Tip3</button>
 
 </div>
 
 </div>
 
-<p id="output-p" :class="EIPdis" ref="deployTokenWalletOutput"></p>
+<p id="output-p" :class="EIPdis" ref="DeployMultiWalletTip3Output"></p>
 
 </div>
 
@@ -873,10 +880,10 @@ Congratulations, you have deployed a Multi Wallet TIP3 contract 🎉
 import { defineComponent, ref, onMounted } from "vue";
 import {deployRootParams} from "../Scripts/types";
 import {toast} from "/src/helpers/toast";
-import {deployTokenWalletEip} from "../Scripts/Account/TokenWallet"
+import {deployMultiWalletTip3Eip} from "../Scripts/Contract/DeployMultiWallet"
 
 export default defineComponent({
-  name: "DeployTokenWallet",
+  name: "DeployMultiWalletTip3",
   data(){
     return{
         LLdis: "cbShow",
@@ -911,26 +918,18 @@ export default defineComponent({
         this.llAction = "llAction cbHide"
         this.eipAction = "eipAction cbShow"
     }
-  async function deployTokenWallet(){
-          this.$refs.deployTokenWalletOutput.innerHTML = "Processing ..."
+  async function deployMultiWallet(){
+          this.$refs.DeployMultiWalletTip3Output.innerHTML = "Processing ..."
         // checking of all the values are fully filled 
-        if (
-            this.$refs.actionTokenRootAddress.value == ""
-
-        ){
-            toast("Token root address field is required !",0)
-            this.$refs.deployTokenWalletOutput.innerHTML = "Failed"
-            return
-        }
-        let deployTokenWalletAddr = await deployTokenWalletEip(this.$refs.actionTokenRootAddress.value)
-                // Rendering the output     
-        deployTokenWalletAddr = !deployTokenWalletAddr ? "Failed" :  deployTokenWalletAddr;
-        this.$refs.deployTokenWalletOutput.innerHTML = deployTokenWalletAddr;
+        let DeployMultiWalletTip3Addr = await deployMultiWalletTip3Eip()
+        // Rendering the output     
+        DeployMultiWalletTip3Addr = !DeployMultiWalletTip3Addr ? "Failed" :  DeployMultiWalletTip3Addr;
+        this.$refs.DeployMultiWalletTip3Output.innerHTML = DeployMultiWalletTip3Addr;
   }
 return {
         eipHandler,
         llHandler,
-        deployTokenWallet
+        deployMultiWallet
     };
   },
 });
@@ -938,7 +937,7 @@ return {
 </script>
 
 <style>
-.DeployTokenWallet{
+.DeployMultiWalletTip3{
   font-size: 1.1rem;
 }
 .action{
@@ -949,7 +948,7 @@ return {
     font-size: .9rem;
 }
 
-.deployTokenWalletBut, .switcherContainer, .codeBlockContainer, .Ain
+.DeployMultiWalletTip3But, .switcherContainer, .codeBlockContainer, .Ain
 {
   background-color: var(--vp-c-bg-mute);
   transition: background-color 0.1s;
@@ -962,15 +961,18 @@ return {
     padding-left : 10px;
     margin : 0;
 }
-.deployTokenWalletBut{
+.DeployMultiWalletTip3But{
     cursor:pointer;
     padding: 5px 12px;
     display: flex;
     transition: all ease .3s;
 }
 
-.deployTokenWalletBut:hover{
+.DeployMultiWalletTip3But:hover{
       border: 1px solid var(--light-color-ts-class);
+}
+.llSwitcher:hover, .eipSwitcher:hover{
+      border-color: var(--light-color-ts-class);
 }
 
 #output-p{
@@ -1006,8 +1008,9 @@ return {
 }
 .llSwitcher{
     padding: 5px 10px;
-    border: 1px solid var(--vp-c-divider);
-    border-bottom: none;
+    border:  0 solid var(--vp-c-divider);
+    border-width: 1px ;
+    border-color: var(--vp-c-divider);
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
     font-weight: 600;
@@ -1015,13 +1018,15 @@ return {
 }
 .eipSwitcher{
     padding: 5px 10px;
-    border: 1px solid var(--vp-c-divider);
-    border-bottom: none;
+    border:  0 solid var(--vp-c-divider);
+    border-width: 1px ;
+    border-color: var(--vp-c-divider);
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
     font-weight: 600;
     transition: all ease .2s;
 }
+
 .eipAction{
     font-weight: 600;
 }
