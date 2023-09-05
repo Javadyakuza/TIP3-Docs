@@ -140,7 +140,7 @@ module.exports = {
               {
                 text: 'Burn TIP-3 Tokens',
                 collapsable: false,
-                link: '/Deployments/External/Burn.md',
+                link: '/Deployments/External/burn.md',
               },
             ],
           },

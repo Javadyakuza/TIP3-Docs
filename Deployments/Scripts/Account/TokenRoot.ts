@@ -122,11 +122,14 @@ export async function deployTokenRootEip(
         initialSupply: ethers
           .parseUnits(String(params.initialSupply), Number(params.decimals))
           .toString(),
-        deployWalletValue: ethers.parseUnits('2', 9).toString(),
+        deployWalletValue: ethers
+          .parseUnits(params.initialSupplyTo == zeroAddress ? '0' : '2', 9)
+          .toString(),
         mintDisabled: params.disableMint,
         burnByRootDisabled: params.disableBurnByRoot,
         burnPaused: params.pauseBurn,
-        remainingGasTo: senderAddress,
+        remainingGasTo:
+          params.initialSupplyTo == zeroAddress ? new Address(zeroAddress) : senderAddress,
       })
       .sendExternal({
         stateInit: stateInit.stateInit,

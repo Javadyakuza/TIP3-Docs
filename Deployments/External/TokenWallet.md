@@ -10,19 +10,24 @@ TON Solidity compiler allows specifying different parameters of the outbound int
 
 <div class="DeployTokenWallet">
 
-Now lets write the scripts to deploy a Token Wallet:
 
-::: tip
-Before we start to write our scripts we need to make a file named `02-deploy-wallet.ts` in the `script` folder in the project root.
-:::
 
 <br/>
 <span  :class="LLdis" style="font-size: 1.1rem;">
+Now lets write the scripts to deploy a Token Wallet using locklift .
 
 Deploying the Token Wallet of a existing Token Root contract using the locklift tool will be accomplished using the code sample below: 
 
+::: info
+Before we start to write our scripts we need to make a file named `02-deploy-wallet.ts` in the `script` folder in the project root.
+:::
 </span>
+<span  :class="EIPdis" style="font-size: 1.1rem;">
 
+Using `everscale-inpage-provider` to deploy a token wallet is like a piece of a cake !\
+We just need to call the `deployWallet` function on the root contract as explained below:
+
+</span>
 <br/>
 
 <div class="switcherContainer">
@@ -351,8 +356,9 @@ return {
 }
 .llSwitcher{
     padding: 5px 10px;
-    border: 1px solid var(--vp-c-divider);
-    border-bottom: none;
+    border:  0 solid var(--vp-c-divider);
+    border-width: 1px ;
+    border-color: var(--vp-c-divider);
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
     font-weight: 600;
@@ -360,12 +366,16 @@ return {
 }
 .eipSwitcher{
     padding: 5px 10px;
-    border: 1px solid var(--vp-c-divider);
-    border-bottom: none;
+    border:  0 solid var(--vp-c-divider);
+    border-width: 1px ;
+    border-color: var(--vp-c-divider);
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
     font-weight: 600;
     transition: all ease .2s;
+}
+.llSwitcher:hover, .eipSwitcher:hover{
+      border-color: var(--light-color-ts-class);
 }
 .eipAction{
     font-weight: 600;

@@ -2,16 +2,17 @@
 
 <div class="DeployTokenRoot">
 
-Great! Now we write scripts to deploy Token Root:
-
-::: tip
-Before we start to write our scripts we need to make a file named `01-deploy-token.ts` in the `script` folder in the project root.
-:::
 
 <br/>
 <span  :class="LLdis" style="font-size: 1.1rem;">
 
+Great! Now we write scripts to deploy a Token Root:
+
 Deploying the token root using the [locklift](https://docs.locklift.io/) is pretty straight forward as explained in the following code sample: 
+
+::: info
+Before we start to write our scripts we need to make a file named `01-deploy-token.ts` in the `script` folder in the project root.
+:::
 
 </span>
 
@@ -19,13 +20,12 @@ Deploying the token root using the [locklift](https://docs.locklift.io/) is pret
 
 Deploying a contract using the `everscale-inpage-provider` is a bit tricky, Please follow the steps below in order to have a successful contract deployment using this tool.   
 
-2 - before proceeding to the next step which is the main part kindly notice at the following disclaimer:
-
 ::: danger
 
-- The parameter `initialSupply` must be **zero** if the `initialSupplyTo` is an **zero address**.
+The parameter `initialSupply` must be **zero** if the `initialSupplyTo` is an **zero address**.
 
 :::
+
 </span>
 <br/>
 
@@ -88,7 +88,7 @@ async function main() {
     contract: "TokenRoot",
     publicKey: signer.publicKey,
     initParams: {
-      deployer_: new Address(zeroAddress),
+      deployer_: new Address(zeroAddress), // its important to be zeroAddress 
       randomNonce_: (Math.random() * 6400) | 0,
       rootOwner_: rootOwner,
       name_: name,
@@ -99,11 +99,11 @@ async function main() {
     constructorParams: {
       initialSupplyTo: initialSupplyTo,
       initialSupply: ethers.parseUnits(initialSupply, decimals).toString(),
-      deployWalletValue: locklift.utils.toNano(1),
+      deployWalletValue: locklift.utils.toNano(1), // zero if initialSupplyTo == 0 
       mintDisabled: disableMint,
       burnByRootDisabled: disableBurnByRoot,
       burnPaused: pauseBurn,
-      remainingGasTo: new Address(myAccount.address),
+      remainingGasTo: new Address(myAccount.address), // zero address if initialSupplyTo == zeroAddress 
     },
     value: locklift.utils.toNano(5),
   });
@@ -274,7 +274,7 @@ npx locklift run -s ./scripts/01-deploy-token.ts -n local
 
 ![](/image(15).png)
 
-Congratulations, you have deployed your first TIP3 Token Root!
+Congratulations, you have deployed your first TIP3 Token Root !
 
 </div>
 
@@ -503,8 +503,9 @@ export default defineComponent({
 }
 .llSwitcher{
     padding: 5px 10px;
-    border: 1px solid var(--vp-c-divider);
-    border-bottom: none;
+    border:  0 solid var(--vp-c-divider);
+    border-width: 1px ;
+    border-color: var(--vp-c-divider);
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
     font-weight: 600;
@@ -512,12 +513,16 @@ export default defineComponent({
 }
 .eipSwitcher{
     padding: 5px 10px;
-    border: 1px solid var(--vp-c-divider);
-    border-bottom: none;
+    border:  0 solid var(--vp-c-divider);
+    border-width: 1px ;
+    border-color: var(--vp-c-divider);
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
     font-weight: 600;
     transition: all ease .2s;
+}
+.llSwitcher:hover, .eipSwitcher:hover{
+      border-color: var(--light-color-ts-class);
 }
 .eipAction{
     font-weight: 600;

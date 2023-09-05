@@ -12,7 +12,7 @@ Before we start to write our scripts we need to make a file named `03-transfer-t
 
 ::: tip
 
-TIP-3 Token Wallet has 2 transfer methods.
+TIP-3 Token Wallet has 2 transfer methods:
 
 * Transfer - Transfer tokens and optionally deploy TokenWallet for recipient account address.
 * Transfer tokens using another TokenWallet address, that wallet must be deployed previously.
@@ -60,7 +60,7 @@ The easiest part between all the previous steps is transferring the TIP-3 tokens
  * locklift is globals declared object 
  */
 
-import { Address, Contract } from "locklift";
+import { Address, Contract, FactorySource } from "locklift";
 import { EverWalletAccount } from "everscale-standalone-client";
 
 
@@ -77,12 +77,12 @@ async function main() {
   const aliceAccount = await EverWalletAccount.fromPubkey({ publicKey: signer.publicKey!, workchain: 0 });
 
   // Creating the target contracts instances
-  const tokenRoot: Contract<tip3Artifacts.factorySource['TokenRoot']> = locklift.factory.getDeployedContract(
+  const tokenRoot: Contract<FactorySource['TokenRoot']> = locklift.factory.getDeployedContract(
     "TokenRoot", 
     tokenRootAddress
   )
 
-  const bobTokenWallet: Contract<tip3Artifacts.factorySource['TokenWallet']> = locklift.factory.getDeployedContract(
+  const bobTokenWallet: Contract<FactorySource['TokenWallet']> = locklift.factory.getDeployedContract(
     "TokenWallet",
     (await tokenRoot.methods.walletOf(answerId: 0, walletOwner: bobAccount.address ).call({})).value0,
   );
@@ -99,13 +99,15 @@ async function main() {
         remainingGasTo: bobAccount.address,
         notify: true,
         payload: '',
-      }),
+      }).send({
+        from : bobAccount.address, 
+        amount: locklift.utils.toNano("3")
+      })
   
-
    /* 
      Creating the alice's token wallet and Checking Alice's balance
    */
- const aliceTokenWallet: Contract<tip3Artifacts.factorySource['TokenWallet']> =
+ const aliceTokenWallet: Contract<FactorySource['TokenWallet']> =
   locklift.factory.getDeployedContract(
     'TokenWallet',
     (
@@ -118,13 +120,13 @@ async function main() {
     ).value0
   );
 
-  const  aliceBalance = (await aliceTokenWallet.methods
+
+  console.log("Alice's balance: ", (
+    await aliceTokenWallet.methods
     .balance({
       answerId: 0,
     })
-    .call()).value0;
-
-  console.log("Alice's balance: ", aliceBalance.toString())
+    .call()).value0.toString()) // >> 100
   
   /* 
      Transfer to deployed token wallet
@@ -135,7 +137,17 @@ async function main() {
         remainingGasTo: bobAccount.address,
         notify: true,
         payload: '',
-      }),    
+      }).send({
+        from : bobAccount.address, 
+        amount: locklift.utils.toNano("3")
+      })
+      
+  console.log("Alice's balance: ", (
+    await aliceTokenWallet.methods
+    .balance({
+      answerId: 0,
+    })
+    .call()).value0.toString()) // >> 200
 }
 
 main()
@@ -377,7 +389,7 @@ async function main(){
 Use this command to transfer TIP-3 tokens:
 
 ```shell
-npx locklift run -s ./scripts/03-transfer-tip3.js -n local
+npx locklift run -s ./scripts/03-transfer-tip3.ts -n local
 ```
 
 ![](</image(3).png>)

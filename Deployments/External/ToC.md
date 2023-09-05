@@ -14,8 +14,16 @@ Here are the articles in this sections:
     </a>
   </div>
   <div class="bridge-section-row">
+    <a href="/Deployments/External/Mint.html">
+      <span class="bridge-section">Mint TIP-3 Tokens</span>
+    </a>
     <a href="/Deployments/External/Transfer.html">
       <span class="bridge-section">Transfer TIP-3 Tokens</span>
+    </a>
+  </div>
+    <div class="bridge-section-row">
+    <a href="/Deployments/External/burn.html">
+      <span class="bridge-section">Burn TIP-3 Tokens</span>
     </a>
   </div>
 </div>
