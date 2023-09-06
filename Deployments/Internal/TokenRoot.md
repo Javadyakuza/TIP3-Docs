@@ -309,7 +309,7 @@ type DeployParams<Abi> = GetExpectedAddressParams<Abi> & {
 
 // Fetching the user public key
 const accountFullState: FullContractState = (
-  await provider.getFullContractState({ address: senderAddress })
+  await provider.getFullContractState({ address: providerAddress })
 ).state!;
 
 const senderPublicKey: string = await provider.extractPublicKey(accountFullState.boc);
@@ -338,9 +338,9 @@ const stateInit = await provider.getStateInit(rootDeployer, deployParams);
 
 // Send the coins to the address
 await provider.sendMessage({
-  sender: senderAddress,
+  sender: providerAddress,
   recipient: expectedAddress,
-  amount: ethers.parseUnits('3', 9).toString(), // 2|3_000_000_000 (2 | 3 evers)
+  amount: 3 * 10 * 9, 
   bounce: false, // It is important to set 'bounce' to false
   // to ensure funds remain in the contract.
   stateInit: stateInit.stateInit,
@@ -401,14 +401,14 @@ const tokenRootDeploymentsParams: deployFromRootDeployerParams = {
   burnByRootDisabled: params.disableBurnByRoot,
   burnPaused: params.pauseBurn,
   initialSupply: params.initialSupply,
-  remainingGasTo: senderAddress,
+  remainingGasTo: providerAddress,
 };
 
 // Deploying the tokenRoot
 const tokenRootDeploymentRes: Transaction = await userRootDeployer.methods
   .deployTokenRoot(tokenRootDeploymentsParams)
   .send({
-    from: senderAddress,
+    from: providerAddress,
     amount: ethers
       .parseUnits(deployWalletValue == '0' ? '2' : '4', Number(params.decimals))
       .toString(),

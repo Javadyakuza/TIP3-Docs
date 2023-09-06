@@ -7,7 +7,7 @@ Therefore, making a transfer is as easy as shelling pears!
 <div class="transferToken">
 
 ::: tip
-Before we start to write our scripts we need to make a file named `03-transfer-tip3.ts` in the `script` folder in the project root.
+Before we start to write our scripts we need to make a file named `04-transfer-tip3.ts` in the `script` folder in the project root.
 :::
 
 ::: tip
@@ -62,7 +62,7 @@ The easiest part between all the previous steps is transferring the TIP-3 tokens
 
 import { Address, Contract, FactorySource } from "locklift";
 import { EverWalletAccount } from "everscale-standalone-client";
-
+import { ethers } from "ethers";
 
 async function main() {
   const tokenRootAddress = new Address("<EXISTING_TOKEN_ROOT_ADDRESS>")
@@ -86,14 +86,24 @@ async function main() {
     "TokenWallet",
     (await tokenRoot.methods.walletOf(answerId: 0, walletOwner: bobAccount.address ).call({})).value0,
   );
-  
+
+  // Fetching the decimals 
+  const decimals: number  = Number((await tokenRoot.methods.decimals({answerId: 0}).call()).value0) 
+
+  console.log("Bob's balance: ",
+   ethers.formatUnits((
+    await bobTokenWallet.methods
+      .balance({
+        answerId: 0,
+    })
+  .call()).value0.toString()),decimals) // assuming that bob has 300 of this token at the first >> 300
   /* 
     Transfer with the deployment of a wallet for the recipient account.
     
     Don't pay attention to notify and payload yet, we'll get back to them.
   */
   await bobTokenWallet.methods.transfer({
-        amount: 100,
+        amount: 100 * 10 * Number(decimals),
         recipient: aliceAccount.address,
         deployWalletValue: locklift.utils.toNano(2),
         remainingGasTo: bobAccount.address,
@@ -101,7 +111,7 @@ async function main() {
         payload: '',
       }).send({
         from : bobAccount.address, 
-        amount: locklift.utils.toNano("3")
+        amount: locklift.utils.toNano("4")
       })
   
    /* 
@@ -120,19 +130,19 @@ async function main() {
     ).value0
   );
 
-
-  console.log("Alice's balance: ", (
+  console.log("Alice's balance: ",
+   ethers.formatUnits((
     await aliceTokenWallet.methods
-    .balance({
-      answerId: 0,
+      .balance({
+        answerId: 0,
     })
-    .call()).value0.toString()) // >> 100
+  .call()).value0.toString()),decimals)  // >> 100
   
   /* 
      Transfer to deployed token wallet
   */
   await bobTokenWallet.methods.transferToWallet({
-        amount: 100,
+        amount: 100 * 10 * Number(decimals),
         recipientTokenWallet: aliceTokenWallet.address,
         remainingGasTo: bobAccount.address,
         notify: true,
@@ -142,12 +152,21 @@ async function main() {
         amount: locklift.utils.toNano("3")
       })
       
-  console.log("Alice's balance: ", (
+  console.log("Alice's balance: ",
+   ethers.formatUnits((
     await aliceTokenWallet.methods
-    .balance({
-      answerId: 0,
+      .balance({
+        answerId: 0,
     })
-    .call()).value0.toString()) // >> 200
+  .call()).value0.toString()),decimals) // >> 200
+
+  console.log("Bob's balance: ",
+   ethers.formatUnits((
+    await bobTokenWallet.methods
+      .balance({
+        answerId: 0,
+    })
+  .call()).value0.toString()),decimals)  // >> 100
 }
 
 main()
@@ -193,7 +212,7 @@ async function main() {
   const tokenWallet = new provider.Contract(
     tip3Artifacts.factorySource['TokenWallet'],
     (
-      await tokenRootContract.methods.walletOf({ answerId: 0, walletOwner: senderAddress }).call()
+      await tokenRootContract.methods.walletOf({ answerId: 0, walletOwner: providerAddress }).call()
     ).value0
   );
   // Checking recipient has a deploy wallet of that h token root
@@ -237,14 +256,14 @@ async function main() {
   // Transferring token
   const transferRes: Transaction = await tokenWallet.methods
     .transfer({
-      amount: ethers.parseUnits(TokenAmount, Number(decimals)).toString(),
+      amount: TokenAmount * 10 * Number(decimals),
       recipient: new Address(receiverAddress),
-      deployWalletValue: ethers.parseUnits('2', 9).toString(),
-      remainingGasTo: senderAddress,
+      deployWalletValue: 2 * 10 * 9,
+      remainingGasTo: providerAddress,
       notify: false, // true if the change must be sent back to the sender wallet account not the sender token wallet 
       payload: '',
     })
-    .send({ from: senderAddress, amount: ethers.parseUnits(amount, 9).toString(), bounce: true });
+    .send({ from: providerAddress, amount: amount * 10 * 9, bounce: true });
 
   /**
    * We first verify if the transfer transaction was aborted. If it was not aborted, we proceed to check the balance of the recipient's token wallet. We compare this balance to the sum of the previous balance (oldBalance) and the amount transferred only If the user had already deployed a token wallet prior to the transfer transaction, and it was not deployed before the transaction it must have been deployed during the transaction, so we create an instance of the recipient's token wallet contract and confirm that its balance is greater than zero.
@@ -260,7 +279,7 @@ async function main() {
         toBigInt(
           (await possibleRecipientTokenWallet!.methods.balance({ answerId: 0 }).call({})).value0
         ) >
-        ethers.parseUnits(TokenAmount, Number(decimals)) + toBigInt(oldBal)
+        TokenAmount * 10 * Number(decimals) + toBigInt(oldBal)
       ) {
         console.log('tokens transferred successfully');
         return `tx Hash: ${transferRes.id.hash}`;
@@ -330,7 +349,7 @@ async function main(){
   const senderTokenWalletContract = new provider.Contract(
     tip3Artifacts.factorySource['TokenWallet'],
     (
-      await tokenRootContract.methods.walletOf({ answerId: 0, walletOwner: senderAddress }).call()
+      await tokenRootContract.methods.walletOf({ answerId: 0, walletOwner: providerAddress }).call()
     ).value0
   );
   
@@ -348,13 +367,13 @@ async function main(){
   // Transferring token
   const transferRes: Transaction = await senderTokenWalletContract.methods
     .transferToWallet({
-      amount: ethers.parseUnits(TokenAmount, Number(decimals)).toString(),
+      amount: TokenAmount * 10 *Number(decimals),
       recipientTokenWallet: recipientTokenWalletContract.address,
-      remainingGasTo: senderAddress,
+      remainingGasTo: providerAddress,
       notify: notify,
       payload: '',
     })
-    .send({ from: senderAddress, amount: ethers.parseUnits("3", 9).toString(), bounce: true });
+    .send({ from: providerAddress, amount: 3 * 10 * 9, bounce: true });
   
   /**
    * Checking the tokens are transferred and the receiver balance is more than before 
@@ -389,10 +408,10 @@ async function main(){
 Use this command to transfer TIP-3 tokens:
 
 ```shell
-npx locklift run -s ./scripts/03-transfer-tip3.ts -n local
+npx locklift run -s ./scripts/04-transfer-tip3.ts -n local
 ```
 
-![](</image(3).png>)
+![](</transferTip3.png>)
 
 Congratulations, you have successfully transferred TIP-3 tokens from one to another Wallet.
 

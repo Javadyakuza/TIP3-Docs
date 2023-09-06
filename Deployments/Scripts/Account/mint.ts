@@ -42,7 +42,7 @@ export async function mintTip3Eip(
     ]);
 
     // Checking if receiver has a wallet of this token root to specify the deployWalletValue parameter
-    let deployWalletValue: string = '0';
+    const deployWalletValue = '0';
     if (
       !(
         await provider.getFullContractState({

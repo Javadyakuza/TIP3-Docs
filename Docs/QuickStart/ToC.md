@@ -1,4 +1,4 @@
-Here are the articles in this sections:
+#### Here you can find the explained topics in this section:
 
 <div class="sections-container">
   <div class="bridge-section-row">

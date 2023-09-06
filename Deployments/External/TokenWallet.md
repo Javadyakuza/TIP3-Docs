@@ -1,5 +1,7 @@
 # Deploy token wallet
 
+**In this section we will learn how to deploy a token wallet of an existing token root contract.**
+
 ::: info
 TON Solidity compiler allows specifying different parameters of the outbound internal message that is sent via external function call. Note, all external function calls are asynchronous, so callee function will be called after termination of the current transaction. `value`, `currencies`, `bounce` or `flag` options can be set. See [\<address>.transfer()](https://github.com/tonlabs/TON-Solidity-Compiler/blob/master/API.md#addresstransfer) where these options are described.&#x20;
 
@@ -16,16 +18,16 @@ TON Solidity compiler allows specifying different parameters of the outbound int
 <span  :class="LLdis" style="font-size: 1.1rem;">
 Now lets write the scripts to deploy a Token Wallet using locklift .
 
-Deploying the Token Wallet of a existing Token Root contract using the locklift tool will be accomplished using the code sample below: 
-
 ::: info
 Before we start to write our scripts we need to make a file named `02-deploy-wallet.ts` in the `script` folder in the project root.
 :::
+
+Deploying the Token Wallet of an existing Token Root contract using the locklift tool can be achieved by utilizing the code sample provided below:
+
 </span>
 <span  :class="EIPdis" style="font-size: 1.1rem;">
 
-Using `everscale-inpage-provider` to deploy a token wallet is like a piece of a cake !\
-We just need to call the `deployWallet` function on the root contract as explained below:
+Using the  `everscale-inpage-provider`  to deploy a token wallet is as easy as a piece of cake! All we need to do is call the  `deployWallet`  function on the root contract, as explained below:
 
 </span>
 <br/>
@@ -53,7 +55,7 @@ import { EverWalletAccount } from "everscale-standalone-client";
 async function main() {
 
   // Preparing the target contracts to interact with 
-  const TokenRootAddress = new Address("<EXISTING_TOKEN_ROOT_ADDRESS>");
+  const tokenRootAddress = new Address("<EXISTING_TOKEN_ROOT_ADDRESS>");
 
   // Fetching the account and signer
   const signer = (await locklift.keystore.getSigner("0"))!;
@@ -66,15 +68,15 @@ async function main() {
   /* 
     Get instance of already deployed TOken Root contract
   */
-  const TokenRoot = locklift.factory.getDeployedContract(
+  const tokenRoot = locklift.factory.getDeployedContract(
     "TokenRoot",
-    new Address(TokenRootAddress),
+    new Address(tokenRootAddress),
   );
   
   /* 
     Call the deployWallet in the TokenRoot contract
   */
-  await TokenRoot.methods.deployWallet({
+  await tokenRoot.methods.deployWallet({
         answerId: 0,
         walletOwner: myAccount.address,
         deployWalletValue: locklift.utils.toNano("2"),
@@ -86,7 +88,7 @@ async function main() {
   /* 
     We call the walletOf get method on the token root contract.
   */
-  const walletAddress = (await TokenRoot.methods
+  const walletAddress: Address = (await tokenRoot.methods
     .walletOf({
       answerId: 0,
       walletOwner: myAccount.address,
@@ -121,11 +123,12 @@ import {
 } from 'everscale-inpage-provider';
 import * as tip3Artifacts from 'tip3-docs-artifacts';
 
-async function main(
-  tokenRootAddress: string
-){
+async function main(){
 
   // Initiate the TVM provider 
+
+  // Preparing the params
+  const tokenRootAddress: string = "<YOUR_TOKEN_ROOT_ADDRESS>";
 
   // creating an instance of the token root contract
   const tokenRootContract = new provider.Contract(
@@ -133,51 +136,48 @@ async function main(
     new Address(tokenRootAddress)
   );
   
-  // Checking if the user already doesn't have the any deployed wallet of that token root
+  // Checking if the user already doesn't have any deployed wallet of that token root
+  const tokenWalletAddress: Address = (
+          await tokenRootContract.methods
+            .walletOf({ answerId: 0, walletOwner: providerAddress })
+            .call()
+        ).value0,
   if (
     (
       await provider.getFullContractState({
-        address: (
-          await tokenRootContract.methods
-            .walletOf({ answerId: 0, walletOwner: senderAddress })
-            .call()
-        ).value0,
+        address: tokenWalletAddress,
       })
     ).state?.isdeployed
   )
-    throw new Error('You already have a Wallet of this token !');
+    throw new Error('You already have a token wallet of this token !');
   
   // Deploying a new token wallet contract
   const deployWalletRes: Transaction = await tokenRootContract.methods
     .deployWallet({
       answerId: 0,
-      walletOwner: senderAddress,
-      deployWalletValue: ethers.parseUnits('2', 9).toString(),
+      walletOwner: providerAddress,
+      deployWalletValue: 2 * 10 * 9 ,
     })
     .send({
-      from: senderAddress,
-      amount: ethers.parseUnits('4', 9).toString(),
-      bounce: false, // Important to be set to false in order to keep the sent amount in the token wallet contract
+      from: providerAddress,
+      amount: 4 * 10 * 9,
+      bounce: true,
     });
   
   // Checking if the token wallet is deployed 
   if (
     (
       await provider.getFullContractState({
-        address: (
-          await tokenRootContract.methods
-            .walletOf({ answerId: 0, walletOwner: senderAddress })
-            .call()
-        ).value0,
+        address: tokenWalletAddress,
       })
     ).state?.isdeployed
   ) {
-    console.log(
-      await tokenRootContract.methods.walletOf({ answerId: 0, walletOwner: senderAddress }).call()
-    ).value0;
+    console.log(` Token wallet deployed to: ${
+      (await tokenRootContract.methods.walletOf({ answerId: 0, walletOwner: providerAddress }).call()
+    ).value0.toString()}`);
     return true;
   } else {
-    throw new Error('The token wallet deployment failed !');
+    throw new Error(`The token wallet deployment failed ! ${deployWalletRes.exitCode, deployWalletRes.resultCode}`);
   }
 }
 
@@ -193,7 +193,7 @@ async function main(
 Use this command and deploy token wallet
 
 ```shell
-npx locklift run -s ./scripts/02-deploy-wallet.js -n local
+npx locklift run -s ./scripts/02-deploy-wallet.ts -n local
 ```
 
 ![](</image(17).png>)

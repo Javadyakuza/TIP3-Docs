@@ -63,7 +63,7 @@ import { Address, WalletTypes, zeroAddress } from "locklift";
 
   // preparing the parameters
   const tokenRootAddress: Address = new Address("<YOUR_TOKEN_ROOT_ADDRESS>")
-  const mintAmount: string = "10";
+  const mintAmount: number = 10;
   const bobHasTokenWallet: boolean = false;
   const deployWalletValue: string = locklift.utils.toNano(bobHasTokenWallet ? "0" : "3");
   const txFee = locklift.utils.toNano(bobHasTokenWallet ? "2" : "5");
@@ -80,7 +80,7 @@ import { Address, WalletTypes, zeroAddress } from "locklift";
   // minting some token for the recipient
   await tokenRootContract.methods
     .mint({
-      amount: ethers.parseUnits(mintAmount, Number(decimals)).toString(),
+      amount: mintAmount * 10 * Number(decimals),
       deployWalletValue: deployWalletValue,
       notify: false,
       recipient: bobEverWallet.address,
@@ -120,9 +120,9 @@ export async function mintTip3Eip(
   recipient: string
 ): Promise<Address | string | Transaction | undefined | any> {
   // setting up the provider
-  let provider: PRC, senderAddress: Address;
+  let provider: PRC, providerAddress: Address;
   try {
-    [provider, senderAddress] = await useProviderInfo();
+    [provider, providerAddress] = await useProviderInfo();
   } catch (e: any) {
     throw new Error(e.message);
   }
@@ -156,7 +156,7 @@ export async function mintTip3Eip(
         await provider.getFullContractState({
           address: (
             await tokenRootContract.methods
-              .walletOf({ answerId: 0, walletOwner: senderAddress })
+              .walletOf({ answerId: 0, walletOwner: providerAddress })
               .call()
           ).value0,
         })
@@ -168,16 +168,16 @@ export async function mintTip3Eip(
     // Deploying a new contract if didn't exist before
     const mintRes: Transaction = await tokenRootContract.methods
       .mint({
-        amount: ethers.parseUnits(amount, Number(decimals)).toString(),
+        amount: amount * 10 * Number(decimals),
         recipient: new Address(recipient),
         deployWalletValue: deployWalletValue,
         notify: false,
         payload: '',
-        remainingGasTo: senderAddress,
+        remainingGasTo: providerAddress,
       })
       .send({
-        from: senderAddress,
-        amount: ethers.parseUnits(deployWalletValue == '0' ? '2' : '5', 9).toString(),
+        from: providerAddress,
+        amount: deployWalletValue == '0' ? 2 * 10 * 9 : 5 * 10 * 9,
       });
 
     if (mintRes.aborted) {

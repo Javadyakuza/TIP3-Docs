@@ -17,10 +17,10 @@ export async function useProviderInfo(): Promise<[ProviderRpcClient, Address]> {
       permissions: ['basic', 'accountInteraction'],
     });
     // setting the ever sender address
-    const everSender: Address = (await provider.getProviderState()).permissions.accountInteraction!
-      .address;
-    
-return [provider, everSender];
+    const providerAddress: Address = (await provider.getProviderState()).permissions
+      .accountInteraction!.address;
+
+    return [provider, providerAddress];
   } catch (e: any) {
     throw new Error(e.message);
   }

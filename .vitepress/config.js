@@ -198,11 +198,6 @@ module.exports = {
               },
             ],
           },
-          {
-            text: 'On-Chain Interaction',
-            collapsable: false,
-            link: '/Deployments/Get.md',
-          },
         ],
       },
     ],

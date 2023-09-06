@@ -104,7 +104,7 @@ export async function deployTokenRootEip(
       sender: senderAddress,
       recipient: expectedAddress,
       amount: ethers.parseUnits(amount, 9).toString(), // 2|3_000_000_000 (2 | 3 evers)
-      bounce: false, // It is important to set 'bounce' to false
+      bounce: true, // It is important to set 'bounce' to false
       // to ensure funds remain in the contract.
       stateInit: stateInit.stateInit,
     });

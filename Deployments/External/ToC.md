@@ -1,9 +1,8 @@
-::: tip
-In this section we will use an Account smart contract to deploy the TIP-3 token contracts.
+::: info  
+In this section, we will explore the utilization of **Account** smart contracts to deploy TIP-3 standard smart contracts and interact with them.
 :::
 
-Here are the articles in this sections:
-
+## Code Samples
 <div class="sections-container">
   <div class="bridge-section-row">
     <a href="/Deployments/External/TokenRoot.html">
@@ -34,10 +33,13 @@ Here are the articles in this sections:
   flex-wrap: wrap;
   justify-content: space-between;
   margin : 10px;
+  cursor: pointer;;
+
 }
 
 .sections-container a{
     flex : 1;
+    text-decoration: none;
 }
 .bridge-section {
   background-color: var(--vp-c-bg-mute);
@@ -51,7 +53,6 @@ Here are the articles in this sections:
   font-size: 16px;
   text-align: left;
   margin-bottom: 0.5rem;
-  cursor: pointer;;
-
 }
 </style>
+

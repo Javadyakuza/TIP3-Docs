@@ -1,4 +1,4 @@
-Here are the articles in this sections:
+#### Concepts section includes following topics:
 
 <div class="sections-container">
   <div class="bridge-section-row">
@@ -22,10 +22,13 @@ Here are the articles in this sections:
   flex-wrap: wrap;
   justify-content: space-between;
   margin : 10px;
+  cursor: pointer;
+
 }
 
 .sections-container a{
     flex : 1;
+    text-decoration: none;
 }
 .bridge-section {
   background-color: var(--vp-c-bg-mute);
@@ -39,7 +42,5 @@ Here are the articles in this sections:
   font-size: 16px;
   text-align: left;
   margin-bottom: 0.5rem;
-  cursor: pointer;;
-
 }
 </style>

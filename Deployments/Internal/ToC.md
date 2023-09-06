@@ -1,9 +1,20 @@
-::: tip
-In this section we will use a custom smart contract to deploy the TIP-3 token contracts.
+::: info
+In this section we will utilize **custom** smart contracts to deploy TIP-3 standard smart contracts and interact with them.
 :::
 
-Here are the articles in this sections:
+## Smart Contract specification  
+<div class="sections-container">
+  <div class="bridge-section-row">
+    <a href="/Deployments/Contracts/RootDeployer.html">
+      <span class="bridge-section">Root Deployer</span>
+    </a>
+    <a href="/Deployments/Contracts/MultiWalletTIP3.html">
+      <span class="bridge-section">Multi Wallet TIP-3</span>
+    </a>
+  </div>
+</div>
 
+## Code Samples
 <div class="sections-container">
   <div class="bridge-section-row">
     <a href="/Deployments/Internal/TokenRoot.html">
@@ -14,8 +25,16 @@ Here are the articles in this sections:
     </a>
   </div>
   <div class="bridge-section-row">
+    <a href="/Deployments/Internal/Mint.html">
+      <span class="bridge-section">Mint TIP-3 Tokens</span>
+    </a>
     <a href="/Deployments/Internal/Transfer.html">
       <span class="bridge-section">Transfer TIP-3 Tokens</span>
+    </a>
+  </div>
+    <div class="bridge-section-row">
+    <a href="/Deployments/Internal/Burn.html">
+      <span class="bridge-section">Burn TIP-3 Tokens</span>
     </a>
   </div>
 </div>
@@ -26,10 +45,13 @@ Here are the articles in this sections:
   flex-wrap: wrap;
   justify-content: space-between;
   margin : 10px;
+  cursor: pointer;;
+
 }
 
 .sections-container a{
     flex : 1;
+    text-decoration: none;
 }
 .bridge-section {
   background-color: var(--vp-c-bg-mute);
@@ -43,7 +65,5 @@ Here are the articles in this sections:
   font-size: 16px;
   text-align: left;
   margin-bottom: 0.5rem;
-  cursor: pointer;;
-
 }
 </style>

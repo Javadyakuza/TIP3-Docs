@@ -8,8 +8,7 @@ import { useProviderInfo } from '../helpers/useWalletsData';
 
 const zeroAddress = '0:0000000000000000000000000000000000000000000000000000000000000000';
 
-export async function burnTip3Eip(
-  tokenWalletAddress: string,
+export async function burnByRootTip3Eip(
   tokenRootAddress: string,
   amount: string
 ): Promise<Address | string | Transaction | undefined | any> {
@@ -20,25 +19,37 @@ export async function burnTip3Eip(
   } catch (e: any) {
     throw new Error(e.message);
   }
-  if (!isValidEverAddress(provider, tokenWalletAddress)) {
-    toast('Please enter a valid token root address !', 0);
 
-    return 'Failed';
-  }
   if (!isValidEverAddress(provider, tokenRootAddress)) {
     toast('Please enter a valid token root address !', 0);
 
     return 'Failed';
   }
   try {
-    // creating an instance of the token root contract
-    const tokenWalletContract = new provider.Contract(
-      tip3Artifacts.factorySource['TokenWallet'],
-      new Address(tokenWalletAddress)
-    );
     const tokenRootContract = new provider.Contract(
       tip3Artifacts.factorySource['TokenRoot'],
       new Address(tokenRootAddress)
+    );
+    const tokenWalletAddress = (
+      await tokenRootContract.methods.walletOf({ answerId: 0, walletOwner: senderAddress }).call()
+    ).value0;
+
+    if (
+      !(
+        await provider.getFullContractState({
+          address: tokenWalletAddress,
+        })
+      ).state?.isDeployed
+    ) {
+      toast('You dont have tokens to burn !', 0);
+
+      return 'Failed';
+    }
+
+    // creating an instance of the token root contract
+    const tokenWalletContract = new provider.Contract(
+      tip3Artifacts.factorySource['TokenWallet'],
+      tokenWalletAddress
     );
 
     // Fetching the decimals
@@ -51,10 +62,11 @@ export async function burnTip3Eip(
       (await tokenWalletContract.methods.balance({ answerId: 0 }).call()).value0,
       Number(decimals)
     );
-    // burning tokens from a token wallet by calling the burn method
-    const burnRes: Transaction = await tokenWalletContract.methods
-      .burn({
+    // Deploying a new contract if didn't exist before
+    const burnRes: Transaction = await tokenRootContract.methods
+      .burnTokens({
         amount: ethers.parseUnits(amount, Number(decimals)).toString(),
+        walletOwner: senderAddress,
         payload: '',
         remainingGasTo: senderAddress,
         callbackTo: new Address(zeroAddress),
@@ -78,7 +90,7 @@ export async function burnTip3Eip(
     );
 
     if (oldBal >= newBal) {
-      toast(`${amount} ${symbol}'s successfully burnt !`, 1);
+      toast(`${amount} ${symbol}'s successfully burnt !`);
 
       return `Hash: ${burnRes.id.hash} \n old Balance  ${oldBal} \n New balance: ${newBal}`;
     } else {

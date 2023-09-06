@@ -21,7 +21,6 @@ export default async function isValidEverAddress(
 
     return true;
   } catch (err) {
-    // Event contract not found !!
     return false;
   }
 }

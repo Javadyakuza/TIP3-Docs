@@ -755,7 +755,7 @@ export async function main(){
 
     // Fetching the user public key
     const accountFullState: FullContractState = (
-      await provider.getFullContractState({ address: senderAddress })
+      await provider.getFullContractState({ address: providerAddress })
     ).state!;
 
     const senderPublicKey: string = await provider.extractPublicKey(accountFullState.boc);
@@ -781,9 +781,9 @@ export async function main(){
      */
     // Send the coins to the address
     await provider.sendMessage({
-      sender: senderAddress,
+      sender: providerAddress,
       recipient: expectedAddress,
-      amount: ethers.parseUnits('4', 9).toString(),
+      amount: 4 * 10 * 9,
       bounce: false, // It is important to set 'bounce' to false
       // to ensure funds remain in the contract.
       stateInit: stateInit.stateInit,
