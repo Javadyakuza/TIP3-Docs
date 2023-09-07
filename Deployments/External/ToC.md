@@ -2,6 +2,10 @@
 In this section, we will explore the utilization of **Account** smart contracts to deploy TIP-3 standard smart contracts and interact with them.
 :::
 
+::: danger 
+It is crucial to exercise caution and carefully manage the numbers and amounts associated with the transactions in this section. Avoid simply copying and pasting the code without thorough review and understanding.
+:::
+
 ## Code Samples
 <div class="sections-container">
   <div class="bridge-section-row">

@@ -7,7 +7,7 @@ Therefore, making a transfer is as easy as shelling pears!
 <div class="transferToken">
 
 ::: tip
-Before we start to write our scripts we need to make a file named `04-transfer-tip3.ts` in the `script` folder in the project root.
+Before we start to write our scripts we need to make sure that there is a file named `04-transfer-tip3.ts` in the `script` folder in the project root.
 :::
 
 ::: tip
@@ -17,20 +17,18 @@ TIP-3 Token Wallet has 2 transfer methods:
 * Transfer - Transfer tokens and optionally deploy TokenWallet for recipient account address.
 * Transfer tokens using another TokenWallet address, that wallet must be deployed previously.
 
-In the following code sample we assume Alice doesn't have a token wallet, so at the first we deploy a token wallet for alice which can be accomplished using `transfer` function, then we can utilize the `transferToWallet` function and transfer some TIP3-token to alice   
-
+In the code sample provided below, we assume that Alice does not have a token wallet. Therefore, we begin by deploying a token wallet for Alice which will be accomplished when using the  `transfer`  function. Subsequently, we can employ the  `transferToWallet`  function to transfer a certain amount of TIP3 tokens to Alice.
 :::
 
 <span  :class="LLdis" style="font-size: 1.1rem;">
 
-We can transfer TIP-3 tokens as explained in the code samples below: 
+In the code sample below, we will demonstrate how to transfer TIP-3 tokens using locklift:
 
 </span>
 
 <span :class="EIPdis" style="font-size: 1.1rem;">
 
-The easiest part between all the previous steps is transferring the TIP-3 tokens which is explained in the codes samples below:
-
+Certainly! Transferring TIP-3 tokens is considered one of the easier steps in the process.
 
 :::danger
 
@@ -60,21 +58,22 @@ The easiest part between all the previous steps is transferring the TIP-3 tokens
  * locklift is globals declared object 
  */
 
-import { Address, Contract, FactorySource } from "locklift";
+import { Address, Contract, Signer } from "locklift";
 import { EverWalletAccount } from "everscale-standalone-client";
-import { ethers } from "ethers";
+import { FactorySource, factorySource } from "../build/factorySource";
 
 async function main() {
-  const tokenRootAddress = new Address("<EXISTING_TOKEN_ROOT_ADDRESS>")
 
-  const signerBob = (await locklift.keystore.getSigner("0"))!;
-  const signerAlice = (await locklift.keystore.getSigner("1"))!;
+  const tokenRootAddress: Address = new Address("<YOUR_TOKEN_ROOT_ADDRESS>")
+
+  const signerBob: Signer = (await locklift.keystore.getSigner("0"))!;
+  const signerAlice: Signer = (await locklift.keystore.getSigner("1"))!;
   
   /**
    * Making an instance of the wallet account using the signer public key and everscale-standalone-client tool 
   */
-  const bobAccount = await EverWalletAccount.fromPubkey({ publicKey: signer.publicKey!, workchain: 0 });
-  const aliceAccount = await EverWalletAccount.fromPubkey({ publicKey: signer.publicKey!, workchain: 0 });
+  const bobAccount: EverWalletAccount = await EverWalletAccount.fromPubkey({ publicKey: signer.publicKey!, workchain: 0 });
+  const aliceAccount: EverWalletAccount = await EverWalletAccount.fromPubkey({ publicKey: signer.publicKey!, workchain: 0 });
 
   // Creating the target contracts instances
   const tokenRoot: Contract<FactorySource['TokenRoot']> = locklift.factory.getDeployedContract(
@@ -91,27 +90,30 @@ async function main() {
   const decimals: number  = Number((await tokenRoot.methods.decimals({answerId: 0}).call()).value0) 
 
   console.log("Bob's balance: ",
-   ethers.formatUnits((
     await bobTokenWallet.methods
       .balance({
         answerId: 0,
     })
-  .call()).value0.toString()),decimals) // assuming that bob has 300 of this token at the first >> 300
+  .call()).value0 / 10 ^ decimals // assuming that bob has 300 of this token at the first >> 300
+
+  // Amount to transfer 
+  const amount : number = 100 * 10 * decimals
+  
   /* 
     Transfer with the deployment of a wallet for the recipient account.
     
     Don't pay attention to notify and payload yet, we'll get back to them.
   */
   await bobTokenWallet.methods.transfer({
-        amount: 100 * 10 * Number(decimals),
+        amount: amount,
         recipient: aliceAccount.address,
-        deployWalletValue: locklift.utils.toNano(2),
+        deployWalletValue: locklift.utils.toNano(2), // assume alice doesn't have any token wallet 
         remainingGasTo: bobAccount.address,
-        notify: true,
+        notify: false,
         payload: '',
       }).send({
         from : bobAccount.address, 
-        amount: locklift.utils.toNano("4")
+        amount: locklift.utils.toNano("5")
       })
   
    /* 
@@ -131,21 +133,20 @@ async function main() {
   );
 
   console.log("Alice's balance: ",
-   ethers.formatUnits((
     await aliceTokenWallet.methods
       .balance({
         answerId: 0,
     })
-  .call()).value0.toString()),decimals)  // >> 100
+  .call()).value0 / 10 ^ decimals  // >> 100
   
   /* 
      Transfer to deployed token wallet
   */
   await bobTokenWallet.methods.transferToWallet({
-        amount: 100 * 10 * Number(decimals),
+        amount: amount,
         recipientTokenWallet: aliceTokenWallet.address,
         remainingGasTo: bobAccount.address,
-        notify: true,
+        notify: false,
         payload: '',
       }).send({
         from : bobAccount.address, 
@@ -153,20 +154,19 @@ async function main() {
       })
       
   console.log("Alice's balance: ",
-   ethers.formatUnits((
+   
     await aliceTokenWallet.methods
       .balance({
         answerId: 0,
     })
-  .call()).value0.toString()),decimals) // >> 200
+  .call()).value0 / 10 ^ decimals // >> 200
 
   console.log("Bob's balance: ",
-   ethers.formatUnits((
     await bobTokenWallet.methods
       .balance({
         answerId: 0,
     })
-  .call()).value0.toString()),decimals)  // >> 100
+  .call()).value0 / 10 ^ decimals  // >> 100
 }
 
 main()
@@ -187,7 +187,6 @@ main()
 ````typescript
 
 // Import the required libraries 
-import { ethers, toBigInt } from 'ethers';
 import {
   ProviderRpcClient as PRC,
   Address,
@@ -201,118 +200,107 @@ import * as tip3Artifacts from 'tip3-docs-artifacts';
 async function main() {
   // Initiate the TVM provider
 
+  // Preparing the params 
+  const tokenRootAddress: Address = new Address("<YOUR_TOKEN_ROOT_ADDRESS>");
+  const recipientAddress: Address = new Address("<RECIPIENT_ACCOUNT_ADDRESS>");
+  let txFee: number  = 3 * 10 * 9;  
+  let oldBal: number = 0 ;
+  let deployWalletValue: number = 0; 
+
   // creating an instance of the target token root contracts
-  const tokenRootContract = new provider.Contract(
+  const tokenRootContract: Contract<tip3Artifacts.FactorySource['TokenRoot']> = new provider.Contract(
     tip3Artifacts.factorySource['TokenRoot'],
-    new Address(tokenRootAddress)
+    tokenRootAddress
   );
   // getting the decimals of the token
-  const decimals = (await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0;
+  const decimals: number = Number((await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0);
+  let transferAmount: number = 10 * 10 * decimals;
+
   // creating an instance of the sender token wallet contract
-  const tokenWallet = new provider.Contract(
+  const tokenWallet: Contract<tip3Artifacts.FactorySource['TokenWallet']> = new provider.Contract(
     tip3Artifacts.factorySource['TokenWallet'],
     (
       await tokenRootContract.methods.walletOf({ answerId: 0, walletOwner: providerAddress }).call()
     ).value0
   );
-  // Checking recipient has a deploy wallet of that h token root
-  let amount: string = '3'; // will be changed depended on the recipient token wallet deployment  
-  let oldBal: string = '1'; // to confirm the transfer
 
+  
   /**
    * we will make an instance of the recipient token wallet contract and we assign value to it if the token wallet was already deployed 
    * the amount attached to the tx varies based on the mentioned subject.
    */
-  let possibleRecipientTokenWallet:
+  let RecipientTokenWallet:
     | Contract<tip3Artifacts.FactorySource['TokenWallet']>
     | undefined = undefined;
   
+  const receiverTokenWalletAddress = (
+          await tokenRootContract.methods
+            .walletOf({ answerId: 0, walletOwner: recipientAddress })
+            .call()
+        ).value0 
   if (
     !(
       await provider.getFullContractState({
-        address: (
-          await tokenRootContract.methods
-            .walletOf({ answerId: 0, walletOwner: new Address(receiverAddress) })
-            .call()
-        ).value0,
+        address: receiverTokenWalletAddress ,
       })
-    ).state?.isdeployed
+    ).state?.isDeployed
   ) {
-    amount = '4';
+    txFee = 5 * 10 * 9 ;
+    deployWalletValue = 2 *10 * 9;
   } else {
-    possibleRecipientTokenWallet = new provider.Contract(
+    RecipientTokenWallet = new provider.Contract(
       // Transferring the token
       tip3Artifacts.factorySource['TokenWallet'],
-      (
-        await tokenRootContract.methods
-          .walletOf({ answerId: 0, walletOwner: new Address(receiverAddress) })
-          .call()
-      ).value0
+      receiverTokenWalletAddress
     );
-    oldBal = (await possibleRecipientTokenWallet.methods.balance({ answerId: 0 }).call({}))
-      .value0;
+
+    oldBal = Number((await RecipientTokenWallet.methods.balance({ answerId: 0 }).call({}))
+      .value0);
   }
 
   // Transferring token
   const transferRes: Transaction = await tokenWallet.methods
     .transfer({
-      amount: TokenAmount * 10 * Number(decimals),
-      recipient: new Address(receiverAddress),
-      deployWalletValue: 2 * 10 * 9,
+      amount: transferAmount,
+      recipient: recipientAddress,
+      deployWalletValue: deployWalletValue,
       remainingGasTo: providerAddress,
       notify: false, // true if the change must be sent back to the sender wallet account not the sender token wallet 
       payload: '',
     })
-    .send({ from: providerAddress, amount: amount * 10 * 9, bounce: true });
+    .send({ from: providerAddress, amount: txFee, bounce: true });
 
   /**
    * We first verify if the transfer transaction was aborted. If it was not aborted, we proceed to check the balance of the recipient's token wallet. We compare this balance to the sum of the previous balance (oldBalance) and the amount transferred only If the user had already deployed a token wallet prior to the transfer transaction, and it was not deployed before the transaction it must have been deployed during the transaction, so we create an instance of the recipient's token wallet contract and confirm that its balance is greater than zero.
    */
   if (transferRes.aborted) {
-    console.log(`Transaction aborted !: ${transferRes.exitCode}`);
-    return `Failed ${transferRes.exitCode}`;
-  } else {
-    // Checking if the money is received successfully
-    let isTokenTransferred: boolean;
-    if (amount == '2') {
-      if (
-        toBigInt(
-          (await possibleRecipientTokenWallet!.methods.balance({ answerId: 0 }).call({})).value0
-        ) >
-        TokenAmount * 10 * Number(decimals) + toBigInt(oldBal)
-      ) {
-        console.log('tokens transferred successfully');
-        return `tx Hash: ${transferRes.id.hash}`;
-      } else {
-        console.log('Transferring tokens failed');
-        return `tx Hash: ${transferRes.id.hash}`;
-      }
+    console.log(`Transaction aborted !: ${transferRes.exitCode, transferRes.resultCode}`);
+    
+    return "Failed";
     } else {
-    possibleRecipientTokenWallet = new provider.Contract(
-      // Transferring the token
-      tip3Artifacts.factorySource['TokenWallet'],
-      (
-        await tokenRootContract.methods
-          .walletOf({ answerId: 0, walletOwner: new Address(receiverAddress) })
-          .call()
-      ).value0
-    );
-      if (
-        toBigInt(
-          (await possibleRecipientTokenWallet!.methods.balance({ answerId: 0 }).call({})).value0
-        ) > 0
-      ) {
+
+      // In this case the recipient didn't have any token wallet and one is deployed during the transfer, so we fetch it since we haven't before 
+      RecipientTokenWallet = new provider.Contract(
+        // Transferring the token
+        tip3Artifacts.factorySource['TokenWallet'],
+        receiverTokenWallet.address
+      );
+      const newBal: number = Number(
+        (await RecipientTokenWallet.methods.balance({ answerId: 0 }).call({})).value0
+      );
+      // Checking if the tokens are received successfully
+      if (amount == '2' && newBal >= Number(transferAmount) * 10 * decimals + oldBal) {
         console.log('tokens transferred successfully');
+
         return `tx Hash: ${transferRes.id.hash}`;
       } else {
         console.log('Transferring tokens failed');
-        return `tx Hash: ${transferRes.id.hash}`;
+
+        return `tx Hash: ${(transferRes.exitCode, transferRes.resultCode)}`;
       }
     }
   }
 
-
-}
 
 
 ````
@@ -321,56 +309,18 @@ async function main() {
 
 ```` typescript
 
-// Import the required libraries 
-import { ethers, toBigInt } from 'ethers';
-import {
-  ProviderRpcClient as PRC,
-  Address,
-  GetExpectedAddressParams,
-  Contract,
-  Transaction,
-  FullContractState,
-} from 'everscale-inpage-provider';
-import * as tip3Artifacts from 'tip3-docs-artifacts';
-
 async function main(){
   
-  // Initiate the TVM provider 
-
-  // creating an instance of the target contracts
-  const recipientTokenWalletContract = new provider.Contract(
-    tip3Artifacts.factorySource['TokenWallet'],
-    new Address(tokenWalletAddress)
-  );
-  const tokenRootContract = new provider.Contract(
-    tip3Artifacts.factorySource['TokenRoot'],
-    (await recipientTokenWalletContract.methods.root({ answerId: 0 }).call()).value0
-  );
-  const senderTokenWalletContract = new provider.Contract(
-    tip3Artifacts.factorySource['TokenWallet'],
-    (
-      await tokenRootContract.methods.walletOf({ answerId: 0, walletOwner: providerAddress }).call()
-    ).value0
-  );
-  
-  // Fetching the decimals 
-  const decimals = (await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0;
-
   /**
-   * @dev Its recommended to use all of the code sample represented in this documentation inside if the try catch blocks 
-   *  in this specific case if we use the code sample inside of the try catch block, an extra check to see if the recipient token wallet is deployed or not is not needed any more.    
+   * We use the previous code block states 
    */
-  
-  let oldBal: string = (
-    await recipientTokenWalletContract.methods.balance({ answerId: 0 }).call()
-  ).value0;
-  // Transferring token
-  const transferRes: Transaction = await senderTokenWalletContract.methods
+
+  const transferRes: Transaction = await tokenWallet.methods
     .transferToWallet({
-      amount: TokenAmount * 10 *Number(decimals),
-      recipientTokenWallet: recipientTokenWalletContract.address,
+      amount: transferAmount * 10 * decimals,
+      recipientTokenWallet: RecipientTokenWallet.address,
       remainingGasTo: providerAddress,
-      notify: notify,
+      notify: false,
       payload: '',
     })
     .send({ from: providerAddress, amount: 3 * 10 * 9, bounce: true });
@@ -382,10 +332,11 @@ async function main(){
     console.log(`Transaction aborted !: ${transferRes.exitCode}`);
     return `Failed ${transferRes.exitCode}`;
   } else {
+    // newBal is actually the old balance and its fetched before utilizing the "transferToWallet" the function
     if (
-      toBigInt(
+      Number(
         (await recipientTokenWalletContract!.methods.balance({ answerId: 0 }).call({})).value0
-      ) > toBigInt(oldBal)
+      ) > newBal
     ) {
       console.log('tokens transferred successfully');
       return `tx Hash: ${transferRes.id.hash}`;
@@ -654,8 +605,9 @@ return {
 }
 .llSwitcher{
     padding: 5px 10px;
-    border: 1px solid var(--vp-c-divider);
-    border-bottom: none;
+    border:  0 solid var(--vp-c-divider);
+    border-width: 1px ;
+    border-color: var(--vp-c-divider);
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
     font-weight: 600;
@@ -663,12 +615,16 @@ return {
 }
 .eipSwitcher{
     padding: 5px 10px;
-    border: 1px solid var(--vp-c-divider);
-    border-bottom: none;
+    border:  0 solid var(--vp-c-divider);
+    border-width: 1px ;
+    border-color: var(--vp-c-divider);
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
     font-weight: 600;
     transition: all ease .2s;
+}
+.llSwitcher:hover, .eipSwitcher:hover{
+      border-color: var(--light-color-ts-class);
 }
 .eipAction{
     font-weight: 600;

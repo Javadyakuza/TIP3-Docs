@@ -28,7 +28,7 @@ TVM memory and persistent storage consist of cells. Recall that the TVM memory a
 <span  :class="LLdis" style="font-size: 1.1rem;">
 
 ::: tip
-Before we start to write our scripts we need to make a file named `01-deploy-token.ts` in the `script` folder in the project root.
+Before we start to write our scripts we need to make sure that there is a file named `01-deploy-token.ts` in the `script` folder in the project root.
 :::
 
 Follow the instructions below to deploy the `RootDeployer` contract and using that `TokenRoot` contract:

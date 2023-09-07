@@ -5,7 +5,7 @@ Now that we know how to deploy the required contracts and their operation(mint a
 <div class="transferToken">
 
 ::: info
-Before we start to write our scripts we need to make a file named `05-burn-tip3.ts` in the `script` folder in the project root.
+Before we start to write our scripts we need to make sure that there is a file named `05-burn-tip3.ts` in the `script` folder in the project root.
 :::
 
 

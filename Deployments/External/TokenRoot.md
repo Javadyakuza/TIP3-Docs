@@ -9,7 +9,7 @@
 To deploy the token root using the [locklift](https://docs.locklift.io/) framework, which provides a straightforward approach. The following code sample demonstrates the deployment process:
 
 ::: info
-Before we start to write our scripts we need to make a file named `01-deploy-token.ts` in the `script` folder in the project root.
+Before we start to write our scripts we need to make sure that there is a file named `01-deploy-token.ts` in the `script` folder in the project root.
 :::
 
 </span>
@@ -44,35 +44,37 @@ The parameter `initialSupply` must be set to **zero** if the `initialSupplyTo` i
  * locklift is a globally declared object 
  */
 
-import { Address, zeroAddress, factory} from "locklift";
+import { Address, zeroAddress, factory, Signer} from "locklift";
+import { ContractData } from "locklift/internal/factory";
+import { FactorySource, factorySource } from "../build/factorySource";
 import { EverWalletAccount } from "everscale-standalone-client";
 
 async function main() {
 
   // Fetching the signer key pair from locklift.config.ts
-  const signer = (await locklift.keystore.getSigner("0"))!;
+  const signer: Signer = (await locklift.keystore.getSigner("0"))!;
   
   /**
    * Making an instance of the wallet account using the signer public key and everscale-standalone-client tool 
   */
-  const myAccount = await EverWalletAccount.fromPubkey({ publicKey: signer.publicKey!, workchain: 0 });
+  const myAccount: EverWalletAccount = await EverWalletAccount.fromPubkey({ publicKey: signer.publicKey!, workchain: 0 });
 
   // Preparing test params
-  const initialSupplyTo = zeroAddress;
-  const rootOwner = "";
-  const name = "Tip3OnboardingToken";
-  const symbol = "TOT";
-  const decimals = 6;
-  const disableMint = "false";
-  const disableBurnByRoot = "false";
-  const pauseBurn = "false";
-  const initialSupply = 0;
+  const initialSupplyTo: Address = new Address(zeroAddress);
+  const rootOwner: Address = new Address(zeroAddress);
+  const name: string = "Tip3OnboardingToken";
+  const symbol: string = "TOT";
+  const decimals: number = 6;
+  const disableMint: boolean = "false";
+  const disableBurnByRoot: boolean = "false";
+  const pauseBurn: boolean = "false";
+  const initialSupply: number = 0;
   
   /* 
     Returns compilation artifacts based on the .sol file name
-      or name from value config.extarnalContracts[pathToLib].
+      or name from value config.externalContracts[pathToLib].
   */
-  const tokenWallet = locklift.factory.getContractArtifacts("TokenWallet");
+  const tokenWallet: ContractData<FactorySource["TokenWallet"]> = locklift.factory.getContractArtifacts("TokenWallet");
 
   /**
     * Deploy the TIP-3 Token Root contract.
@@ -90,7 +92,7 @@ async function main() {
     contract: "TokenRoot",
     publicKey: signer.publicKey,
     initParams: {
-      deployer_: new Address(zeroAddress), // its important to be zeroAddress 
+      deployer_: new Address(zeroAddress), 
       randomNonce_: (Math.random() * 6400) | 0,
       rootOwner_: rootOwner,
       name_: name,
@@ -100,12 +102,12 @@ async function main() {
     },
     constructorParams: {
       initialSupplyTo: initialSupplyTo,
-      initialSupply: initialSupply * 10 * Number(decimals),
+      initialSupply: initialSupply * 10 * decimals,
       deployWalletValue: locklift.utils.toNano(2),
       mintDisabled: disableMint,
       burnByRootDisabled: disableBurnByRoot,
       burnPaused: pauseBurn,
-      remainingGasTo: new Address(myAccount.address),
+      remainingGasTo: myAccount.address,
     },
     value: locklift.utils.toNano(5),
   });
@@ -136,6 +138,7 @@ import {
   Contract,
   Transaction,
   isAddressObject,
+  ProviderApiResponse
 } from 'everscale-inpage-provider';
 import * as tip3Artifacts from 'tip3-docs-artifacts';
 
@@ -144,9 +147,12 @@ async function main(){
   // Initiate the TVM provider 
 
   // Preparing test params
+
+  // zero address instance
+  const zeroAddress: Address = new Address('0:0000000000000000000000000000000000000000000000000000000000000000');
   interface deployRootParams {
-    initialSupplyTo: string;
-    rootOwner: string;
+    initialSupplyTo: Adddress;
+    rootOwner: Address;
     name: string;
     symbol: string;
     decimals: number;
@@ -156,13 +162,12 @@ async function main(){
     initialSupply: number;
   }
 
-  // zero address instance
-    const zeroAddress: string = '0:0000000000000000000000000000000000000000000000000000000000000000';
+  // Token root abi
+  const tokenRootAbi: tip3Artifacts.FactorySource["TokenRoot"] = tip3Artifacts.factorySource['TokenRoot'];
 
-  // preparing the parameters  
-  const tokenRootAbi = tip3Artifacts.factorySource['TokenRoot'];
-  const tokenRootArtifacts = tip3Artifacts.artifacts.TokenRoot;
-  const tokenWalletArtifacts = tip3Artifacts.artifacts.TokenWallet;
+  // Token root and wallet's code and tvc
+  const tokenRootArtifacts: typeof tip3Artifacts.artifacts.TokenRoot = tip3Artifacts.artifacts.TokenRoot;
+  const tokenWalletArtifacts; typeof tip3Artifacts.artifacts.TokenWallet = tip3Artifacts.artifacts.TokenWallet;
 
   const params: deployRootParams = {
       initialSupplyTo: zeroAddress,
@@ -175,6 +180,8 @@ async function main(){
       pauseBurn: false,
       initialSupply: 0
   } // Or get them from user 
+
+  const deployWalletValue: number = params.initialSupplyTo = zeroAddress ? 2 * 10 * params.decimals : 0  
 
   // Amount to attach to the tx 
   const amount: number = params.initialSupplyTo == zeroAddress ? 2 : 4;
@@ -190,15 +197,18 @@ async function main(){
   ).state!;
   const senderPublicKey: string = await provider.extractPublicKey(accountFullState.boc!);
 
-  // Preparing the deployment params
+  /**
+   * Preparing deploy params to build the state init with the contract abi
+    * @param deployer_ Its important to set this param to zero address when deploying the token root contract whiteout using an smart contract.
+  */
   const deployParams: DeployParams<tip3Artifacts.FactorySource['TokenRoot']> = {
     tvc: tokenRootArtifacts.tvc,
     workchain: 0,
     publicKey: senderPublicKey,
     initParams: {
-      deployer_: new Address(zeroAddress),
+      deployer_: zeroAddress,
       randomNonce_: (Math.random() * 6400) | 0,
-      rootOwner_: new Address(params.rootOwner),
+      rootOwner_: params.rootOwner,
       name_: params.name,
       symbol_: params.symbol,
       decimals_: params.decimals,
@@ -207,12 +217,13 @@ async function main(){
   };
 
   // Get the expected contract address
-  const expectedAddress = await provider.getExpectedAddress(tokenRootAbi, deployParams);
+  const expectedAddress: Address = await provider.getExpectedAddress(tokenRootAbi, deployParams);
 
   // Get the state init
-  const stateInit = await provider.getStateInit(tokenRootAbi, deployParams);
+  const stateInit: ProviderApiResponse<'getExpectedAddress'> = await provider.getStateInit(tokenRootAbi, deployParams);
+ = await provider.getStateInit(tokenRootAbi, deployParams);
 
-  // Send the coins to the address
+  // Send the coins to the calculated address
   await provider.sendMessage({
     sender: providerAddress,
     recipient: expectedAddress,
@@ -230,9 +241,9 @@ async function main(){
   // Call the contract constructor
   const { transaction: deployRes } = await tokenRootContract.methods
     .constructor({
-      initialSupplyTo: new Address(params.initialSupplyTo),
-      initialSupply: params.initialSupply * 10 * params.decimals,
-      deployWalletValue: 2 * 10 * 9,
+      initialSupplyTo: params.initialSupplyTo,
+      initialSupply: params.initialSupply,
+      deployWalletValue: deployWalletValue,
       mintDisabled: params.disableMint,
       burnByRootDisabled: params.disableBurnByRoot,
       burnPaused: params.pauseBurn,
@@ -243,7 +254,7 @@ async function main(){
       publicKey: deployParams.publicKey!,
     });
 
-  // checking if the token root is deployed successfully by calling one of its methods
+  // checking if the token root is deployed successfully by calling its name method
   const tokenName: string = (await tokenRootContract.methods.name({ answerId: 0 }).call({}))
     .value0;
   if (tokenName == params.name) {

@@ -23,7 +23,7 @@ In Everscale, a contract can have an external (msg.pubkey) and/or internal (msg.
 
 
 ::: tip
-Before we start to write our scripts we need to make a file named `03-deploy-wallet.ts` in the `script` folder in the project root.
+Before we start to write our scripts we need to make sure that there is a file named `03-deploy-wallet.ts` in the `script` folder in the project root.
 :::
 
 <br/>

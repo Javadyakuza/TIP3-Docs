@@ -36,7 +36,9 @@ export async function transferTokenEip(
       tip3Artifacts.factorySource['TokenRoot'],
       new Address(tokenRootAddress)
     );
-    const decimals = (await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0;
+    const decimals = Number(
+      (await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0
+    );
     const tokenWallet = new provider.Contract(
       // Transferring the token
       tip3Artifacts.factorySource['TokenWallet'],
@@ -46,7 +48,7 @@ export async function transferTokenEip(
     );
     // Checking recipient has a deploy wallet of that h token root
     let amount = '3';
-    let oldBal = '0';
+    let oldBal = 0;
 
     const receiverTokenWalletAddress = (
       await tokenRootContract.methods
@@ -77,8 +79,9 @@ export async function transferTokenEip(
         receiverTokenWalletAddress
       );
 
-      oldBal = (await possibleRecipientTokenWallet.methods.balance({ answerId: 0 }).call({}))
-        .value0;
+      oldBal = Number(
+        (await possibleRecipientTokenWallet.methods.balance({ answerId: 0 }).call({})).value0
+      );
     }
 
     // Transferring token
@@ -103,14 +106,11 @@ export async function transferTokenEip(
         tip3Artifacts.factorySource['TokenWallet'],
         receiverTokenWalletAddress
       );
-      const newBal = toBigInt(
+      const newBal = Number(
         (await possibleRecipientTokenWallet.methods.balance({ answerId: 0 }).call({})).value0
       );
       // Checking if the tokens are received successfully
-      if (
-        amount == '2' &&
-        newBal >= ethers.parseUnits(TokenAmount, Number(decimals)) + toBigInt(oldBal)
-      ) {
+      if (amount == '2' && newBal >= Number(TokenAmount) * 10 * decimals + oldBal) {
         toast('tokens transferred successfully', 1);
 
         return `tx Hash: ${transferRes.id.hash}`;

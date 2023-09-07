@@ -11,12 +11,17 @@ The TIP-3 standard have to methods to burn tokens:
 
 
 - `burn`: This method will be called on the token wallet and easily burns the tokens.
+ 
 - `burnByRoot`: The `burnTokens` will be called on the token root contract, accordingly root will call the `burnByRoot` function on the token wallet and burns the tokens.
 
 :::
+
 ::: tip
-- To be able to utilize the `burnByRoot` function the `burnByRootDisabled` parameter must be set to `false` at the time of deploying the token root contract !
-- Only the owner of the root can call the `burnTokens`. 
+
+To utilize the  `burnByRoot`  function, it is essential to ensure that the  `burnByRootDisabled`  parameter is set to  `false`  during the deployment of the token root contract. This will enable the functionality required for burning tokens.
+
+Furthermore, it is important to note that only the owner of the root contract has the authority to invoke the  `burnTokens`  function.
+
 :::
 
 <div class="transferToken">
@@ -24,7 +29,7 @@ The TIP-3 standard have to methods to burn tokens:
 <span  :class="LLdis" style="font-size: 1.1rem;">
 
 ::: info
-Before we start to write our scripts we need to make a file named `05-burn-tip3.ts` in the `script` folder in the project root.
+Before we start to write our scripts we need to make sure that there is a file named `05-burn-tip3.ts` in the `script` folder in the project root.
 :::
 
 </span>
@@ -60,107 +65,105 @@ Before we start to write our scripts we need to make a file named `05-burn-tip3.
  * locklift is globals declared object 
  */
 
-import { ethers } from "ethers";
 import { EverWalletAccount } from "everscale-standalone-client";
-import { Address, WalletTypes, zeroAddress } from "locklift";
+import { Address, WalletTypes, zeroAddress, Signer, Contract } from "locklift";
+import { FactorySource, factorySource } from "../build/factorySource";
+
+  // Preparing the params 
+  const tokenRootAddress: Address = new Address("<YOUR_TOKEN_ROOT_ADDRESS>");
 
   // Creating two signers and wallets
-  const aliceSigner = (await locklift.keystore.getSigner("0"))!;
+  const aliceSigner: Signer = (await locklift.keystore.getSigner("0"))!;
 
-  const aliceEverWallet = await EverWalletAccount.fromPubkey({ publicKey: aliceSigner.publicKey!, workchain: 0 });
+  const aliceEverWallet: EverWalletAccount = await EverWalletAccount.fromPubkey({ publicKey: aliceSigner.publicKey!, workchain: 0 });
 
   // Fetching the token root contract
-  const tokenRootContract = locklift.factory.getDeployedContract("TokenRoot", tokenRootAddress);
+  const tokenRootContract: Contract<FactorySources["TokenRoot"]> = locklift.factory.getDeployedContract("TokenRoot", tokenRootAddress);
 
   // getting decimals and symbols
   const [decimals, symbol] = await Promise.all([
-    (await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0,
+    Number((await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0),
     (await tokenRootContract.methods.symbol({ answerId: 0 }).call()).value0,
   ]);
 
-    const aliceTWCon: Contract<FactorySource["TokenWallet"]> = locklift.factory.getDeployedContract(
-      "TokenWallet",
+  // Preparing the params 
+  const burnAmount: number = 100 * 10 * decimals;
+  const burnByRootAmount: number = 50 * 10 * decimals;
+  
+  const aliceTWCon: Contract<FactorySource["TokenWallet"]> = locklift.factory.getDeployedContract(
+    "TokenWallet",
+    (
+      await tokenRoot.methods
+        .walletOf({
+          answerId: 0,
+          walletOwner: aliceEverWallet.address,
+        })
+        .call()
+    ).value0,
+  );
+  // We assume that alice has 200 tokens 
+  console.log(
+    "Alice's balance: ",
       (
-        await tokenRoot.methods
-          .walletOf({
+        await aliceTWCon.methods
+          .balance({
             answerId: 0,
-            walletOwner: aliceEverWallet.address,
           })
           .call()
-      ).value0,
-    );
+      ).value0
+      / 10 ^ decimals,
+  ); // >> 200
+  
+  // burning tokens by calling the "burn" method in the alice's token wallet 
+  await aliceTWCon.methods
+    .burn({
+      amount: burnAmount,
+      remainingGasTo: aliceEverWallet.address,
+      callbackTo: zeroAddress,
+      payload: "",
+    })
+    .send({
+      from: aliceEverWallet.address,
+      amount: locklift.utils.toNano(3),
+    });
 
-    // We assume that alice has 200 tokens 
-    console.log(
-      "Alice's balance: ",
-      ethers.formatUnits(
-        (
-          await aliceTWCon.methods
-            .balance({
-              answerId: 0,
-            })
-            .call()
-        ).value0.toString(),
-        Number(decimals),
-      ),
-    ); // >> 200
+  // checking if tis burned 
+  console.log(
+    "Alice's balance: ",
+      (
+        await aliceTWCon.methods
+          .balance({
+            answerId: 0,
+          })
+          .call()
+      ).value0
+      / 10 ^ decimals,
+  ); // >> 200
 
-    // burning tokens by calling the "burn" method in the alice's token wallet 
-    await aliceTWCon.methods
-      .burn({
-        amount: 100_000_000,
-        remainingGasTo: aliceEverWallet.address,
-        callbackTo: zeroAddress,
-        payload: "",
-      })
-      .send({
-        from: aliceEverWallet.address,
-        amount: locklift.utils.toNano(3),
-      });
-
-    // checking if tis burned 
-    console.log(
-      "alice's balance: ",
-      ethers.formatUnits(
-        (
-          await aliceTWCon.methods
-            .balance({
-              answerId: 0,
-            })
-            .call()
-        ).value0.toString(),
-        Number(decimals),
-      ),
-    ); // >> 100
-
-
-    // burning tokens by calling the "burnTokens" on the token root 
-    await tokenRoot.methods
-      .burnTokens({
-        amount: 50_000_000,
-        walletOwner: aliceEverWallet.address,
-        remainingGasTo: aliceEverWallet.address,
-        callbackTo: zeroAddress,
-        payload: "",
-      })
-      .send({
-        from: aliceEverWallet.address,
-        amount: locklift.utils.toNano(3),
-      });
-
-    console.log(
-      "alice's balance: ",
-      ethers.formatUnits(
-        (
-          await aliceTWCon.methods
-            .balance({
-              answerId: 0,
-            })
-            .call()
-        ).value0.toString(),
-        Number(decimals),
-      ),
-    ); // >> 50 
+  // burning tokens by calling the "burnTokens" on the token root 
+  await tokenRoot.methods
+    .burnTokens({
+      amount: burnByRootAmount,
+      walletOwner: aliceEverWallet.address,
+      remainingGasTo: aliceEverWallet.address,
+      callbackTo: zeroAddress,
+      payload: "",
+    })
+    .send({
+      from: aliceEverWallet.address,
+      amount: locklift.utils.toNano(3),
+    });
+  console.log(
+    "Alice's balance: ",
+      (
+        await aliceTWCon.methods
+          .balance({
+            answerId: 0,
+          })
+          .call()
+      ).value0
+      / 10 ^ decimals,
+  ); // >> 50 
 
 ````
 
@@ -168,52 +171,52 @@ import { Address, WalletTypes, zeroAddress } from "locklift";
 
 <span  :class="EIPdis">
 
-** Using `burn` method: 
+**Using `burn` method:**
 
 ````typescript
-import { ethers } from 'ethers';
-import { ProviderRpcClient as PRC, Address, Transaction } from 'everscale-inpage-provider';
+import { ProviderRpcClient as PRC, Address, Transaction, Contract } from 'everscale-inpage-provider';
 import * as tip3Artifacts from 'tip3-docs-artifacts';
 
-const zeroAddress = '0:0000000000000000000000000000000000000000000000000000000000000000';
-
-export async function main()
+async function main()
 {
 
   // Initiate the TVm provider 
-  const tokenWalletAddress: string = "<YOUR_TOKEN_ROOT_ADDRESS>"
-  const tokenRootAddress: string = "<YOUR_TOKEN_WALLET_ADDRESS>"
-  const burnAmount: number = 100;
+  const zeroAddress: Address = new Address('0:0000000000000000000000000000000000000000000000000000000000000000');
+  const tokenWalletAddress: Address = new Address("<YOUR_TOKEN_ROOT_ADDRESS>")
+  const tokenRootAddress: Address = new Address("<YOUR_TOKEN_WALLET_ADDRESS>")
+
 
   try {
     // creating an instance of the token root contract
-    const tokenWalletContract = new provider.Contract(
+    const tokenWalletContract: Contract<tip3Artifacts.factorySources["TokenWallet"]> = new provider.Contract(
       tip3Artifacts.factorySource['TokenWallet'],
-      new Address(tokenWalletAddress)
+      tokenWalletAddress
     );
-    const tokenRootContract = new provider.Contract(
+    const tokenRootContract: Contract<tip3Artifacts.factorySources["TokenRoot"]> = new provider.Contract(
       tip3Artifacts.factorySource['TokenRoot'],
-      new Address(tokenRootAddress)
+      tokenRootAddress
     );
 
     // Fetching the decimals
     const [decimals, symbol] = await Promise.all([
-      (await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0,
+      Number((await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0),
       (await tokenRootContract.methods.symbol({ answerId: 0 }).call()).value0,
     ]);
 
-    const oldBal = ethers.formatUnits(
-      (await tokenWalletContract.methods.balance({ answerId: 0 }).call()).value0,
-      Number(decimals)
-    );
+    const burnAmount: number = 100 * 10  * decimals
+
+    const oldBal: number = 
+      (await tokenWalletContract.methods.balance({ answerId: 0 }).call()).value0
+      / 10 ^ decimals
+    
 
     // burning tokens from a token wallet by calling the burn method
     const burnRes: Transaction = await tokenWalletContract.methods
       .burn({
-        amount: burnAmount * 10 * Number(decimals),
+        amount: burnAmount,
         payload: '',
         remainingGasTo: providerAddress,
-        callbackTo: new Address(zeroAddress),
+        callbackTo: zeroAddress,
       })
       .send({
         from: providerAddress,
@@ -221,17 +224,16 @@ export async function main()
       });
 
     if (burnRes.aborted) {
-      console.log(`Transaction aborted ! ${burnRes.exitCode}`);
+      console.log(`Transaction aborted ! ${burnRes.exitCode, burnRes.resultCode}`);
 
       return burnRes;
     }
     // Checking if the user already doesn't have the any wallet of that token root
     // Getting the recipient balance
 
-    const newBal = ethers.formatUnits(
-      (await tokenWalletContract.methods.balance({ answerId: 0 }).call()).value0,
-      Number(decimals)
-    );
+    const newBal: number = 
+    (await tokenWalletContract.methods.balance({ answerId: 0 }).call()).value0
+      / 10 ^ decimals
 
     if (oldBal >= newBal) {
       console.log(`${amount} ${symbol}'s successfully burnt !`);
@@ -251,32 +253,28 @@ export async function main()
 }
 
 ````
-** Using `burnByRoot` method: 
+
+**Using `burnByRoot` method:** 
 
 ````typescript
-import { ethers } from 'ethers';
-import { ProviderRpcClient as PRC, Address, Transaction } from 'everscale-inpage-provider';
+import { ProviderRpcClient as PRC, Address, Transaction, Contract} from 'everscale-inpage-provider';
 import * as tip3Artifacts from 'tip3-docs-artifacts';
 
-import { toast } from '../../../src/helpers/toast';
-import isValidEverAddress from '../helpers/isValideverAddress';
-import { useProviderInfo } from '../helpers/useWalletsData';
 
-const zeroAddress = '0:0000000000000000000000000000000000000000000000000000000000000000';
-
-export async function main(){
+async function main(){
 
   // Initiate the TVM provider 
 
-  const tokenRootAddress: string = "<YOUR_TOKEN_WALLET_ADDRESS>"
-  const burnByRootAmount: number  = 50;
+  const zeroAddress: Address = new Address('0:0000000000000000000000000000000000000000000000000000000000000000');
+  const tokenRootAddress: Address = new Address("<YOUR_TOKEN_WALLET_ADDRESS>");
 
   try {
-    const tokenRootContract = new provider.Contract(
+    const tokenRootContract: : Contract<tip3Artifacts.factorySources["TokenRoot"]> = new provider.Contract(
       tip3Artifacts.factorySource['TokenRoot'],
-      new Address(tokenRootAddress)
+      tokenRootAddress
     );
-    const tokenWalletAddress = (
+
+    const tokenWalletAddress: Address = (
       await tokenRootContract.methods.walletOf({ answerId: 0, walletOwner: providerAddress }).call()
     ).value0;
 
@@ -287,31 +285,34 @@ export async function main(){
         })
       ).state?.isDeployed
     ) {
-      console.log('You dont have tokens to burn !');
+      console.log("You don't have tokens to burn !");
 
       return 'Failed';
     }
 
     // creating an instance of the token root contract
-    const tokenWalletContract = new provider.Contract(
+    const tokenWalletContract: Contract<tip3Artifacts.factorySources["TokenWallet"]> = new provider.Contract(
       tip3Artifacts.factorySource['TokenWallet'],
       tokenWalletAddress
     );
 
     // Fetching the decimals
     const [decimals, symbol] = await Promise.all([
-      (await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0,
+      Number((await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0),
       (await tokenRootContract.methods.symbol({ answerId: 0 }).call()).value0,
     ]);
 
-    const oldBal = ethers.formatUnits(
-      (await tokenWalletContract.methods.balance({ answerId: 0 }).call()).value0,
-      Number(decimals)
-    );
+    const burnByRootAmount: number  = 50 * 10 * decimals;
+
+    const oldBal: number = 
+    (await tokenWalletContract.methods.balance({ answerId: 0 }).call()).value0
+      / 10 ^ decimals
+    
+
     // Deploying a new contract if didn't exist before
-    const burnRes: Transaction = await tokenRootContract.methods
+    const burnByRotRes: Transaction = await tokenRootContract.methods
       .burnTokens({
-        amount: burnByRootAmount * 10 * Number(decimals),
+        amount: burnByRootAmount,
         walletOwner: providerAddress,
         payload: '',
         remainingGasTo: providerAddress,
@@ -322,28 +323,27 @@ export async function main(){
         amount: 3 * 10 * 9,
       });
 
-    if (burnRes.aborted) {
-      console.log(`Transaction aborted ! ${burnRes.exitCode}`);
+    if (burnByRotRes.aborted) {
+      console.log(`Transaction aborted ! ${(burnByRotRes.exitCode, burnByRotRes.resultCode)}`);
 
-      return burnRes;
+      return burnByRotRes;
     }
     // Checking if the user already doesn't have the any wallet of that token root
     // Getting the recipient balance
 
-    const newBal = ethers.formatUnits(
-      (await tokenWalletContract.methods.balance({ answerId: 0 }).call()).value0,
-      Number(decimals)
-    );
+    const newBal: number = 
+    (await tokenWalletContract.methods.balance({ answerId: 0 }).call()).value0
+      / 10 ^ decimals
 
     if (oldBal >= newBal) {
       console.log(`${amount} ${symbol}'s successfully burnt`);
 
-      return `Hash: ${burnRes.id.hash} \n old Balance  ${oldBal} \n New balance: ${newBal}`;
+      return `Hash: ${burnByRotRes.id.hash} \n old Balance  ${oldBal} \n New balance: ${newBal}`;
     } else {
       console.log('Burning tokens failed !');
 
       return `Failed \n 
-      ${(burnRes.exitCode, burnRes.resultCode)}`;
+      ${(burnByRotRes.exitCode, burnByRotRes.resultCode)}`;
     }
   } catch (e: any) {
     console.log(e.message);
@@ -383,7 +383,7 @@ Congratulations, you have successfully burned TIP-3 tokens from a token wallet.
 ## burn TIP-3 tokens  
 
 ::: info 
-In order to be able to burn token for token wallet from a token root you must be the root owner .
+In order to utilize the `burnByRoot` you must be the root owner !
 :::
 
 <p class=actionInName style="margin-bottom: 0;">Token Root address</p> 

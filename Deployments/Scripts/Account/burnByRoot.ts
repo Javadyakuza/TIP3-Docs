@@ -81,6 +81,7 @@ export async function burnByRootTip3Eip(
 
       return burnRes;
     }
+
     // Checking if the user already doesn't have the any wallet of that token root
     // Getting the recipient balance
 

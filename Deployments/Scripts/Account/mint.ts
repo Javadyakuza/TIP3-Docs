@@ -42,19 +42,19 @@ export async function mintTip3Eip(
     ]);
 
     // Checking if receiver has a wallet of this token root to specify the deployWalletValue parameter
-    const deployWalletValue = '0';
+    let deployWalletValue = 0;
     if (
       !(
         await provider.getFullContractState({
           address: (
             await tokenRootContract.methods
-              .walletOf({ answerId: 0, walletOwner: senderAddress })
+              .walletOf({ answerId: 0, walletOwner: new Address(recipient) })
               .call()
           ).value0,
         })
       ).state?.isDeployed
     ) {
-      deployWalletValue: 3;
+      deployWalletValue = 3 * 10 * 9;
     }
 
     // Deploying a new contract if didn't exist before
@@ -69,7 +69,7 @@ export async function mintTip3Eip(
       })
       .send({
         from: senderAddress,
-        amount: ethers.parseUnits(deployWalletValue == '0' ? '2' : '5', 9).toString(),
+        amount: ethers.parseUnits(deployWalletValue == 0 ? '2' : '5', 9).toString(),
       });
 
     if (mintRes.aborted) {

@@ -19,7 +19,7 @@ TON Solidity compiler allows specifying different parameters of the outbound int
 Now lets write the scripts to deploy a Token Wallet using locklift .
 
 ::: info
-Before we start to write our scripts we need to make a file named `02-deploy-wallet.ts` in the `script` folder in the project root.
+Before we start to write our scripts we need to make sure that there is a file named `02-deploy-wallet.ts` in the `script` folder in the project root.
 :::
 
 Deploying the Token Wallet of an existing Token Root contract using the locklift tool can be achieved by utilizing the code sample provided below:
@@ -49,28 +49,29 @@ Using the  `everscale-inpage-provider`  to deploy a token wallet is as easy as a
  * locklift is globals declared object 
  */
 
-import { Address, Contract } from "locklift";
+import { Address, Contract, Signer } from "locklift";
 import { EverWalletAccount } from "everscale-standalone-client";
+import { FactorySource, factorySource } from "../build/factorySource";
 
 async function main() {
 
   // Preparing the target contracts to interact with 
-  const tokenRootAddress = new Address("<EXISTING_TOKEN_ROOT_ADDRESS>");
+  const tokenRootAddress: Address = new Address("<YOUR_TOKEN_ROOT_ADDRESS>");
 
   // Fetching the account and signer
-  const signer = (await locklift.keystore.getSigner("0"))!;
+  const signer: Signer = (await locklift.keystore.getSigner("0"))!;
 
   /**
    * Making an instance of the wallet account using the signer public key and everscale-standalone-client tool 
   */
-  const myAccount = await EverWalletAccount.fromPubkey({ publicKey: signer.publicKey!, workchain: 0 });
+  const myAccount: EverWalletAccount = await EverWalletAccount.fromPubkey({ publicKey: signer.publicKey!, workchain: 0 });
   
   /* 
     Get instance of already deployed TOken Root contract
   */
-  const tokenRoot = locklift.factory.getDeployedContract(
+  const tokenRoot: : Contract<FactorySource['TokenRoot']> = locklift.factory.getDeployedContract(
     "TokenRoot",
-    new Address(tokenRootAddress),
+    tokenRootAddress,
   );
   
   /* 
@@ -112,7 +113,6 @@ main()
 <span  :class="EIPdis">
 
 ````typescript
-import { ethers } from 'ethers';
 import {
   ProviderRpcClient as PRC,
   Address,
@@ -128,12 +128,12 @@ async function main(){
   // Initiate the TVM provider 
 
   // Preparing the params
-  const tokenRootAddress: string = "<YOUR_TOKEN_ROOT_ADDRESS>";
+  const tokenRootAddress: Address = new Address("<YOUR_TOKEN_ROOT_ADDRESS>");
 
   // creating an instance of the token root contract
-  const tokenRootContract = new provider.Contract(
+  const tokenRootContract: Contract<tip3Artifacts.FactorySource['TokenRoot']> = new provider.Contract(
     tip3Artifacts.factorySource['TokenRoot'],
-    new Address(tokenRootAddress)
+    tokenRootAddress
   );
   
   // Checking if the user already doesn't have any deployed wallet of that token root
@@ -142,12 +142,14 @@ async function main(){
             .walletOf({ answerId: 0, walletOwner: providerAddress })
             .call()
         ).value0,
+
+  // checking if the token wallet is already deployed or not  
   if (
     (
       await provider.getFullContractState({
         address: tokenWalletAddress,
       })
-    ).state?.isdeployed
+    ).state?.isDeployed
   )
     throw new Error('You already have a token wallet of this token !');
   
@@ -170,7 +172,7 @@ async function main(){
       await provider.getFullContractState({
         address: tokenWalletAddress,
       })
-    ).state?.isdeployed
+    ).state?.isDeployed
   ) {
     console.log(` Token wallet deployed to: ${
       (await tokenRootContract.methods.walletOf({ answerId: 0, walletOwner: providerAddress }).call()
