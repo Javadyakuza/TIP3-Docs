@@ -49,12 +49,13 @@ export async function deployTokenRootEip(
       throw new Error('initialSupplyTo address is not valid !!');
     }
     if (!(await isValidEverAddress(provider, params.rootOwner))) {
-      throw new Error('initialSupplyTo address is not valid !!');
+      throw new Error('rootOwner address is not valid !!');
     }
+
     /* 
     Returns compilation artifacts based on the .sol file name
       or name from value config.externalContracts[pathToLib].
-  */
+    */
     const TokenRoot = tip3Artifacts.factorySource['TokenRoot'];
     const TRArt = tip3Artifacts.artifacts.TokenRoot;
     const TWArt = tip3Artifacts.artifacts.TokenWallet;
@@ -99,11 +100,12 @@ export async function deployTokenRootEip(
      * @important Its really important to the mentioned disclaimer otherwise the func will be lost since its just an simple money transfer !!
      */
     // Send the coins to the address
-    const amount: string = params.initialSupplyTo == zeroAddress ? '2' : '4';
+    const amount: string = params.initialSupplyTo == zeroAddress ? '2' : '5';
+
     await provider.sendMessage({
       sender: senderAddress,
       recipient: expectedAddress,
-      amount: ethers.parseUnits(amount, 9).toString(), // 2|3_000_000_000 (2 | 3 evers)
+      amount: ethers.parseUnits(amount, 9).toString(),
       bounce: true, // It is important to set 'bounce' to false
       // to ensure funds remain in the contract.
       stateInit: stateInit.stateInit,

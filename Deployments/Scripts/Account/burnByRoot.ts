@@ -8,8 +8,10 @@ import { useProviderInfo } from '../helpers/useWalletsData';
 
 const zeroAddress = '0:0000000000000000000000000000000000000000000000000000000000000000';
 
+// candle is the person whose tokens is going to be burnt
 export async function burnByRootTip3Eip(
   tokenRootAddress: string,
+  candleAddress: string,
   amount: string
 ): Promise<Address | string | Transaction | undefined | any> {
   // setting up the provider
@@ -25,15 +27,30 @@ export async function burnByRootTip3Eip(
 
     return 'Failed';
   }
+  if (!isValidEverAddress(provider, candleAddress)) {
+    toast('Please enter a valid recipient address !', 0);
+
+    return 'Failed';
+  }
+
   try {
     const tokenRootContract = new provider.Contract(
       tip3Artifacts.factorySource['TokenRoot'],
       new Address(tokenRootAddress)
     );
     const tokenWalletAddress = (
-      await tokenRootContract.methods.walletOf({ answerId: 0, walletOwner: senderAddress }).call()
+      await tokenRootContract.methods
+        .walletOf({ answerId: 0, walletOwner: new Address(candleAddress) })
+        .call()
     ).value0;
 
+    if (
+      (await tokenRootContract.methods.rootOwner({ answerId: 0 }).call()).value0 == senderAddress
+    ) {
+      toast(' You are not the root owner !!', 0);
+
+      return 'Failed';
+    }
     if (
       !(
         await provider.getFullContractState({
@@ -41,7 +58,7 @@ export async function burnByRootTip3Eip(
         })
       ).state?.isDeployed
     ) {
-      toast('You dont have tokens to burn !', 0);
+      toast("Recipient doesn't have any tokens to burn !", 0);
 
       return 'Failed';
     }
@@ -66,18 +83,19 @@ export async function burnByRootTip3Eip(
     const burnRes: Transaction = await tokenRootContract.methods
       .burnTokens({
         amount: ethers.parseUnits(amount, Number(decimals)).toString(),
-        walletOwner: senderAddress,
+        walletOwner: new Address(candleAddress),
         payload: '',
         remainingGasTo: senderAddress,
         callbackTo: new Address(zeroAddress),
       })
       .send({
         from: senderAddress,
-        amount: ethers.parseUnits('3', 9).toString(),
+        amount: ethers.parseUnits('1', 9).toString(),
+        bounce: true,
       });
 
     if (burnRes.aborted) {
-      toast(`Transaction aborted ! ${burnRes.exitCode}`, 0);
+      toast(`Transaction aborted ! ${(burnRes.exitCode, burnRes.resultCode)}`, 0);
 
       return burnRes;
     }

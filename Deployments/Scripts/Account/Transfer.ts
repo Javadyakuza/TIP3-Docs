@@ -22,11 +22,13 @@ export async function transferTokenEip(
   try {
     [provider, senderAddress] = await useProviderInfo();
 
-    if (
-      !isValidEverAddress(provider, tokenRootAddress) ||
-      !isValidEverAddress(provider, receiverAddress)
-    ) {
-      toast('Please enter a valid ever address !', 0);
+    if (!isValidEverAddress(provider, tokenRootAddress)) {
+      toast('Please enter a valid token root address !', 0);
+
+      return 'Failed';
+    }
+    if (!isValidEverAddress(provider, receiverAddress)) {
+      toast('Please enter a valid receiver address !', 0);
 
       return 'Failed';
     }
@@ -47,9 +49,9 @@ export async function transferTokenEip(
       ).value0
     );
     // Checking recipient has a deploy wallet of that h token root
-    let amount = '3';
+    let amount = '2';
     let oldBal = 0;
-
+    let deployWalletValue = 0;
     const receiverTokenWalletAddress = (
       await tokenRootContract.methods
         .walletOf({ answerId: 0, walletOwner: new Address(receiverAddress) })
@@ -63,15 +65,12 @@ export async function transferTokenEip(
     if (
       !(
         await provider.getFullContractState({
-          address: (
-            await tokenRootContract.methods
-              .walletOf({ answerId: 0, walletOwner: senderAddress })
-              .call()
-          ).value0,
+          address: receiverTokenWalletAddress,
         })
       ).state?.isDeployed
     ) {
       amount = '4';
+      deployWalletValue = Number(ethers.parseUnits('2', 9).toString());
     } else {
       possibleRecipientTokenWallet = new provider.Contract(
         // Transferring the token
@@ -89,7 +88,7 @@ export async function transferTokenEip(
       .transfer({
         amount: ethers.parseUnits(TokenAmount, Number(decimals)).toString(),
         recipient: new Address(receiverAddress),
-        deployWalletValue: ethers.parseUnits('2', 9).toString(),
+        deployWalletValue: deployWalletValue,
         remainingGasTo: senderAddress,
         notify: notify,
         payload: '',
@@ -110,7 +109,7 @@ export async function transferTokenEip(
         (await possibleRecipientTokenWallet.methods.balance({ answerId: 0 }).call({})).value0
       );
       // Checking if the tokens are received successfully
-      if (amount == '2' && newBal >= Number(TokenAmount) * 10 * decimals + oldBal) {
+      if (amount == '2' && newBal >= Number(TokenAmount) + oldBal) {
         toast('tokens transferred successfully', 1);
 
         return `tx Hash: ${transferRes.id.hash}`;
@@ -138,7 +137,7 @@ export async function transferTokenToWalletEip(
     [provider, senderAddress] = await useProviderInfo();
 
     if (!isValidEverAddress(provider, tokenWalletAddress)) {
-      toast('Please enter a valid ever address !', 0);
+      toast('Please enter a valid token Wallet address !', 0);
 
       return 'Failed';
     }
@@ -159,11 +158,14 @@ export async function transferTokenToWalletEip(
       ).value0
     );
 
-    const decimals = (await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0;
+    const decimals = Number(
+      (await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0
+    );
 
     // Checking recipient has a deploy wallet of that h token root
-    const amount = '3';
+    const amount = '2';
 
+    // if the token wallet was not deployed before will be catcher here
     const oldBal: string = (
       await recipientTokenWalletContract.methods.balance({ answerId: 0 }).call()
     ).value0;

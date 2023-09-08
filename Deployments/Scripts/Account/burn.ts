@@ -9,7 +9,6 @@ import { useProviderInfo } from '../helpers/useWalletsData';
 const zeroAddress = '0:0000000000000000000000000000000000000000000000000000000000000000';
 
 export async function burnTip3Eip(
-  tokenWalletAddress: string,
   tokenRootAddress: string,
   amount: string
 ): Promise<Address | string | Transaction | undefined | any> {
@@ -20,11 +19,7 @@ export async function burnTip3Eip(
   } catch (e: any) {
     throw new Error(e.message);
   }
-  if (!isValidEverAddress(provider, tokenWalletAddress)) {
-    toast('Please enter a valid token root address !', 0);
 
-    return 'Failed';
-  }
   if (!isValidEverAddress(provider, tokenRootAddress)) {
     toast('Please enter a valid token root address !', 0);
 
@@ -32,15 +27,31 @@ export async function burnTip3Eip(
   }
   try {
     // creating an instance of the token root contract
-    const tokenWalletContract = new provider.Contract(
-      tip3Artifacts.factorySource['TokenWallet'],
-      new Address(tokenWalletAddress)
-    );
+
     const tokenRootContract = new provider.Contract(
       tip3Artifacts.factorySource['TokenRoot'],
       new Address(tokenRootAddress)
     );
 
+    const tokenWalletAddress: Address = (
+      await tokenRootContract.methods.walletOf({ answerId: 0, walletOwner: senderAddress }).call({})
+    ).value0;
+
+    if (
+      !(
+        await provider.getFullContractState({
+          address: tokenWalletAddress,
+        })
+      ).state?.isDeployed
+    ) {
+      toast("You don't have any tokens to burn !", 0);
+
+      return 'Failed';
+    }
+    const tokenWalletContract = new provider.Contract(
+      tip3Artifacts.factorySource['TokenWallet'],
+      tokenWalletAddress
+    );
     // Fetching the decimals
     const [decimals, symbol] = await Promise.all([
       (await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0,
@@ -61,7 +72,8 @@ export async function burnTip3Eip(
       })
       .send({
         from: senderAddress,
-        amount: ethers.parseUnits('3', 9).toString(),
+        amount: ethers.parseUnits('1', 9).toString(),
+        bounce: true,
       });
 
     if (burnRes.aborted) {

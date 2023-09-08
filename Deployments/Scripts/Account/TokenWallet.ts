@@ -17,7 +17,7 @@ export async function deployTokenWalletEip(
     throw new Error(e.message);
   }
   if (!isValidEverAddress(provider, tokenRootAddress)) {
-    toast('Please enter a valid ever address !', 0);
+    toast('Please enter a valid token root address !', 0);
 
     return 'Failed';
   }
@@ -76,7 +76,7 @@ export async function deployTokenWalletEip(
         })
       ).state?.isDeployed
     ) {
-      toast('Token Wallet successfully deployed !');
+      toast('Token Wallet successfully deployed !', 1);
 
       return (
         await tokenRootContract.methods.walletOf({ answerId: 0, walletOwner: senderAddress }).call()

@@ -24,7 +24,7 @@ Furthermore, it is important to note that only the owner of the root contract ha
 
 :::
 
-<div class="transferToken">
+<div class="burnToken">
 
 <span  :class="LLdis" style="font-size: 1.1rem;">
 
@@ -182,20 +182,23 @@ async function main()
 
   // Initiate the TVm provider 
   const zeroAddress: Address = new Address('0:0000000000000000000000000000000000000000000000000000000000000000');
-  const tokenWalletAddress: Address = new Address("<YOUR_TOKEN_ROOT_ADDRESS>")
   const tokenRootAddress: Address = new Address("<YOUR_TOKEN_WALLET_ADDRESS>")
 
 
   try {
-    // creating an instance of the token root contract
-    const tokenWalletContract: Contract<tip3Artifacts.factorySources["TokenWallet"]> = new provider.Contract(
-      tip3Artifacts.factorySource['TokenWallet'],
-      tokenWalletAddress
-    );
+
+    // Fetching the required contracts
     const tokenRootContract: Contract<tip3Artifacts.factorySources["TokenRoot"]> = new provider.Contract(
       tip3Artifacts.factorySource['TokenRoot'],
       tokenRootAddress
     );
+    const tokenWalletAddress : Address = (await tokenRootContract.methods.walletOf({answerId: 0, walletOwner: providerAddress}).call({})).value0
+    
+    const tokenWalletContract: Contract<tip3Artifacts.factorySources["TokenWallet"]> = new provider.Contract(
+      tip3Artifacts.factorySource['TokenWallet'],
+      tokenWalletAddress
+    );
+
 
     // Fetching the decimals
     const [decimals, symbol] = await Promise.all([
@@ -376,33 +379,44 @@ Congratulations, you have successfully burned TIP-3 tokens from a token wallet.
 
 <div :class="eipAction" >
 
-<div :class="transfer">
+<div :class="burn">
 
+## Burn TIP-3 tokens  
 
-
-## burn TIP-3 tokens  
-
-::: info 
-In order to utilize the `burnByRoot` you must be the root owner !
-:::
 
 <p class=actionInName style="margin-bottom: 0;">Token Root address</p> 
 <input ref="actionTokenRootAddress" class="action Ain" type="text"/>
 
-<p class=actionInName style="margin-bottom: 0;">Recipient address</p> 
-<input ref="actionRecipientAddress" class="action Ain" type="text"/>
-
 <p class=actionInName style="margin-bottom: 0;">Amount</p> 
 <input ref="actionAmount" class="action Ain" type="text"/>
 
-<label class="container"> Notify
-<input class="checkboxInput" ref="actionNotify" type="checkbox">
-<span class="checkmark"></span>
-</label>
+<button @click="burnTokens" class="burnTokenBut" >burn Tokens</button>
 
-<button @click="transferTokens" class="transferTokenBut" >Transfer Tokens</button>
 </div>
-<p id="output-p" :class="EIPdis" ref="transferTokenOutput"></p>
+<p id="output-p" :class="EIPdis" ref="burnTokenOutput"></p>
+
+## Burn TIP-3 Tokens By root 
+
+::: info 
+In order to utilize the `burnByRoot` you must be the root owner !
+:::
+<div class="burnByRoot">
+<p class=actionInName style="margin-bottom: 0;">Token Root address</p> 
+<input ref="actionTokenRootAddressByRoot" class="action Ain" type="text"/>
+
+<p class=actionInName style="margin-bottom: 0;">Target address to burn tokens from</p> 
+<input ref="actionCandleAddressByRoot" class="action Ain" type="text"/>
+
+<p class=actionInName style="margin-bottom: 0;">Amount</p> 
+<input ref="actionAmountByRoot" class="action Ain" type="text"/>
+
+<button @click="burnTokensByRoot" class="burnTokenBut" >burn TIP-3 Tokens By Root </button>
+</div>
+<p id="output-p" :class="EIPdis" ref="burnTokenOutputByRoot"></p>
+
+
+
+
 
 </div>
 
@@ -413,10 +427,12 @@ In order to utilize the `burnByRoot` you must be the root owner !
 <script lang="ts" >
 import { defineComponent, ref, onMounted } from "vue";
 import {toast} from "/src/helpers/toast";
-import {transferTokenEip, transferTokenToWalletEip} from "../Scripts/Account/Transfer"
+import {burnTip3Eip} from "../Scripts/Account/burn"
+import {burnByRootTip3Eip} from "../Scripts/Account/burnByRoot"
+
 
 export default defineComponent({
-  name: "transferToken",
+  name: "burnToken",
   data(){
     return{
         LLdis: "cbShow",
@@ -451,78 +467,79 @@ export default defineComponent({
         this.llAction = "llAction cbHide"
         this.eipAction = "eipAction cbShow"
     }
-  async function transferTokens(){
-          this.$refs.transferTokenOutput.innerHTML = "Processing ..."
+  async function burnTokens(){
+          this.$refs.burnTokenOutput.innerHTML = "Processing ..."
         // checking of all the values are fully filled 
         if (
             this.$refs.actionTokenRootAddress.value == ""
 
         ){
             toast("Token root address field is required !",0)
-            this.$refs.transferTokenOutput.innerHTML = "Failed"
+            this.$refs.burnTokenOutput.innerHTML = "Failed"
             return
-        }
-                // checking of all the values are fully filled 
-        if (
-            this.$refs.actionRecipientAddress.value == ""
-
-        ){
-            toast("Recipient address field is required !",0)
-            this.$refs.transferTokenOutput.innerHTML = "Failed"
-            return
-        }        // checking of all the values are fully filled 
+        }    
+        // checking of all the values are fully filled 
         if (
             this.$refs.actionAmount.value == ""
 
         ){
-            toast("Amount field is required !",0)
-            this.$refs.transferTokenOutput.innerHTML = "Failed"
+            toast("Amount field is required !", 0)
+            this.$refs.burnTokenOutput.innerHTML = "Failed"
             return
         }
-        let transferTokenRes = await transferTokenEip(
+ 
+        
+        let burnTokenRes = await burnTip3Eip(
           this.$refs.actionTokenRootAddress.value,
-          this.$refs.actionRecipientAddress.value,
           this.$refs.actionAmount.value,
-          this.$refs.actionNotify.checked
           )
           // Rendering the output     
-          transferTokenRes = !transferTokenRes ? "Failed" :  transferTokenRes;
-          this.$refs.transferTokenOutput.innerHTML = transferTokenRes;
+          burnTokenRes = !burnTokenRes ? "Failed" :  burnTokenRes;
+          this.$refs.burnTokenOutput.innerHTML = burnTokenRes;
   }
 
-   async function transferTokensToWallet(){
-          this.$refs.WalletTransferTokenOutput.innerHTML = "Processing ..."
+   async function burnTokensByRoot(){
+          this.$refs.burnTokenOutputByRoot.innerHTML = "Processing ..."
         if (
-            this.$refs.actionWalletRecipientAddress.value == ""
+            this.$refs.actionTokenRootAddressByRoot.value == ""
 
         ){
-            toast("Recipient address field is required !",0)
-            this.$refs.actionWalletAmount.innerHTML = "Failed"
+            toast("token Root field field is required !",0)
+            this.$refs.burnTokenOutputByRoot.innerHTML = "Failed"
             return
-        }        // checking of all the values are fully filled 
+        }  
         if (
-            this.$refs.actionWalletNotify.value == ""
+            this.$refs.actionCandleAddressByRoot.value == ""
+
+        ){
+            toast("target field is required !", 0)
+            this.$refs.burnTokenOutputByRoot.innerHTML = "Failed"
+            return
+        }  
+        // checking of all the values are fully filled 
+        if (
+            this.$refs.actionAmountByRoot.value == ""
 
         ){
             toast("Amount field is required !",0)
-            this.$refs.WalletTransferTokenOutput.innerHTML = "Failed"
+            this.$refs.burnTokenOutputByRoot.innerHTML = "Failed"
             return
         }
-        let transferTokenRes = await transferTokenToWalletEip(
-          this.$refs.actionWalletRecipientAddress.value,
-          this.$refs.actionWalletAmount.value,
-          this.$refs.actionWalletNotify.checked
+        let burnTokenRes = await burnByRootTip3Eip(
+          this.$refs.actionTokenRootAddressByRoot.value,
+          this.$refs.actionCandleAddressByRoot.value,
+          this.$refs.actionAmountByRoot.value
           )
           // Rendering the output     
-          transferTokenRes = !transferTokenRes ? "Failed" :  transferTokenRes;
-          this.$refs.WalletTransferTokenOutput.innerHTML = transferTokenRes;
+          burnTokenRes = !burnTokenRes ? "Failed" :  burnTokenRes;
+          this.$refs.burnTokenOutputByRoot.innerHTML = burnTokenRes;
   }
   
 return {
         eipHandler,
         llHandler,
-        transferTokens,
-        transferTokensToWallet
+        burnTokens,
+        burnTokensByRoot
     };
   },
 });
@@ -530,7 +547,7 @@ return {
 </script>
 
 <style>
-.transferTokens{
+.burnTokens{
   font-size: 1.1rem;
 }
 .action{
@@ -541,7 +558,7 @@ return {
     font-size: .9rem;
 }
 
-.transferTokenBut, .switcherContainer, .codeBlockContainer, .Ain
+.burnTokenBut, .switcherContainer, .codeBlockContainer, .Ain
 {
   background-color: var(--vp-c-bg-mute);
   transition: background-color 0.1s;
@@ -554,14 +571,14 @@ return {
     padding-left : 10px;
     margin : 0;
 }
-.transferTokenBut{
+.burnTokenBut{
     cursor:pointer;
     padding: 5px 12px;
     display: flex;
     transition: all ease .3s;
 }
 
-.transferTokenBut:hover{
+.burnTokenBut:hover{
       border: 1px solid var(--light-color-ts-class);
 }
 

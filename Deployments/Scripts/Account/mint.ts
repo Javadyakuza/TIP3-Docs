@@ -37,7 +37,7 @@ export async function mintTip3Eip(
 
     // Fetching the decimals
     const [decimals, symbol] = await Promise.all([
-      (await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0,
+      Number((await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0),
       (await tokenRootContract.methods.symbol({ answerId: 0 }).call()).value0,
     ]);
 
@@ -69,7 +69,8 @@ export async function mintTip3Eip(
       })
       .send({
         from: senderAddress,
-        amount: ethers.parseUnits(deployWalletValue == 0 ? '2' : '5', 9).toString(),
+        amount: ethers.parseUnits(deployWalletValue == 0 ? '3' : '5', 9).toString(),
+        bounce: true,
       });
 
     if (mintRes.aborted) {
@@ -78,14 +79,20 @@ export async function mintTip3Eip(
       return mintRes;
     }
     // Checking if the user already doesn't have the any wallet of that token root
-    // Getting the recipient balance
+    // Getting the recipient token wallet balance
+    const recipientTWAddress = (
+      await tokenRootContract.methods
+        .walletOf({ answerId: 0, walletOwner: new Address(recipient) })
+        .call({})
+    ).value0;
+
     const recipientTWCon = new provider.Contract(
       tip3Artifacts.factorySource.TokenWallet,
-      new Address(recipient)
+      recipientTWAddress
     );
     const recipientBal = ethers.formatUnits(
       (await recipientTWCon.methods.balance({ answerId: 0 }).call({})).value0,
-      decimals
+      Number(decimals)
     );
 
     if (recipientBal >= amount) {

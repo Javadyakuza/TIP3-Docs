@@ -21,8 +21,7 @@ Before we start to write our scripts we need to make sure that there is a file n
 
 :::danger
 
-Please note that if the  `Notify`  parameter is set to true for the transaction, any change will be sent back to the sender's  `tokenWallet`  contract. Therefore, if you wish to receive the change back into your  `account contract` , please leave the  `Notify`  checkbox unchecked.
-
+Please be aware that if the `Notify` parameter is set to true for the transaction, any change will be sent back to the sender's `tokenWallet` contract. Therefore, if you prefer to receive the change back into your `account contract`, please ensure that the `Notify` checkbox remains unchecked.
 :::
 
 
