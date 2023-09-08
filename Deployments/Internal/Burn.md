@@ -41,7 +41,7 @@ Using the `burn` function to burn some TIP-3 tokens :
 import { EverWalletAccount } from "everscale-standalone-client";
 
 /**
- * locklift is globals declared object 
+ * locklift is a globally declared object  
  */
 
 async function main() {
@@ -112,7 +112,7 @@ Using the `burnByRoot` function, we will call the burnTokens on the token root c
 import { EverWalletAccount } from "everscale-standalone-client";
 
 /**
- * locklift is globals declared object 
+ * locklift is a globally declared object  
  */
 
 async function main() {
@@ -429,6 +429,7 @@ return {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
     padding: 8px 12px;
+    font-size: 1rem;
 }
 .cbShow{
     display: block;

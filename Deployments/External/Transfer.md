@@ -6,7 +6,7 @@ Therefore, making a transfer is as easy as shelling pears!
 
 <div class="transferToken">
 
-::: tip
+::: info
 Before we start to write our scripts we need to make sure that there is a file named `04-transfer-tip3.ts` in the `script` folder in the project root.
 :::
 
@@ -55,7 +55,7 @@ Certainly! Transferring TIP-3 tokens is considered one of the easier steps in th
 
 ```typescript
 /**
- * locklift is globals declared object 
+ * locklift is a globally declared object  
  */
 
 import { Address, Contract, Signer } from "locklift";

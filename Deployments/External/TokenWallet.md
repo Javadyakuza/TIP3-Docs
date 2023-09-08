@@ -46,7 +46,7 @@ Using the  `everscale-inpage-provider`  to deploy a token wallet is as easy as a
 
 ```typescript
 /**
- * locklift is globals declared object 
+ * locklift is a globally declared object  
  */
 
 import { Address, Contract, Signer } from "locklift";

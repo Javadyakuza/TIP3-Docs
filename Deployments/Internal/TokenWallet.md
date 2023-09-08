@@ -22,7 +22,7 @@ In Everscale, a contract can have an external (msg.pubkey) and/or internal (msg.
 :::
 
 
-::: tip
+::: info
 Before we start to write our scripts we need to make sure that there is a file named `03-deploy-wallet.ts` in the `script` folder in the project root.
 :::
 
@@ -325,6 +325,7 @@ return {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
     padding: 8px 12px;
+    font-size: 1rem;
 }
 .cbShow{
     display: block;

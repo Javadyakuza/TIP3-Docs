@@ -62,7 +62,7 @@ Before we start to write our scripts we need to make sure that there is a file n
 
 ````typescript
 /**
- * locklift is globals declared object 
+ * locklift is a globally declared object  
  */
 
 import { EverWalletAccount } from "everscale-standalone-client";

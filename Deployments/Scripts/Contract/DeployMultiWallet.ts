@@ -28,9 +28,9 @@ export async function deployMultiWalletTip3Eip(): Promise<
     Returns compilation artifacts based on the .sol file name
       or name from value config.externalContracts[pathToLib].
   */
-    const MV = tip3Artifacts.factorySource['MultiWalletTIP3'];
+    const MW = tip3Artifacts.factorySource['MultiWalletTIP3'];
     const TWArt = tip3Artifacts.artifacts.TokenWallet;
-    const RDArt = tip3Artifacts.artifacts.RootDeployer;
+    const MWArt = tip3Artifacts.artifacts.MultiWalletTIP3;
 
     // define the deployParams type
     type DeployParams<Abi> = GetExpectedAddressParams<Abi> & {
@@ -45,7 +45,7 @@ export async function deployMultiWalletTip3Eip(): Promise<
     const senderPublicKey: string = await provider.extractPublicKey(accountFullState.boc);
 
     const deployParams: DeployParams<tip3Artifacts.FactorySource['MultiWalletTIP3']> = {
-      tvc: RDArt.tvc,
+      tvc: MWArt.tvc,
       workchain: 0,
       publicKey: senderPublicKey,
       initParams: {
@@ -53,10 +53,10 @@ export async function deployMultiWalletTip3Eip(): Promise<
       },
     };
     // Get the expected contract address
-    const expectedAddress = await provider.getExpectedAddress(MV, deployParams);
+    const expectedAddress = await provider.getExpectedAddress(MW, deployParams);
 
     // Get the state init
-    const stateInit = await provider.getStateInit(MV, deployParams);
+    const stateInit = await provider.getStateInit(MW, deployParams);
 
     /**
      * @dev Notice that if the initialSupply was to an address except the zeroAddress the amount that is sent to the calculated address must be more that the walletDeployValue
@@ -67,7 +67,7 @@ export async function deployMultiWalletTip3Eip(): Promise<
     await provider.sendMessage({
       sender: senderAddress,
       recipient: expectedAddress,
-      amount: ethers.parseUnits('4', 9).toString(),
+      amount: ethers.parseUnits('20', 9).toString(),
       bounce: false, // It is important to set 'bounce' to false
       // to ensure funds remain in the contract.
       stateInit: stateInit.stateInit,
@@ -75,14 +75,14 @@ export async function deployMultiWalletTip3Eip(): Promise<
 
     toast('Fund sent to the Calculated address !', 2);
     // Create a contract instance
-    const MVcon: Contract<tip3Artifacts.FactorySource['MultiWalletTIP3']> = new provider.Contract(
-      MV,
+    const MWcon: Contract<tip3Artifacts.FactorySource['MultiWalletTIP3']> = new provider.Contract(
+      MW,
       expectedAddress
     );
 
     toast('Sending stateInit to the Calculated address ...', 2);
     // Call the contract constructor
-    const { transaction: deployRes } = await MVcon.methods
+    const { transaction: deployRes } = await MWcon.methods
       .constructor({
         _walletCode: TWArt.code,
       })
@@ -93,9 +93,9 @@ export async function deployMultiWalletTip3Eip(): Promise<
 
     // returning the tx response as a string if aborted
     if (deployRes.aborted) {
-      toast(`Transaction aborted ! ${deployRes.exitCode}`, 0);
+      toast(`Transaction aborted ! ${(deployRes.exitCode, deployRes.resultCode)}`, 0);
 
-      return `Failed ${deployRes.exitCode}`;
+      return `Failed ${(deployRes.exitCode, deployRes.resultCode)}`;
     }
 
     // checking if the token root is deployed successfully by calling one of its methods
@@ -111,9 +111,12 @@ export async function deployMultiWalletTip3Eip(): Promise<
 
       return `Multi Wallet Tip3 deployed to ${expectedAddress.toString()}`;
     } else {
-      toast(`Multi Wallet Tip3 deployment failed !${deployRes.exitCode}`, 0);
+      toast(
+        `Multi Wallet Tip3 deployment failed !${(deployRes.exitCode, deployRes.resultCode)}`,
+        0
+      );
 
-      return `Failed ${deployRes.exitCode}`;
+      return `Failed ${(deployRes.exitCode, deployRes.resultCode)}`;
     }
   } catch (e: any) {
     toast(e.message, 0);

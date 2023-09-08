@@ -48,7 +48,7 @@ Minting TIP-3 tokens using everscale-inpage-provider tool is pretty easy as well
 import { EverWalletAccount } from "everscale-standalone-client";
 
 /**
- * locklift is globals declared object 
+ * locklift is a globally declared object  
  */
 
 async function main() {
@@ -363,6 +363,7 @@ return {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
     padding: 8px 12px;
+    font-size: 1rem;
 }
 .cbShow{
     display: block;

@@ -43,7 +43,7 @@ Please be aware that if the `Notify` parameter is set to true for the transactio
 
 ````typescript
 /**
- * locklift is globals declared object 
+ * locklift is a globally declared object  
  */
 
 import { EverWalletAccount } from "everscale-standalone-client";
@@ -239,7 +239,7 @@ Congratulations, you have successfully minted TIP-3 tokens for a token wallet.
 ## Mint TIP-3 tokens  
 
 ::: info 
-In order to be able to mint token for token wallet from a token root you must be the root owner .
+In order to be able to mint token for a token wallet you must be the token root owner .
 :::
 
 <p class=actionInName style="margin-bottom: 0;">Token Root address</p> 
