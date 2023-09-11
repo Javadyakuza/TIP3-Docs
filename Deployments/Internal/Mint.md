@@ -1,31 +1,38 @@
-# Transfer TIP-3 Tokens
+# Mint TIP-3 Tokens
 
 In previous section we have learned to deploy a token root and wallet using the our custom contract.&#x20;
 
 In this section we will learn the how to mint some tokens for the deployed token wallet, it's pretty easy and straight forward, you just need to pay attention to a few small points.
 
-<div class="transferToken">
-
-::: info
-Before we start to write our scripts we need to make sure that there is a file named `03-mint-tip3.ts` in the `script` folder in the project root.
-:::
-
-::: tip 
-
+::: tip
 - Notice that the owner of the deployed Token Wallet is the `MultiWalletTIP3` contract that we deployed earlier.  
-- the `notify` parameter is always true in `MultiWalletTIP3` in order to receive callback function from the token root contract and update the state of the `MultiWalletTIP3` contract.
+- the `notify` parameter is always true in `MultiWalletTIP3` in order to receive callback function from the token root  and update the state of the `MultiWalletTIP3` contract.
+- We send the `mint` transaction to the `token root` contract,  so how do we update the `MultiWalletTIP3` contract state ?\
+There is a callback function named `onAcceptTokensMint` which will be called by the token wallet when the tokens are minted if we set the parameter `notify` to _true_ !
 :::
+
+<div class="mintToken">
+
 
 <span  :class="LLdis" style="font-size: 1.1rem;">
 
-We can mint some TIP-3 tokens for the target Token Wallet as explained in the code samples below: 
+We can mint TIP-3 tokens for the target Token Wallet, as shown in the code samples below using the locklift tool.
+
+
+- Before we start to write our scripts we need to make sure that there is a file named `03-mint-tip3.ts` in the `script` folder in the project root.
+:::
 
 </span>
 
 <span :class="EIPdis" style="font-size: 1.1rem;">
 
-Minting TIP-3 tokens using everscale-inpage-provider tool is pretty easy as well:
+Minting TIP-3 tokens using everscale-inpage-provider is pretty easy as well:
 
+::: info
+
+- You may find the following code sample a bit complex, that's because we want to get familiar with the multi wallet functionalities and how to use them.  
+
+:::
 
 </span>
 <br/>
@@ -45,60 +52,74 @@ Minting TIP-3 tokens using everscale-inpage-provider tool is pretty easy as well
 
 ```` typescript
 
-import { EverWalletAccount } from "everscale-standalone-client";
-
 /**
  * locklift is a globally declared object  
  */
 
+import { EverWalletAccount } from "everscale-standalone-client";
+import { factorySource ,FactorySource} from "../build/factorySource";
+import {Address, Contract, zeroAddress, Signer} from "locklift";
+
 async function main() {
   // Setting up the signer and the wallet
-  const signerAlice = (await locklift.keystore.getSigner("0"))!;
+  const signer: Signer: = (await locklift.keystore.getSigner("0"))!;
   
-  const AliceEverWallet = await EverWalletAccount.fromPubkey({ publicKey: signer.publicKey!, workchain: 0 });
+  const everWallet: EverWalletAccount = await EverWalletAccount.fromPubkey({ publicKey: signer.publicKey!, workchain: 0 });
   
+
   // deploy or use the Root Deployer, Multi Wallet and the Token Root contracts from previous sections 
-  const AliceMWCon;  
-  const tokenRootCon;
+  const tokenRootAddress: Address = new Address('<YOUR_TOKEN_ROOT_ADDReSS>');
+  const multiWalletAddress: Address = new Address('<YOUR_MULTI_WALLET_ADDRESS>');
 
-  // Deploying a TokenWallet contract for Alice using the newly deployed MultiWallet contract
-  await AliceMWCon.methods
-    .deployWallet({
-      _deployWalletBalance: locklift.utils.toNano("10"),
-      _tokenRoot: tokenRootCon.address,
-    })
-    .sendExternal({ publicKey: signerAlice.publicKey });
+  const [tokenRootContract, multiWalletContract] = await Promise.all([
+    await locklift.factory.getDeployedContract("TokenRoot", tokenRootAddress),
+    await locklift.factory.getDeployedContract("MultiWalletTIP3", tokenRootAddress),
+  ])
 
-  // Fetching the newly deployed Token Wallet
-  const AliceTW = (await AliceMWCon.methods.wallets().call()).wallets.map(item => {
-    if (item[0].toString() == tokenRootCon.address.toString()) {
+   const [decimals, symbol] = await Promise.all([
+    Number((await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0),
+    (await tokenRootContract.methods.symbol({ answerId: 0 }).call()).value0,
+  ]);
+
+  let tokenWalletContract: Contract<FactorySource['TokenWallet']>;
+  
+  // fetching the balance of the token wallet associated with the token root and determining of its deployed or no 
+  const tokenWalletData = (await multiWalletContract.methods.wallets().call()).wallets.map(item => {
+    if (item[0].toString() == tokenRootAddress.toString()) {
       return item[1];
     }
   });
+  
+  let deployWalletValue: number = 0;
+  if (tokenWalletData[0]!.tokenWallet.toString() != zeroAddress.toString()){
+    // means that the token wallet is deployed for the user
+    tokenWalletContract = locklift.factory.getDeployedContract("TokenWallet", tokenWalletData[0]!.tokenWallet);
+    console.log("Token Wallet is deployed, balance before mint: ", Number(tokenWalletData[0]!.balance) / 10 ^ decimals);
+    deployWalletValue = locklift.utils.toNano("2");
+  }else{
+    console.log("Token Wallet is not deployed, balance before mint: 0");
+  }
 
-  const AliceTWCon = locklift.factory.getDeployedContract("TokenWallet", AliceTW[0]!.tokenWallet);
 
-  console.log("Alice Token Wallet  ", AliceTW[0]!.tokenWallet.toString());
-
-  const mintAmount: number = 50_000_000;
+  const mintAmount: number = 50 * 10 * decimals;
 
   // Minting tokens for Alice
-  await tokenRootCon.methods
+  await tokenRootContract.methods
     .mint({
       amount: mintAmount,
-      recipient: AliceMWCon.address,
-      deployWalletValue: 0, // 2 if the token wallet was not deployed
+      recipient: multiWalletAddress, // the owner of the token wallet is the MW contract
+      deployWalletValue: deployWalletValue , 
       notify: true, // To update the Multi Wallet contract
       payload: "",
-      remainingGasTo: AliceEverWallet.address,
+      remainingGasTo: everWallet.address,
     })
-    .send({ from: AliceEverWallet.address, amount: locklift.utils.toNano("2") });
+    .send({ from: everWallet.address, amount: deployWalletValue + locklift.utils.toNano("2") });
 
   // confirming that its received
   console.log(
-    "Is the tokens minted for Alice ?",
-    Number((await AliceTWCon.methods.balance({ answerId: 0 }).call({})).value0) == mintAmount,
-  ); // >> true
+    "balance after mint:",
+    Number((await tokenWalletContract.methods.balance({ answerId: 0 }).call({})).value0) / 10 ^ decimals,
+  ); 
 }
 
 main()
@@ -114,7 +135,96 @@ main()
 
 <span  :class="EIPdis">
 
+````typescript
+import { ProviderRpcClient as PRC, Address, Transaction, Contract} from 'everscale-inpage-provider';
+import * as tip3Artifacts from 'tip3-docs-artifacts';
 
+async function main(){
+
+  // Initiate the TVM provider
+  const tokenRootAddress: Address = new Address("<YOUR_TOKEN_ROOT_ADDRESS>");
+  const multiWalletAddress: Address = new Address("<YOUR_MULTI_WALLET_ADDRESS>");
+  const mintAmount: number = 50;
+
+  try {
+    // creating an instance of the token root contract
+    const tokenRootContract: Contract<tip3Artifacts.factorySource['TokenRoot']> = new provider.Contract(
+      tip3Artifacts.factorySource['TokenRoot'],
+      tokenRootAddress
+    );
+    // creating an instance of the token root contract
+    const MultiWalletContract: Contract<tip3Artifacts.factorySource['MultiWalletTIP3']> = new provider.Contract(
+      tip3Artifacts.factorySource['MultiWalletTIP3'],
+      multiWalletAddress
+    );
+    // Fetching the decimals and symbol
+    const [decimals, symbol] = await Promise.all([
+      Number((await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0),
+      (await tokenRootContract.methods.symbol({ answerId: 0 }).call()).value0,
+    ]);
+
+    // Checking if the user already doesn't have the any wallet of that token root
+    let tokenWalletData = (await MultiWalletContract.methods.wallets().call()).wallets.map(item => {
+      if (item[0].toString() == tokenRootContract.address.toString()) {
+        return item[1];
+      }
+    });
+    const zeroAddress: string = '0:0000000000000000000000000000000000000000000000000000000000000000';
+
+    let deployWalletValue: number = 0;
+
+    const oldBal: number = Number(tokenWalletData[0]!.balance) / 10 ^ decimals;
+
+    if (tokenWalletData[0]!.tokenWallet.toString() == zeroAddress) {
+      deployWalletValue = 2 * 10 * 9;
+    }
+
+    // Deploying a new contract if didn't exist before
+    const deployWalletRes: Transaction = await tokenRootContract.methods
+      .mint({
+        amount: mintAmount * 10 * decimals,
+        deployWalletValue: deployWalletValue,
+        remainingGasTo: senderAddress,
+        recipient: multiWalletAddress,
+        notify: true, // to update the MW contract state
+        payload: '',
+      })
+      .send({
+        from: senderAddress,
+        amount: 2 * 10 * 9 + deployWalletValue,
+        bounce: true, 
+      });
+      
+    if (deployWalletRes.aborted) {
+      console.log(`Transaction aborted ! ${deployWalletRes.exitCode}`);
+
+      return deployWalletRes;
+    }
+
+    tokenWalletData = (await MultiWalletContract.methods.wallets().call()).wallets.map(item => {
+      if (item[0].toString() == tokenRootContract.address.toString()) {
+        return item[1];
+      }
+    });
+    const newBal: number = Number(tokenWalletData[0]!.balance) / 10 ^ decimals;
+
+    if (newBal >= oldBal) {
+      console.log(`${mintAmount} ${symbol}'s minted successfully `);
+
+      return `Old balance: ${oldBal} \n New balance: ${newBal}`;
+    } else {
+      console.log('Minting tokens failed !');
+
+      return `Failed ${(deployWalletRes.exitCode, deployWalletRes.resultCode)}`;
+    }
+  } catch (e: any) {
+    console.log(e.message);
+
+    return `Failed ${e.message}`;
+  }
+}
+
+````
 </span>
 
 </div>
@@ -123,74 +233,53 @@ main()
 <div class="action">
 <div :class="llAction">
 
-Use this command to transfer TIP-3 tokens:
+Use this command to mint TIP-3 tokens:
 
 ```shell
-npx locklift run -s ./scripts/03-mint-tip3.js -n local
+npx locklift run -s ./scripts/03-mint-tip3.ts -n local
 ```
 
-![](</internal_mint.png>)
+![](</mintForTWFromMW.png>)
 
-Congratulations, you have successfully minted TIP-3 tokens for an token wallet deployed a costume contract .
+Congratulations, you have successfully minted TIP-3 tokens for a token wallet deployed by a costume contract .
 
 </div>
 
 <div :class="eipAction" >
 
-<div :class="transfer">
+<div :class="mint">
 
-## Transfer TIP-3 tokens  
+## mint TIP-3 tokens  
 
 <p class=actionInName style="margin-bottom: 0;">Token Root address</p> 
 <input ref="actionTokenRootAddress" class="action Ain" type="text"/>
 
-<p class=actionInName style="margin-bottom: 0;">Recipient address</p> 
-<input ref="actionRecipientAddress" class="action Ain" type="text"/>
+<p class=actionInName style="margin-bottom: 0;">Multi Wallet (recipient) address</p> 
+<input ref="actionMultiWalletAddress" class="action Ain" type="text"/>
 
 <p class=actionInName style="margin-bottom: 0;">Amount</p> 
 <input ref="actionAmount" class="action Ain" type="text"/>
 
-<label class="container"> Notify
-<input class="checkboxInput" ref="actionNotify" type="checkbox">
-<span class="checkmark"></span>
-</label>
 
-<button @click="transferTokens" class="transferTokenBut" >Transfer Tokens</button>
+<button @click="mintTokens" class="mintTokenBut" >mint Tokens</button>
+
 </div>
-<p id="output-p" :class="EIPdis" ref="transferTokenOutput"></p>
 
-<div :class="transferToWallet">
+<p id="output-p" :class="EIPdis" ref="mintTokenOutput"></p>
 
-## Transfer TIP-3 tokens to Token Wallet  
-
-<p class=actionInName style="margin-bottom: 0;">Token Wallet address</p> 
-<input ref="actionWalletRecipientAddress" class="action Ain" type="text"/>
-
-<p class=actionInName style="margin-bottom: 0;">Amount</p> 
-<input ref="actionWalletAmount" class="action Ain" type="text"/>
-
-<label class="container"> Notify
-<input class="checkboxInput" ref="actionWalletNotify" type="checkbox">
-<span class="checkmark"></span>
-</label>
-
-<button @click="transferTokensToWallet" class="transferTokenBut" >Transfer Tokens to Wallet</button>
 </div>
 </div>
 
 </div>
 
-<p id="output-p" :class="EIPdis" ref="WalletTransferTokenOutput"></p>
-
-</div>
 
 <script lang="ts" >
 import { defineComponent, ref, onMounted } from "vue";
 import {toast} from "/src/helpers/toast";
-import {transferTokenEip, transferTokenToWalletEip} from "../Scripts/Account/Transfer"
+import {mintTokenCon} from "../Scripts/Contract/mint"
 
 export default defineComponent({
-  name: "transferToken",
+  name: "mintToken",
   data(){
     return{
         LLdis: "cbShow",
@@ -225,24 +314,24 @@ export default defineComponent({
         this.llAction = "llAction cbHide"
         this.eipAction = "eipAction cbShow"
     }
-  async function transferTokens(){
-          this.$refs.transferTokenOutput.innerHTML = "Processing ..."
+  async function mintTokens(){
+          this.$refs.mintTokenOutput.innerHTML = "Processing ..."
         // checking of all the values are fully filled 
         if (
             this.$refs.actionTokenRootAddress.value == ""
 
         ){
             toast("Token root address field is required !",0)
-            this.$refs.transferTokenOutput.innerHTML = "Failed"
+            this.$refs.mintTokenOutput.innerHTML = "Failed"
             return
         }
                 // checking of all the values are fully filled 
         if (
-            this.$refs.actionRecipientAddress.value == ""
+            this.$refs.actionMultiWalletAddress.value == ""
 
         ){
-            toast("Recipient address field is required !",0)
-            this.$refs.transferTokenOutput.innerHTML = "Failed"
+            toast("Multi Wallet  address field is required !",0)
+            this.$refs.mintTokenOutput.innerHTML = "Failed"
             return
         }        // checking of all the values are fully filled 
         if (
@@ -250,53 +339,24 @@ export default defineComponent({
 
         ){
             toast("Amount field is required !",0)
-            this.$refs.transferTokenOutput.innerHTML = "Failed"
+            this.$refs.mintTokenOutput.innerHTML = "Failed"
             return
         }
-        let transferTokenRes = await transferTokenEip(
+        let mintTokenRes = await mintTokenCon(
           this.$refs.actionTokenRootAddress.value,
-          this.$refs.actionRecipientAddress.value,
+          this.$refs.actionMultiWalletAddress.value,
           this.$refs.actionAmount.value,
-          this.$refs.actionNotify.checked
           )
           // Rendering the output     
-          transferTokenRes = !transferTokenRes ? "Failed" :  transferTokenRes;
-          this.$refs.transferTokenOutput.innerHTML = transferTokenRes;
+          mintTokenRes = !mintTokenRes ? "Failed" :  mintTokenRes;
+          this.$refs.mintTokenOutput.innerHTML = mintTokenRes;
   }
 
-   async function transferTokensToWallet(){
-          this.$refs.WalletTransferTokenOutput.innerHTML = "Processing ..."
-        if (
-            this.$refs.actionWalletRecipientAddress.value == ""
-
-        ){
-            toast("Recipient address field is required !",0)
-            this.$refs.actionWalletAmount.innerHTML = "Failed"
-            return
-        }        // checking of all the values are fully filled 
-        if (
-            this.$refs.actionWalletNotify.value == ""
-
-        ){
-            toast("Amount field is required !",0)
-            this.$refs.WalletTransferTokenOutput.innerHTML = "Failed"
-            return
-        }
-        let transferTokenRes = await transferTokenToWalletEip(
-          this.$refs.actionWalletRecipientAddress.value,
-          this.$refs.actionWalletAmount.value,
-          this.$refs.actionWalletNotify.checked
-          )
-          // Rendering the output     
-          transferTokenRes = !transferTokenRes ? "Failed" :  transferTokenRes;
-          this.$refs.WalletTransferTokenOutput.innerHTML = transferTokenRes;
-  }
   
 return {
         eipHandler,
         llHandler,
-        transferTokens,
-        transferTokensToWallet
+        mintTokens,
     };
   },
 });
@@ -304,7 +364,7 @@ return {
 </script>
 
 <style>
-.transferTokens{
+.mintTokens{
   font-size: 1.1rem;
 }
 .action{
@@ -315,7 +375,7 @@ return {
     font-size: .9rem;
 }
 
-.transferTokenBut, .switcherContainer, .codeBlockContainer, .Ain
+.mintTokenBut, .switcherContainer, .codeBlockContainer, .Ain
 {
   background-color: var(--vp-c-bg-mute);
   transition: background-color 0.1s;
@@ -328,14 +388,14 @@ return {
     padding-left : 10px;
     margin : 0;
 }
-.transferTokenBut{
+.mintTokenBut{
     cursor:pointer;
     padding: 5px 12px;
     display: flex;
     transition: all ease .3s;
 }
 
-.transferTokenBut:hover{
+.mintTokenBut:hover{
       border: 1px solid var(--light-color-ts-class);
 }
 

@@ -18,6 +18,15 @@ Before we start to write our scripts we need to make sure that there is a file n
 
 </span>
 
+<span  :class="EIPdis" style="font-size: 1.1rem;">
+
+In this section, we will cover the process of deploying a token wallet using the Multi Wallet TIP-3 contract. Please note that this operation can only be executed if the user does not possess an existing wallet for the respective token. Furthermore, to successfully deploy a token wallet for a token root using `everscale-inpage-provider`, you will require the addresses of both the token root and the multi wallet. 
+
+::: info 
+According to the Multi Wallet contract, it stores the wallet information and its corresponding balance. This balance is dynamically updated whenever there are token minting, burning, or transfer operations involving the wallet.
+:::
+
+</span>
 <br/>
 
 <div class="switcherContainer">
@@ -35,20 +44,14 @@ Before we start to write our scripts we need to make sure that there is a file n
 ````typescript
 import { EverWalletAccount } from "everscale-standalone-client";
 import { factorySource ,FactorySource} from "../build/factorySource";
-import { Address, WalletTypes, zeroAddress, Signer, Contract} from "locklift";
+import { Address, zeroAddress, Signer, Contract} from "locklift";
 
 async function main() {
   // Setting up the signers and the wallets
 
   const signer: Signer = (await locklift.keystore.getSigner("0"))!;
 
-  const everWallet: EverWalletAccount = (
-    await locklift.factory.accounts.addNewAccount({
-      type: WalletTypes.EverWallet,
-      value: locklift.utils.toNano(100),
-      publicKey: signerAlice.publicKey,
-    })
-  ).account;
+  const everWallet: EverWalletAccount = await EverWalletAccount.fromPubkey({ publicKey: signer.publicKey!, workchain: 0 });
 
   const tokenRootAddress: Address = new Address('<YOUR_TOKEN_ROOT_ADDReSS>');
   const multiWalletAddress: Address = new Address('<YOUR_MULTI_WALLET_ADDRESS>');
@@ -73,7 +76,8 @@ async function main() {
   });
 
   const tokenWalletContract: Contract<FactorySource['TokenWallet']> = locklift.factory.getDeployedContract("TokenWallet", tokenWalletData[0]!.tokenWallet);
-  console.log("Token wallet address; ", AliceTWCon.address.toString());
+
+  console.log("Token wallet address; ", tokenWalletContract.address.toString());
 }
 
 main()
@@ -94,8 +98,6 @@ main()
 // Import the following libraries
 import { ProviderRpcClient as PRC, Address, Transaction } from 'everscale-inpage-provider';
 import * as tip3Artifacts from 'tip3-docs-artifacts';
-
-
 
 export async function main(){
 
