@@ -12,7 +12,7 @@ import * as tip3Artifacts from 'tip3-docs-artifacts';
 import { toast } from '../../../src/helpers/toast';
 import { useProviderInfo } from '../helpers/useWalletsData';
 
-export async function deployMultiWalletTip3Eip(): Promise<
+export async function deployMultiWalletTip3Con(): Promise<
   Address | string | Transaction | undefined | any
 > {
   // Fetching the provider

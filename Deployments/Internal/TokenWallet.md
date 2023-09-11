@@ -1,35 +1,20 @@
 # Deploy token wallet
 
 
-
-
-
-
-
-
 <div class="DeployTokenWallet">
 
-We have finally reached this section. We will write a smart contract that can manage wallets of TIP-3 tokens. And we will interact with it by external messages.
 
+In this section, we will explore an important aspect of deploying the TIP-3 standard contracts, which involves deploying a token wallet from a smart contract other than the token root contract. Specifically, we will focus on deploying a token wallet using the  MultiWalletTIP3  contract.
 
-
-Let's create an empty contract and write the storage so that the contract can be the owner of many TIP-3 wallets.
-
-
-
-::: tip
-In Everscale, a contract can have an external (msg.pubkey) and/or internal (msg.sender/ smart contract address)
-:::
-
-
-::: info
-Before we start to write our scripts we need to make sure that there is a file named `03-deploy-wallet.ts` in the `script` folder in the project root.
-:::
 
 <br/>
 <span  :class="LLdis" style="font-size: 1.1rem;">
 
-Deploying the Token Wallet of a existing Token Root contract using the locklift tool will be accomplished using the code sample below: 
+We can utilize the code sample below to deploy a token wallet and retrieve its address from the multi wallet contract with help of the locklift tool.
+
+::: info
+Before we start to write our scripts we need to make sure that there is a file named `03-deploy-wallet.ts` in the `script` folder in the project root.
+:::
 
 </span>
 
@@ -47,111 +32,56 @@ Deploying the Token Wallet of a existing Token Root contract using the locklift 
 
 <span  :class="LLdis">
 
-We will build a contract around an external owner
+````typescript
+import { EverWalletAccount } from "everscale-standalone-client";
+import { factorySource ,FactorySource} from "../build/factorySource";
+import { Address, WalletTypes, zeroAddress, Signer, Contract} from "locklift";
 
-```solidity
-pragma ton-solidity >= 0.61.2;
-pragma AbiHeader expire;
-pragma AbiHeader pubkey;
+async function main() {
+  // Setting up the signers and the wallets
 
-import '@broxus/contracts/contracts/utils/CheckPubKey.sol';
-import '@broxus/contracts/contracts/utils/RandomNonce.sol';
-import '@broxus/contracts/contracts/access/ExternalOwner.sol';
-import "@broxus/tip3/contracts/interfaces/ITokenRoot.sol";
-import "@broxus/tip3/contracts/interfaces/ITokenWallet.sol";
-import "@broxus/tip3/contracts/libraries/TokenMsgFlag.sol";
+  const signer: Signer = (await locklift.keystore.getSigner("0"))!;
 
-import "./libraries/Errors.sol";
+  const everWallet: EverWalletAccount = (
+    await locklift.factory.accounts.addNewAccount({
+      type: WalletTypes.EverWallet,
+      value: locklift.utils.toNano(100),
+      publicKey: signerAlice.publicKey,
+    })
+  ).account;
 
-contract MultiWalletTIP3 is CheckPubKey, ExternalOwner, RandomNonce {
-    uint128 constant msgFee = 0.5 ever;
-    uint128 constant computeFee = 0.1 ever;
+  const tokenRootAddress: Address = new Address('<YOUR_TOKEN_ROOT_ADDReSS>');
+  const multiWalletAddress: Address = new Address('<YOUR_MULTI_WALLET_ADDRESS>');
 
-    struct Wallet {
-        address tokenWallet;
-        uint256 balance;
+  const multiWalletContract: Contract<FactorySource['MultiWalletTIP3']> = await locklift.factory.getDeployedContract("MultiWalletTIP3", multiWalletAddress);
+  
+  console.log("Multi Wallet TIP-3 address: ", multiWalletContract.address.toString());
+
+  // Deploying a TokenWallet contract using the using multi wallet contract
+  await multiWalletContract.methods
+    .deployWallet({
+      _deployWalletBalance: locklift.utils.toNano("3"),
+      _tokenRoot: tokenRootAddress,
+    })
+    .sendExternal({ publicKey: signer.publicKey });
+
+  // Fetching the newly deployed Token Wallet
+  const tokenWalletData = (await multiWalletContract.methods.wallets().call()).wallets.map(item => {
+    if (item[0].toString() == tokenRootAddress.toString()) {
+      return item[1];
     }
-    // tokenRoot => Wallet
-    mapping (address => Wallet) public wallets;
+  });
 
-    // tokenWallet => TokenRoot
-    mapping (address => address) public tokenRoots;
-
-    address awaitedRoot;
-
-    modifier onlyTokenWallet(address _tokenRoot) {
-      require(msg.sender == wallets[_tokenRoot].tokenWallet, Errors.NOT_TOKEN_WALLET);
-      _;
-    }
-    
-    constructor(
-    ) public checkPubKey {
-        tvm.accept();
-        setOwnership(msg.pubkey());
-    }
-
+  const tokenWalletContract: Contract<FactorySource['TokenWallet']> = locklift.factory.getDeployedContract("TokenWallet", tokenWalletData[0]!.tokenWallet);
+  console.log("Token wallet address; ", AliceTWCon.address.toString());
 }
 
-```
-
-::: tip
-
-Executes TVM instruction "ACCEPT" ([TVM](https://test.ton.org/tvm.pdf) - A.11.2). This instruction sets current gas limit to its maximal allowed value. This action is required to process external messages that bring no value.
-
-
-
-In simple terms, when we call a contract from outside, we cannot pay for gas, because we don't have an account to store Evers. And in Everscale, the contract can do that for you.
-
-:::
-
-Now let's write a function to deploy a new wallet. The function will take two parameters: the initial amount of EVERs on the new wallet and the address of the Token Root
-
-```solidity
-function deployWallet(
-        uint128 _deployWalletBalance,
-        address _tokenRoot
-    ) public onlyOwner {
-        // Check that the wallet has not been created before
-        require(!wallets.exists(_tokenRoot), Errors.WALLET_EXISTS);
-        tvm.accept();
-
-        awaitedRoot = _tokenRoot;
-        ITokenRoot(_tokenRoot).deployWallet{
-            // amount of Evers send
-            value: _deployWalletBalance + msgFee,
-            flag: TokenMsgFlag.IGNORE_ERRORS, 
-            // Specify the function to which the address 
-            // of the deployed wallet will come
-            callback: MultiWalletTIP3.receiveTokenWalletAddress
-        }(
-            address(this), // Now the owner of the wallet token will be TIP3Account
-            _deployWalletBalance
-        );
-    }
-
-    function receiveTokenWalletAddress(address wallet) external {
-        // Be sure to check that the message came from the expected root token
-        require(msg.sender == awaitedRoot, 200, Errors.NOT_AWAITED_ROOT);
-        wallets[msg.sender] = Wallet(wallet, 0);
-        tokenRoots[wallet] = awaitedRoot;
-        awaitedRoot = address(0);
-    }
-```
-
-::: tip
-
-It is important to understand that smart contracts in Everscale ~~have a life of their own~~
-
-live in separate mini-blockchains and can only communicate by messages.
-
-For this reason, we pass callbacks so that the contract returns something.
-
-:::
-
-Great, we have learned how to deploy TIP-3 Wallet from a smart contract.
-
-
-````typescript
+main()
+  .then(() => process.exit(0))
+  .catch(e => {
+    // console.log(e);
+    process.exit(1);
+  });
 
 ````
 
@@ -159,6 +89,91 @@ Great, we have learned how to deploy TIP-3 Wallet from a smart contract.
 
 <span  :class="EIPdis">
 
+````typescript
+
+// Import the following libraries
+import { ProviderRpcClient as PRC, Address, Transaction } from 'everscale-inpage-provider';
+import * as tip3Artifacts from 'tip3-docs-artifacts';
+
+
+
+export async function main(){
+
+  // Initiate the TVM provider
+  const tokenRootAddress: Address = new Address("<YOUR_TOKEN_ROOT_ADDRESS>");
+  const multiWalletAddress: Address = new Address("<YOUR_MULTI_WALLET_TIP3_ADDRESS>");
+
+
+  try {
+    // creating an instance of the token root contract
+    const tokenRootContract = new provider.Contract(
+      tip3Artifacts.factorySource['TokenRoot'],
+      tokenRootAddress
+    );
+    // creating an instance of the token root contract
+    const MultiWalletContract = new provider.Contract(
+      tip3Artifacts.factorySource['MultiWalletTIP3'],
+      multiWalletAddress
+    );
+    // Fetching the decimals
+    const symbol: string = (await tokenRootContract.methods.symbol({ answerId: 0 }).call()).value0;
+    
+    // Checking if the user already doesn't have any wallet of that token root
+    let tokenWalletData = (await MultiWalletContract.methods.wallets().call()).wallets.map(item => {
+      if (item[0].toString() == tokenRootContract.address.toString()) {
+        return item[1];
+      }
+    });
+
+    const zeroAddress = '0:0000000000000000000000000000000000000000000000000000000000000000';
+
+    if (tokenWalletData[0]!.tokenWallet.toString() != zeroAddress) {
+      console.log('You already have a wallet of this token !');
+
+      return 'Failed';
+    }
+
+    // Deploying a new contract if didn't exist before
+    const deployWalletRes: Transaction = await MultiWalletContract.methods
+      .deployWallet({
+        _deployWalletBalance: 2 * 10 * 9,
+        _tokenRoot: tokenRootContract.address,
+      })
+      .send({
+        from: senderAddress,
+        amount: 4 * 10 * 9,
+        bounce: true, 
+      });
+
+    if (deployWalletRes.aborted) {
+      console.log(`Transaction aborted ! ${deployWalletRes.exitCode, deployWalletRes.resultCode}`);
+
+      return deployWalletRes;
+    }
+    // Checking if the user already doesn't have the any wallet of that token root
+
+    tokenWalletData = (await MultiWalletContract.methods.wallets().call()).wallets.map(item => {
+      if (item[0].toString() == tokenRootContract.address.toString()) {
+        return item[1];
+      }
+    });
+    if (tokenWalletData[0]!.tokenWallet.toString() != zeroAddress) {
+      console.log('Token Wallet successfully deployed !');
+
+      return `${symbol}'s token wallet deployed to: ${tokenWalletData[0]!.tokenWallet.toString()}`;
+    } else {
+      console.log('The token wallet deployment failed !');
+
+      return `Failed ${(deployWalletRes.exitCode, deployWalletRes.resultCode)}`;
+    }
+  } catch (e: any) {
+    console.log(e.message);
+
+    return `Failed ${e.message}`;
+  }
+}
+
+````
 
 </span>
 
@@ -171,10 +186,10 @@ Great, we have learned how to deploy TIP-3 Wallet from a smart contract.
 Use this command and deploy token wallet
 
 ```shell
-npx locklift run -s ./scripts/02-deploy-wallet.js -n local
+npx locklift run -s ./scripts/02-deploy-wallet.ts -n local
 ```
 
-![](</image(17).png>)
+![](</deployTokenWalletFromMW.png>)
 
 Congratulations, you have deployed your first TIP3 Token Wallet !
 
@@ -186,6 +201,9 @@ Congratulations, you have deployed your first TIP3 Token Wallet !
 
 <p class=actionInName style="margin-bottom: 0;">Token Root address</p> 
 <input ref="actionTokenRootAddress" class="action Ain" type="text"/>
+
+<p class=actionInName style="margin-bottom: 0;">Multi Wallet TIP-3 address</p> 
+<input ref="actionMultiWalletTip3Address" class="action Ain" type="text"/>
 
 <button @click="deployTokenWallet" class="deployTokenWalletBut" >Deploy token wallet</button>
 
@@ -201,7 +219,7 @@ Congratulations, you have deployed your first TIP3 Token Wallet !
 import { defineComponent, ref, onMounted } from "vue";
 import {deployRootParams} from "../Scripts/types";
 import {toast} from "/src/helpers/toast";
-import {deployTokenWalletEip} from "../Scripts/Account/TokenWallet"
+import {deployTokenWalletCon} from "../Scripts/Contract/tokenWallet"
 
 export default defineComponent({
   name: "DeployTokenWallet",
@@ -250,8 +268,17 @@ export default defineComponent({
             this.$refs.deployTokenWalletOutput.innerHTML = "Failed"
             return
         }
-        let deployTokenWalletAddr = await deployTokenWalletEip(this.$refs.actionTokenRootAddress.value)
-                // Rendering the output     
+        if (
+            this.$refs.actionMultiWalletTip3Address.value == ""
+
+        ){
+            toast("Multi wallet tip-3 address field is required !",0)
+            this.$refs.deployTokenWalletOutput.innerHTML = "Failed"
+            return
+        }
+        
+        let deployTokenWalletAddr = await deployTokenWalletCon(this.$refs.actionTokenRootAddress.value, this.$refs.actionMultiWalletTip3Address.value)
+        // Rendering the output     
         deployTokenWalletAddr = !deployTokenWalletAddr ? "Failed" :  deployTokenWalletAddr;
         this.$refs.deployTokenWalletOutput.innerHTML = deployTokenWalletAddr;
   }

@@ -81,7 +81,7 @@ async function main() {
 
     const rootDeployerAbi: FactorySource['RootDeployer'] = tip3Artifacts.factorySource['RootDeployer'];
 
-    const rootDeployerContract: Contract<FactorySources["RootDeployer"]> =  await locklift.factory.getDeployedContract(rootDeployerAbi, rootDeployerAddress)
+    const rootDeployerContract: Contract<FactorySource["RootDeployer"]> =  await locklift.factory.getDeployedContract(rootDeployerAbi, rootDeployerAddress)
 
     // Preparing the params 
     export interface deployRootParams {
@@ -122,7 +122,7 @@ async function main() {
 
     // Confirming tha that the token root is deployed by calling the name method on it 
     // making an instance of the contract , the deployment confirmation will be recognized here as well but we prefer getting the name of the contract 
-    const tokenRoot: Contract<FactorySources['TokenRoot']>= locklift.factory.getDeployedContract(
+    const tokenRoot: Contract<FactorySource['TokenRoot']>= locklift.factory.getDeployedContract(
         "TokenRoot",
          (await rootDeployer.methods
               .getExpectedTokenRootAddress(
@@ -185,7 +185,7 @@ const rootDeployerAddress: Address =new Address('<YOUR_ROOT_DEPLOYER_ADDRESS>')
   
 const rootDeployerAbi: tip3Artifacts.FactorySource['RootDeployer'] = tip3Artifacts.factorySource['RootDeployer'];
   
-const rootDeployerContract: Contract<tip3Artifacts.FactorySources["RootDeployer"]> =  await locklift.factory.getDeployedContract(rootDeployerAbi, rootDeployerAddress)
+const rootDeployerContract: Contract<tip3Artifacts.FactorySource["RootDeployer"]> =  await locklift.factory.getDeployedContract(rootDeployerAbi, rootDeployerAddress)
 
 // Preparing the params 
 export interface deployFromRootDeployerParams {
@@ -252,7 +252,7 @@ const tokenRootAddr: Address = (
 ).value0;
 
 // making an instance of the token root
-const tokenRootContract: Contract<tip3Artifacts.FactorySources['TokenRoot']> = new provider.Contract(TokenRoot, tokenRootAddr);
+const tokenRootContract: Contract<tip3Artifacts.FactorySource['TokenRoot']> = new provider.Contract(TokenRoot, tokenRootAddr);
 
 const tokenName: string = (await tokenRootContract.methods.name({ answerId: 0 }).call({}))
   .value0;
@@ -290,14 +290,7 @@ Congratulations, you have deployed your first TIP3 Token Root!
 
 <div :class="eipAction" >
 
-## Deploy Root Deployer
-
-<button @click="deployRootDeployer" class="deployTokenRootBut" >Deploy root deployer</button>
-
-<p id="output-p" :class="EIPdis" ref="deployRootDeployerOutput"></p>
-
-
-## Deploy a TokenRoot from Root Deployer
+## Deploy a Token Root from Root Deployer
 
 <p class=actionInName style="margin-bottom: 0;">Root deployer</p> 
 <input ref="actionRootDeployer" class="action Ain" type="text"/>

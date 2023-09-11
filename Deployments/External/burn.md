@@ -78,7 +78,7 @@ import { FactorySource, factorySource } from "../build/factorySource";
   const aliceEverWallet: EverWalletAccount = await EverWalletAccount.fromPubkey({ publicKey: aliceSigner.publicKey!, workchain: 0 });
 
   // Fetching the token root contract
-  const tokenRootContract: Contract<FactorySources["TokenRoot"]> = locklift.factory.getDeployedContract("TokenRoot", tokenRootAddress);
+  const tokenRootContract: Contract<FactorySource["TokenRoot"]> = locklift.factory.getDeployedContract("TokenRoot", tokenRootAddress);
 
   // getting decimals and symbols
   const [decimals, symbol] = await Promise.all([

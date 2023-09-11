@@ -4,6 +4,10 @@
 
 ## Contract Specifications and Code 
 
+::: tip
+In Everscale, a contract can have an external (msg.pubkey) and/or internal (msg.sender/ smart contract address)
+:::
+
 **We will build a contract around an external owner**
 
 ```solidity
@@ -903,7 +907,7 @@ Congratulations, you have deployed a Multi Wallet TIP3 contract 🎉
 import { defineComponent, ref, onMounted } from "vue";
 import {deployRootParams} from "../Scripts/types";
 import {toast} from "/src/helpers/toast";
-import {deployMultiWalletTip3Eip} from "../Scripts/Contract/DeployMultiWallet"
+import {deployMultiWalletTip3Con} from "../Scripts/Contract/DeployMultiWallet"
 
 export default defineComponent({
   name: "DeployMultiWalletTip3",
@@ -944,7 +948,7 @@ export default defineComponent({
   async function deployMultiWallet(){
           this.$refs.DeployMultiWalletTip3Output.innerHTML = "Processing ..."
         // checking of all the values are fully filled 
-        let DeployMultiWalletTip3Addr = await deployMultiWalletTip3Eip()
+        let DeployMultiWalletTip3Addr = await deployMultiWalletTip3Con()
         // Rendering the output     
         DeployMultiWalletTip3Addr = !DeployMultiWalletTip3Addr ? "Failed" :  DeployMultiWalletTip3Addr;
         this.$refs.DeployMultiWalletTip3Output.innerHTML = DeployMultiWalletTip3Addr;

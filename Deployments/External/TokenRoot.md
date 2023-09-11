@@ -6,7 +6,7 @@
 <br/>
 <span  :class="LLdis" style="font-size: 1.1rem;">
 
-To deploy the token root using the [locklift](https://docs.locklift.io/) framework, which provides a straightforward approach. The following code sample demonstrates the deployment process:
+To deploy the token root using the [locklift](https://docs.locklift.io/) tool, which provides a straightforward approach. The following code sample demonstrates the deployment process:
 
 ::: info
 Before we start to write our scripts we need to make sure that there is a file named `01-deploy-token.ts` in the `script` folder in the project root.

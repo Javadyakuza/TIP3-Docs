@@ -47,7 +47,7 @@ Please be aware that if the `Notify` parameter is set to true for the transactio
  */
 
 import { EverWalletAccount } from "everscale-standalone-client";
-import { Address, WalletTypes, zeroAddress, Signer, FactorySources} from "locklift";
+import { Address, WalletTypes, zeroAddress, Signer, FactorySource} from "locklift";
 import { FactorySource, factorySource } from "../build/factorySource";
 
   // Creating two signers and wallets
@@ -80,7 +80,7 @@ import { FactorySource, factorySource } from "../build/factorySource";
       txFee = locklift.utils.toNano("5")
     }
   // Fetching the token root contract
-  const tokenRootContract: Contract<FactorySources["TokenRoot"]> = locklift.factory.getDeployedContract("TokenRoot", tokenRootAddress);
+  const tokenRootContract: Contract<FactorySource["TokenRoot"]> = locklift.factory.getDeployedContract("TokenRoot", tokenRootAddress);
 
   // getting decimals and symbols
   const [decimals, symbol] = await Promise.all([
@@ -104,7 +104,7 @@ import { FactorySource, factorySource } from "../build/factorySource";
     });
 
   // Fetching the bobs balance
-  const bobTWCon: Contract<FactorySources["TokenWallet"]> = await locklift.factory.getDeployedContract(
+  const bobTWCon: Contract<FactorySource["TokenWallet"]> = await locklift.factory.getDeployedContract(
     "TokenWallet",
     (await tokenRootContract.methods.walletOf({ answerId: 0, walletOwner: bobEverWallet.address }).call()).value0,
   );

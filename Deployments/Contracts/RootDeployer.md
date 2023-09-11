@@ -115,6 +115,16 @@ contract RootDeployer {
 ````
 
 
+::: tip
+
+It is important to understand that smart contracts in Everscale ~~have a life of their own~~
+
+live in separate mini-blockchains and can only communicate by messages.
+
+For this reason, we pass callbacks so that the contract returns something.
+
+:::
+
 ## Deploy
 
 <div class="DeployRootDeployer">
@@ -340,7 +350,7 @@ Congratulations, you have deployed a Root Deployer contract 🎉
 import { defineComponent, ref, onMounted } from "vue";
 import {deployRootParams} from "../Scripts/types";
 import {toast} from "/src/helpers/toast";
-import {deployRootDeployerEip} from  "../Scripts/Contract/RootDeployer";
+import {deployRootDeployerCon} from  "../Scripts/Contract/RootDeployer";
 
 export default defineComponent({
   name: "DeployRootDeployer",
@@ -381,7 +391,7 @@ export default defineComponent({
 
     async function deployRootDeployer(){
         this.$refs.DeployRootDeployerOutput.innerHTML = "Processing ...";
-        let deployRootDeployerRes = await deployRootDeployerEip();
+        let deployRootDeployerRes = await deployRootDeployerCon();
         deployRootDeployerRes = !deployRootDeployerRes ? "Failed" :  deployRootDeployerRes;
         this.$refs.DeployRootDeployerOutput.innerHTML = deployRootDeployerRes;
     }
