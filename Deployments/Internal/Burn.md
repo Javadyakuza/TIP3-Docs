@@ -7,7 +7,7 @@ As we learned earlier in [here](../External/burn.md), burn also has two implemen
 Notice that the multi wallet contract only supports sending transactions that will utilize the `burn` function since the `burnByRoot` function is only callable on the token root contract. 
 We will cover both of them to see the multi wallet contract functionality on updating its state.
 
-<span  :class="LLdis" style="font-size: 1.1rem;">
+<span  :class="LLdis"  >
 
 The code sample below utilizes both burn functions with the help of the locklift but checks the balance on the multi wallet contract:
 
@@ -16,7 +16,7 @@ Before we start to write our scripts we need to make sure that there is a file n
 :::
 </span>
 
-<span :class="EIPdis" style="font-size: 1.1rem;">
+<span :class="EIPdis"  >
 
 The code sample below follows the same approach but makes the transactions using everscale-inpage-provider:
 

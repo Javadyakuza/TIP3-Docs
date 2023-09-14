@@ -26,7 +26,7 @@ Furthermore, it is important to note that only the owner of the root contract ha
 
 <div class="burnToken">
 
-<span  :class="LLdis" style="font-size: 1.1rem;">
+<span  :class="LLdis"  >
 
 ::: info
 Before we start to write our scripts we need to make sure that there is a file named `05-burn-tip3.ts` in the `script` folder in the project root.
@@ -34,7 +34,7 @@ Before we start to write our scripts we need to make sure that there is a file n
 
 </span>
 
-<span :class="EIPdis" style="font-size: 1.1rem;">
+<span :class="EIPdis"  >
 
 :::danger
 

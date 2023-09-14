@@ -1,6 +1,8 @@
+<div class="DeployTokenWallet">
+
 # Deploy token wallet
 
-**In this section we will learn how to deploy a token wallet of an existing token root contract.**
+In this section we will learn how to deploy a token wallet of an existing token root contract.
 
 ::: info
 TON Solidity compiler allows specifying different parameters of the outbound internal message that is sent via external function call. Note, all external function calls are asynchronous, so callee function will be called after termination of the current transaction. `value`, `currencies`, `bounce` or `flag` options can be set. See [\<address>.transfer()](https://github.com/tonlabs/TON-Solidity-Compiler/blob/master/API.md#addresstransfer) where these options are described.&#x20;
@@ -8,14 +10,8 @@ TON Solidity compiler allows specifying different parameters of the outbound int
 **Note:** if `value` isn't set, then the default value is equal to 0.01 ever, or 10^7 nanoever. It's equal to 10\_000 units of gas in workchain. If the callee function returns some value and marked as `responsible` then `callback` option must be set. This callback function will be called by another contract. Remote function will pass its return values as function arguments for the callback function. That's why types of return values of the callee function must be equal to function arguments of the callback function. If the function marked as `responsible` then field `answerId` appears in the list of input parameters of the function in `*abi.json` file. `answerId` is function id that will be called.
 :::
 
-
-
-<div class="DeployTokenWallet">
-
-
-
-<br/>
-<span  :class="LLdis" style="font-size: 1.1rem;">
+## Step 1: Write Deployment script
+<span  :class="LLdis"  >
 Now lets write the scripts to deploy a Token Wallet using locklift .
 
 ::: info
@@ -25,7 +21,7 @@ Before we start to write our scripts we need to make sure that there is a file n
 Deploying the Token Wallet of an existing Token Root contract using the locklift tool can be achieved by utilizing the code sample provided below:
 
 </span>
-<span  :class="EIPdis" style="font-size: 1.1rem;">
+<span  :class="EIPdis"  >
 
 Using the  `everscale-inpage-provider`  to deploy a token wallet is as easy as a piece of cake! All we need to do is call the  `deployWallet`  function on the root contract, as explained below:
 
@@ -46,56 +42,62 @@ Using the  `everscale-inpage-provider`  to deploy a token wallet is as easy as a
 
 ```typescript
 /**
- * locklift is a globally declared object  
+ * locklift is a globally declared object
  */
 
 import { Address, Contract, Signer } from "locklift";
 import { EverWalletAccount } from "everscale-standalone-client";
-import { FactorySource, factorySource } from "../build/factorySource";
+import { FactorySource } from "../build/factorySource";
 
 async function main() {
-
-  // Preparing the target contracts to interact with 
-  const tokenRootAddress: Address = new Address("<YOUR_TOKEN_ROOT_ADDRESS>");
-
   // Fetching the account and signer
   const signer: Signer = (await locklift.keystore.getSigner("0"))!;
 
   /**
-   * Making an instance of the wallet account using the signer public key and everscale-standalone-client tool 
-  */
-  const myAccount: EverWalletAccount = await EverWalletAccount.fromPubkey({ publicKey: signer.publicKey!, workchain: 0 });
-  
-  /* 
+   * Making an instance of the wallet account using the signer public key and everscale-standalone-client tool
+   */
+  const everWallet: EverWalletAccount = await EverWalletAccount.fromPubkey({
+    publicKey: signer.publicKey!,
+    workchain: 0,
+  });
+
+  /*
     Get instance of already deployed TOken Root contract
   */
-  const tokenRoot: : Contract<FactorySource['TokenRoot']> = locklift.factory.getDeployedContract(
+  // Preparing the target contracts to interact with
+
+  const tokenRootAddress: Address = new Address("<YOUR_TOKEN_ROOT_ADDRESS>");
+  const tokenRoot: Contract<FactorySource["TokenRoot"]> = locklift.factory.getDeployedContract(
     "TokenRoot",
     tokenRootAddress,
   );
-  
-  /* 
+
+  /*
     Call the deployWallet in the TokenRoot contract
   */
-  await tokenRoot.methods.deployWallet({
-        answerId: 0,
-        walletOwner: myAccount.address,
-        deployWalletValue: locklift.utils.toNano("2"),
-      }).send({
-        from : myAccount.address, 
-        amount : locklift.utils.toNano("4")
-      }),
-  
-  /* 
+  await tokenRoot.methods
+    .deployWallet({
+      answerId: 0,
+      walletOwner: everWallet.address,
+      deployWalletValue: locklift.utils.toNano("2"),
+    })
+    .send({
+      from: everWallet.address,
+      amount: locklift.utils.toNano("4"),
+    });
+
+  /*
     We call the walletOf get method on the token root contract.
   */
-  const walletAddress: Address = (await tokenRoot.methods
-    .walletOf({
-      answerId: 0,
-      walletOwner: myAccount.address,
-    })
-    .call({})).value0;
-  
+  const walletAddress: Address = (
+    await tokenRoot.methods
+      .walletOf({
+        answerId: 0,
+        walletOwner: everWallet.address,
+      })
+      .call({})
+  ).value0;
+
   console.log(`TIP3 Wallet deployed at: ${walletAddress.toString()}`);
 }
 
@@ -114,36 +116,27 @@ main()
 
 ````typescript
 import {
-  ProviderRpcClient as PRC,
   Address,
-  GetExpectedAddressParams,
   Contract,
   Transaction,
-  FullContractState,
 } from 'everscale-inpage-provider';
 import * as tip3Artifacts from 'tip3-docs-artifacts';
+import { provider, providerAddress } from './useProvider';
 
-async function main(){
-
-  // Initiate the TVM provider 
-
+async function main() {
   // Preparing the params
-  const tokenRootAddress: Address = new Address("<YOUR_TOKEN_ROOT_ADDRESS>");
+  const tokenRootAddress: Address = new Address('<YOUR_TOKEN_ROOT_ADDRESS>');
 
   // creating an instance of the token root contract
-  const tokenRootContract: Contract<tip3Artifacts.FactorySource['TokenRoot']> = new provider.Contract(
-    tip3Artifacts.factorySource['TokenRoot'],
-    tokenRootAddress
-  );
-  
+  const tokenRootContract: Contract<tip3Artifacts.FactorySource['TokenRoot']> =
+    new provider.Contract(tip3Artifacts.factorySource['TokenRoot'], tokenRootAddress);
+
   // Checking if the user already doesn't have any deployed wallet of that token root
   const tokenWalletAddress: Address = (
-          await tokenRootContract.methods
-            .walletOf({ answerId: 0, walletOwner: providerAddress })
-            .call()
-        ).value0,
+    await tokenRootContract.methods.walletOf({ answerId: 0, walletOwner: providerAddress }).call()
+  ).value0;
 
-  // checking if the token wallet is already deployed or not  
+  // checking if the token wallet is already deployed or not
   if (
     (
       await provider.getFullContractState({
@@ -152,21 +145,21 @@ async function main(){
     ).state?.isDeployed
   )
     throw new Error('You already have a token wallet of this token !');
-  
+
   // Deploying a new token wallet contract
   const deployWalletRes: Transaction = await tokenRootContract.methods
     .deployWallet({
       answerId: 0,
       walletOwner: providerAddress,
-      deployWalletValue: 2 * 10 ** 9 ,
+      deployWalletValue: 2 * 10 ** 9,
     })
     .send({
       from: providerAddress,
-      amount: 4 * 10 ** 9,
+      amount: String(4 * 10 ** 9),
       bounce: true,
     });
-  
-  // Checking if the token wallet is deployed 
+
+  // Checking if the token wallet is deployed
   if (
     (
       await provider.getFullContractState({
@@ -174,22 +167,33 @@ async function main(){
       })
     ).state?.isDeployed
   ) {
-    console.log(` Token wallet deployed to: ${
-      (await tokenRootContract.methods.walletOf({ answerId: 0, walletOwner: providerAddress }).call()
-    ).value0.toString()}`);
+    console.log(
+      ` Token wallet deployed to: ${(
+        await tokenRootContract.methods
+          .walletOf({ answerId: 0, walletOwner: providerAddress })
+          .call()
+      ).value0.toString()}`
+    );
     return true;
   } else {
-    throw new Error(`The token wallet deployment failed ! ${deployWalletRes.exitCode, deployWalletRes.resultCode}`);
+    throw new Error(
+      `The token wallet deployment failed ! ${
+        (deployWalletRes.exitCode, deployWalletRes.resultCode)
+      }`
+    );
   }
 }
 
 ````
+
 </span>
 
 </div>
 
 
 <div class="action">
+
+## step 2: Deploy Token Wallet
 <div :class="llAction">
 
 Use this command and deploy token wallet
@@ -206,9 +210,7 @@ Congratulations, you have deployed your first TIP3 Token Wallet !
 
 <div :class="eipAction" >
 
-## Deploy a TokenWallet
-
-<p class=actionInName style="margin-bottom: 0;">Token Root address</p> 
+<p class=actionInName style="margin-bottom: 0;">Token Root address</p>
 <input ref="actionTokenRootAddress" class="action Ain" type="text"/>
 
 <button @click="deployTokenWallet" class="deployTokenWalletBut" >Deploy token wallet</button>
@@ -240,9 +242,9 @@ export default defineComponent({
     }
   },
   setup() {
-    
+
     function llHandler(e){
-        if(this.LLdis == "cbHide")  
+        if(this.LLdis == "cbHide")
         {
             this.llSwitcher = "llSwitcher on";
             this.eipSwitcher = "eipSwitcher off"
@@ -251,9 +253,9 @@ export default defineComponent({
         this.LLdis = "cbShow"
         this.llAction = "llAction cbShow"
         this.eipAction = "eipAction cbHide"
-}   
+}
     async function eipHandler(e){
-        if(this.EIPdis == "cbHide")  
+        if(this.EIPdis == "cbHide")
         {
             this.llSwitcher = "llSwitcher off";
             this.eipSwitcher = "eipSwitcher on"
@@ -265,7 +267,7 @@ export default defineComponent({
     }
   async function deployTokenWallet(){
           this.$refs.deployTokenWalletOutput.innerHTML = "Processing ..."
-        // checking of all the values are fully filled 
+        // checking of all the values are fully filled
         if (
             this.$refs.actionTokenRootAddress.value == ""
 
@@ -275,7 +277,7 @@ export default defineComponent({
             return
         }
         let deployTokenWalletAddr = await deployTokenWalletEip(this.$refs.actionTokenRootAddress.value)
-                // Rendering the output     
+                // Rendering the output
         deployTokenWalletAddr = !deployTokenWalletAddr ? "Failed" :  deployTokenWalletAddr;
         this.$refs.deployTokenWalletOutput.innerHTML = deployTokenWalletAddr;
   }
@@ -290,9 +292,7 @@ return {
 </script>
 
 <style>
-.DeployTokenWallet{
-  font-size: 1.1rem;
-}
+
 .action{
     display:inline-block;
 }
@@ -390,7 +390,7 @@ return {
 }
 
 * {box-sizing: border-box;}
- 
+
 .container {
   display: flex;
   position: relative;
@@ -403,7 +403,7 @@ return {
   opacity: 0;
   height: 0;
   width: 0;
-  
+
 }
 
 .checkmark {

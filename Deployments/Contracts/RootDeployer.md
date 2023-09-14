@@ -131,7 +131,7 @@ For this reason, we pass callbacks so that the contract returns something.
 
 Now we write scripts to deploy the Root Deployer contract :
 
-<span  :class="LLdis" style="font-size: 1.1rem;">
+<span  :class="LLdis"  >
 
 We have already covered how to deploy a contract using locklift, so deploying  `RootDeployer`  should be a straightforward process:
 
@@ -141,7 +141,7 @@ Before we start to write our scripts we need to make sure that there is file nam
 
 </span>
 
-<span  :class="EIPdis" style="font-size: 1.1rem;">
+<span  :class="EIPdis"  >
 
 Deploying a contract using the `everscale-inpage-provider` is a bit tricky, Please follow the steps below in order to have a successful contract deployment using this tool.   
 

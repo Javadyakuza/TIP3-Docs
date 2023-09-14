@@ -6,7 +6,7 @@ Now that we have minted some TIP-3 tokens, why not transfer them ?
 As explained [here](../External/Transfer.md), the transfer concept in the TIP-3 standard has two implementation which we will cover both of them.
 Its noticeable that both of this methods are implemented inside of the MultiWalletTIP-3 contract as well, so we will get our hands dirty with those.   
 
-<span  :class="LLdis" style="font-size: 1.1rem;">
+<span  :class="LLdis"  >
 
 In the code sample below, we will demonstrate how to utilize the transfer functions of the TIP-3 standard using locklift and MultiWalletTIP3 contract:
 
@@ -16,7 +16,7 @@ Before we start to write our scripts we need to make sure that there is a file n
 
 </span>
 
-<span :class="EIPdis" style="font-size: 1.1rem;">
+<span :class="EIPdis"  >
 
 Transferring tokens using everscale-inpage-provider MultiWalletTIP3 contract:
 

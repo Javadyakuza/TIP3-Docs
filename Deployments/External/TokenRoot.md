@@ -1,13 +1,12 @@
-# Deploy Token Root
-
-In this section we will learn how to deploy a token root.
 
 <div class="DeployTokenRoot">
 
+# Deploy Token Root
+
+In this section, we will provide a simple, step-by-step guide on deploying the token root contract.
+
 ## Step 1: Write Deployment script
 <span  :class="LLdis" >
-
-
 
 To deploy the token root using the [locklift](https://docs.locklift.io/) tool, which provides a straightforward approach. The following code sample demonstrates the deployment process:
 
@@ -279,7 +278,7 @@ async function main() {
 
 <div class="action">
 
-## step 2: Deploy TokenRoot
+## step 2: Deploy Token Root
 <div :class="llAction">
 
 Let's run our script using locklift:

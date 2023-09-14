@@ -9,7 +9,7 @@ To mint TIP-3 tokens we simply need to invoke the  `mint`  function within the t
 <div class="mintToken">
 
 
-<span  :class="LLdis" style="font-size: 1.1rem;">
+<span  :class="LLdis"  >
 
 ::: info
 Before we start to write our scripts we need to make sure that there is a file named `03-mint-tip3.ts` in the `script` folder in the project root.
@@ -17,7 +17,7 @@ Before we start to write our scripts we need to make sure that there is a file n
 
 </span>
 
-<span :class="EIPdis" style="font-size: 1.1rem;">
+<span :class="EIPdis"  >
 
 :::danger
 

@@ -708,7 +708,7 @@ contract MultiWalletTIP3 is CheckPubKey, ExternalOwner, RandomNonce {
 
 <div class="DeployMultiWalletTip3">
 
-<span  :class="LLdis" style="font-size: 1.1rem;">
+<span  :class="LLdis"  >
 
 We can utilize the code sample below to deploy a `MultiWalletTIP3` contract:
 
@@ -718,7 +718,7 @@ Before we start to write our scripts we need to make sure that there is file nam
 
 </span>
 
-<span  :class="EIPdis" style="font-size: 1.1rem;">
+<span  :class="EIPdis"  >
 
 The code samples below demonstrate how to deploy a Multi Wallet TIP3 contract using `everscale-inpage-provider` tool.
 

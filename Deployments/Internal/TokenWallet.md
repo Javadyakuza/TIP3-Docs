@@ -8,7 +8,7 @@ In this section, we will explore an important aspect of deploying the TIP-3 stan
 
 
 <br/>
-<span  :class="LLdis" style="font-size: 1.1rem;">
+<span  :class="LLdis"  >
 
 We can utilize the code sample below to deploy a token wallet and retrieve its address from the multi wallet contract with help of the locklift tool.
 
@@ -18,7 +18,7 @@ Before we start to write our scripts we need to make sure that there is a file n
 
 </span>
 
-<span  :class="EIPdis" style="font-size: 1.1rem;">
+<span  :class="EIPdis"  >
 
 In this section, we will cover the process of deploying a token wallet using the Multi Wallet TIP-3 contract. Please note that this operation can only be executed if the user does not possess an existing wallet for the respective token. Furthermore, to successfully deploy a token wallet for a token root using `everscale-inpage-provider`, you will require the addresses of both the token root and the multi wallet. 
 
@@ -295,9 +295,7 @@ return {
 </script>
 
 <style>
-.DeployTokenWallet{
-  font-size: 1.1rem;
-}
+ 
 .action{
     display:inline-block;
 }

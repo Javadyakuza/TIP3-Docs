@@ -20,13 +20,13 @@ TIP-3 Token Wallet has 2 transfer methods:
 In the code sample provided below, we assume that Alice does not have a token wallet. Therefore, we begin by deploying a token wallet for Alice which will be accomplished when using the  `transfer`  function. Subsequently, we can employ the  `transferToWallet`  function to transfer a certain amount of TIP3 tokens to Alice.
 :::
 
-<span  :class="LLdis" style="font-size: 1.1rem;">
+<span  :class="LLdis"  >
 
 In the code sample below, we will demonstrate how to transfer TIP-3 tokens using locklift:
 
 </span>
 
-<span :class="EIPdis" style="font-size: 1.1rem;">
+<span :class="EIPdis"  >
 
 Transferring TIP-3 tokens is considered one of the easier steps depended to previous steps. let's look at the code samples below to see how its done using everscale-inpage-provider: 
 

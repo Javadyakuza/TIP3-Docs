@@ -25,7 +25,7 @@ TVM memory and persistent storage consist of cells. Remember that the TVM memory
 
 
 <br/>
-<span  :class="LLdis" style="font-size: 1.1rem;">
+<span  :class="LLdis"  >
 
 
 
@@ -37,7 +37,7 @@ Before we start to write our scripts we need to make sure that there is a file n
 
 </span>
 
-<span  :class="EIPdis" style="font-size: 1.1rem;">
+<span  :class="EIPdis"  >
 
 Deploying a token root using everscale-inpage-provider is now made easier with the Multi Wallet contract, as demonstrated in the code samples below:
 

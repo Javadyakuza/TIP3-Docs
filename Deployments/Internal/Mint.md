@@ -14,7 +14,7 @@ There is a callback function named `onAcceptTokensMint` which will be called by 
 <div class="mintToken">
 
 
-<span  :class="LLdis" style="font-size: 1.1rem;">
+<span  :class="LLdis"  >
 
 We can mint TIP-3 tokens for the target Token Wallet, as shown in the code samples below using the locklift tool.
 
@@ -24,7 +24,7 @@ We can mint TIP-3 tokens for the target Token Wallet, as shown in the code sampl
 
 </span>
 
-<span :class="EIPdis" style="font-size: 1.1rem;">
+<span :class="EIPdis"  >
 
 Minting TIP-3 tokens using everscale-inpage-provider is pretty easy as well:
 
