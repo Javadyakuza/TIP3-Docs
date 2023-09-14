@@ -15,7 +15,7 @@ In this onboarding, we will get acquainted with TVM based blockchains smart cont
 We will use default Account and typescript. And in the second case, we will write our custom smart contract which can handle the  the TIP-3 Token deployment.
 
 
-::: info 
+::: tip 
 
 TIP-3 standard describes basic principles of building smart token contracts.
 

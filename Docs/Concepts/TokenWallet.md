@@ -1,16 +1,20 @@
 # Token Wallet 
  
-Token Wallet contracts provide users with primary functions such as fetching balances, transferring tokens, and approving (acceptTransfer), among others. 
- 
-The token transfer operation is implemented through two approaches: 
- 
+Token Wallet contracts offer primary functions to users, including fetching balances, transferring tokens, accepting transfers, and burning tokens, among others.
+
+Token transfer operations can be performed in two ways:
+
 -  `transfer`  
 -  `transferToWallet`  
  
-The  `transferToWallet`  function is straightforward. It accepts a TokenWallet address as a parameter and transfers tokens to that specific wallet. 
- 
-On the other hand, the  `transfer`  function transfers tokens to the user's TokenWallet by calculating its address based on the given [Account](./Accounts.md) address, TokenWallet's code and initial data. 
- 
+`transferToWallet` accepts the receiver token wallet address and transfers tokens to that directly.
+
+Contrarily, the  `transfer`  function receives the receiver's account address and computes the corresponding token wallet address for the receiver. The process of deploying the token wallet takes place at this stage. If the calculated token wallet address does not correspond to an existing deployed contract, a token wallet will be deployed specifically for the receiver. It is important to note that the decision to deploy a token wallet for the receiver lies with the sender.   
+
 ## Deploying Token Wallets by Token Wallets 
  
-If no token wallet is deployed for the provided user Account address, the sender's token wallet has the option to deploy one for the recipient. However, this step is optional. If the sender chooses to deploy a token wallet for the recipient, the  `deployWalletValue`  parameter must be set to a specific amount.
+In cases where a token wallet hasn't been deployed for a given user account address, the initiating token wallet has the option to deploy one for the recipient. However, this step isn't mandatory. If one chooses to proceed, the `deployWalletValue` parameter must be assigned a specific value to facilitate the deployment.
+
+::: tip
+Given that all token wallets share the same code, it's straightforward for the receiving token wallet to verify the sender token wallet's correctness.
+:::

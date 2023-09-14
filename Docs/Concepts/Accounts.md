@@ -1,13 +1,13 @@
 # Accounts 
 
-In Ethereum, accounts can be externally owned (controlled by anyone with private keys) or implemented as smart contracts.
-There is no distinction between accounts and smart contracts in the TVM based blockchains.
-Every account is a smart contract with code, and there is no concept of an externally-owned account (owned by key pair) in the traditional sense.
+In EVM, accounts can either be externally owned (controlled by anyone with private keys) or implemented as smart contracts. However, in TVM-based blockchains, there is no distinction between accounts and smart contracts. Every account is essentially a smart contract, equipped with its own code. The concept of an externally-owned account, in the traditional sense, does not exist.
 
-All accounts can hold a balance, perform code, and call each other. 
-This approach is called `Account abstraction` and allows for authentication through other means beyond external ownership.
-Since every account in the TVM based blockchains is a smart contract, the contract's code can include any authentication logic necessary to verify a user's identity. 
+Each account, being a smart contract, has the capability to hold a balance, execute code, and interact with other accounts. This principle is known as Account Abstraction, which allows for authentication through various means, not limited to external ownership. Given that every account is a smart contract, the embedded code can incorporate any necessary authentication logic to verify a user's identity.
 
-The flexibility of smart contract code allows for a wide range of authentication options beyond traditional private key ownership. 
+This flexibility of the smart contract code provides a broad range of authentication options, surpassing the traditional private key ownership.
 
-More information at [here](https://docs.everscale.network/arch/accounts) and [here](https://everkit.org/en/articles/account-abstraction-everything-you-wanted-to-know).
+For more information, please refer to the provided links.
+
+- https://docs.everscale.network/arch/accounts
+
+- https://everkit.org/en/articles/account-abstraction-everything-you-wanted-to-know.

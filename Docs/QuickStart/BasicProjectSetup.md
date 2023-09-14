@@ -1,25 +1,24 @@
-# Basic project setup
+# Setup of TIP-3 Contracts in a Project
 
-First, let's create a new folder and name it multiwallet, or whatever you want
+This guide will walk you through the process of setting up a project with TIP3 contracts and integrating it with a multiwallet example.
+
+## Prerequisites
+First, make sure you have the nodeJs and npm installed on your machine.
+
+And it will be very good if you are already familiar with the basics of [Everscale-solidity](https://github.com/ever-guild/ever-solidity).
+
+## Step 1: Create a New Project Directory
+
+First, let's create a new directory for our project. We'll call it "multiwallet", but you can name it anything you want.
 
 ```shell
 mkdir multiwallet
 cd multiwallet
 ```
 
-Let's create a new npm project
+## Step 2: Initialize a Locklift Project
 
-``` shell
-npm init
-```
-
-And install locally locklift. If you have locklift installed globally, skip this step
-
-``` shell
-npm install --save-dev locklift
-```
-
-Excellent! Now we can create a locklift project
+Locklift is a tool that simplifies the development and management of smart contracts. We can initialize a locklift project in our new directory. This command will also install locklift if it's not already installed.
 
 ``` shell
 npx locklift init
@@ -31,13 +30,15 @@ We should get such a project structure:
 
 ![](< /image(7).png>)
 
-then we need to install the **@broxus/contracts* and **tip3** packages:
+## Step 3: Install TIP-3 Contracts and @broxus/contracts
+
+Next, we'll install the `TIP-3` contracts and the `@broxus/contracts` package. `TIP-3` contracts represent token contracts for the TON network, and `@broxus/contracts`provides smart contract interfaces.
 
 ```` shell
 npm i @broxus/contracts tip3 
 ````
 
+And that's it! You've set up a project with TIP3 contracts and prepared it for multiwallet integration.
 
-
-
+You can also watch the tutorial video for more guidance.https://www.youtube.com/watch?v=SLNEeDrnTB8
 

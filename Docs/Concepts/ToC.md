@@ -1,4 +1,8 @@
-#### Concepts section includes following topics:
+# Concepts
+
+In this section, we will explore the commonly used terms and ideas in TVM (Threaded Virtual Machine) based networks. We will break them down in a simpler manner for better understanding.
+
+**This section includes following topics:**
 
 <div class="sections-container">
   <div class="bridge-section-row">
@@ -12,6 +16,14 @@
   <div class="bridge-section-row">
     <a href="/Docs/Concepts/Accounts.html">
       <span class="bridge-section">Accounts</span>
+    </a>
+    <a href="/Docs/Concepts/tip6.html">
+      <span class="bridge-section">TIP-6.1 Standard</span>
+    </a>
+  </div>
+    <div class="bridge-section-row">
+    <a href="/Docs/Concepts/UpgradableContracts.html">
+      <span class="bridge-section">Upgradable Contracts</span>
     </a>
   </div>
 </div>

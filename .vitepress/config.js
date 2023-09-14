@@ -63,6 +63,12 @@ module.exports = {
             collapsable: false,
             link: '/Docs/Concepts/Accounts.md',
           },
+          { text: 'TIP-6.1', collapsable: false, link: '/Docs/Concepts/tip6.md' },
+          {
+            text: 'Upgradable Contracts',
+            collapsable: false,
+            link: '/Docs/Concepts/UpgradableContracts.md',
+          },
         ],
       },
       {
@@ -70,11 +76,6 @@ module.exports = {
         collapsable: false,
         link: '/Docs/QuickStart/ToC.md',
         items: [
-          {
-            text: 'Prerequisites',
-            collapsable: false,
-            link: '/Docs/QuickStart/Prerequisites.md',
-          },
           {
             text: 'Setup',
             collapsable: false,

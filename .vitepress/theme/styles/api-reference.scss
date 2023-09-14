@@ -561,7 +561,11 @@ ul.tsd-type-parameter-list h5 {
   line-height: 0;
   padding: 12px 0;
 }
+.logo:hover{
+    /* filter configuration comes from CSS filter generator - check NOTE below */
 
+    filter: brightness(0) saturate(100%) invert(42%) sepia(98%) saturate(5030%) hue-rotate(218deg) brightness(96%) contrast(97%);    
+  }
 .tsd-widget {
   display: inline-block;
   overflow: hidden;
@@ -599,7 +603,9 @@ input[type="checkbox"]:checked + .tsd-widget:before {
 img {
   max-width: 100%;
 }
-
+.button{
+  border: none;
+}
 .tsd-anchor-icon {
   display: inline-flex;
   align-items: center;
