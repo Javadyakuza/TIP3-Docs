@@ -91,7 +91,7 @@ import { FactorySource, factorySource } from "../build/factorySource";
   // minting some token for the recipient
   await tokenRootContract.methods
     .mint({
-      amount: mintAmount * 10 * decimals,
+      amount: mintAmount * 10 ** decimals,
       deployWalletValue: deployWalletValue,
       notify: false,
       recipient: bobEverWallet.address,
@@ -145,7 +145,7 @@ async function main()
 
     // Checking if receiver has a wallet of this token root to specify the deployWalletValue parameter
     let deployWalletValue: number = 0;
-    let txFee: number = 2 * 10 * 9
+    let txFee: number = 2 * 10 ** 9
     if (
       !(
         await provider.getFullContractState({
@@ -157,14 +157,14 @@ async function main()
         })
       ).state?.isDeployed
     ) {
-      deployWalletValue = 3 * 10 * 9;
-      txFee = 5 * 10 * 9;
+      deployWalletValue = 3 * 10 ** 9;
+      txFee = 5 * 10 ** 9;
     }
 
     // Deploying a new contract if didn't exist before
     const mintRes: Transaction = await tokenRootContract.methods
       .mint({
-        amount: amount * 10 * decimals,
+        amount: amount * 10 ** decimals,
         recipient: recipient,
         deployWalletValue: deployWalletValue,
         remainingGasTo: providerAddress,
@@ -189,7 +189,7 @@ async function main()
     );
     const recipientBal: number = 
       (await recipientTWCon.methods.balance({ answerId: 0 }).call({})).value0 
-      / 10 ^ decimals;
+      / 10 ** decimals;
 
     if (recipientBal >= amount) {
       console.log(`${amount} ${symbol}'s successfully minted for recipient`);

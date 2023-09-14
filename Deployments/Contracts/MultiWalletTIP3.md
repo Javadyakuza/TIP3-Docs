@@ -810,7 +810,7 @@ export async function main(){
     await provider.sendMessage({
       sender: providerAddress,
       recipient: expectedAddress,
-      amount: 20 * 10 * 9,
+      amount: 20 * 10 ** 9,
       bounce: false, // It is important to set 'bounce' to false
       // to ensure funds remain in the contract.
       stateInit: stateInit.stateInit,

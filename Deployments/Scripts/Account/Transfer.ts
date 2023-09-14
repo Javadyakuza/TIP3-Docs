@@ -39,7 +39,7 @@ export async function transferTokenEip(
       new Address(tokenRootAddress)
     );
     const decimals = Number(
-      (await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0
+      Number((await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0)
     );
     const tokenWallet = new provider.Contract(
       // Transferring the token
@@ -159,7 +159,7 @@ export async function transferTokenToWalletEip(
     );
 
     const decimals = Number(
-      (await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0
+      Number((await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0)
     );
 
     // Checking recipient has a deploy wallet of that h token root

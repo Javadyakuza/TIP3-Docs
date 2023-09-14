@@ -28,7 +28,7 @@ In the code sample below, we will demonstrate how to transfer TIP-3 tokens using
 
 <span :class="EIPdis" style="font-size: 1.1rem;">
 
-Certainly! Transferring TIP-3 tokens is considered one of the easier steps in the process.
+Transferring TIP-3 tokens is considered one of the easier steps depended to previous steps. let's look at the code samples below to see how its done using everscale-inpage-provider: 
 
 :::danger
 
@@ -94,10 +94,10 @@ async function main() {
       .balance({
         answerId: 0,
     })
-  .call()).value0 / 10 ^ decimals // assuming that bob has 300 of this token at the first >> 300
+  .call()).value0 / 10 ** decimals // assuming that bob has 300 of this token at the first >> 300
 
   // Amount to transfer 
-  const amount : number = 100 * 10 * decimals
+  const amount : number = 100 * 10 ** decimals
   
   /* 
     Transfer with the deployment of a wallet for the recipient account.
@@ -137,7 +137,7 @@ async function main() {
       .balance({
         answerId: 0,
     })
-  .call()).value0 / 10 ^ decimals  // >> 100
+  .call()).value0 / 10 ** decimals  // >> 100
   
   /* 
      Transfer to deployed token wallet
@@ -159,14 +159,14 @@ async function main() {
       .balance({
         answerId: 0,
     })
-  .call()).value0 / 10 ^ decimals // >> 200
+  .call()).value0 / 10 ** decimals // >> 200
 
   console.log("Bob's balance: ",
     await bobTokenWallet.methods
       .balance({
         answerId: 0,
     })
-  .call()).value0 / 10 ^ decimals  // >> 100
+  .call()).value0 / 10 ** decimals  // >> 100
 }
 
 main()
@@ -203,7 +203,7 @@ async function main() {
   // Preparing the params 
   const tokenRootAddress: Address = new Address("<YOUR_TOKEN_ROOT_ADDRESS>");
   const recipientAddress: Address = new Address("<RECIPIENT_ACCOUNT_ADDRESS>");
-  let txFee: number  = 3 * 10 * 9;  
+  let txFee: number  = 3 * 10 ** 9;  
   let oldBal: number = 0 ;
   let deployWalletValue: number = 0; 
 
@@ -214,7 +214,7 @@ async function main() {
   );
   // getting the decimals of the token
   const decimals: number = Number((await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0);
-  let transferAmount: number = 10 * 10 * decimals;
+  let transferAmount: number = 10 **10 ** decimals;
 
   // creating an instance of the sender token wallet contract
   const tokenWallet: Contract<tip3Artifacts.FactorySource['TokenWallet']> = new provider.Contract(
@@ -245,8 +245,8 @@ async function main() {
       })
     ).state?.isDeployed
   ) {
-    txFee = 5 * 10 * 9 ;
-    deployWalletValue = 2 *10 * 9;
+    txFee = 5 * 10 ** 9 ;
+    deployWalletValue = 2 *10 ** 9;
   } else {
     RecipientTokenWallet = new provider.Contract(
       // Transferring the token
@@ -289,7 +289,7 @@ async function main() {
         (await RecipientTokenWallet.methods.balance({ answerId: 0 }).call({})).value0
       );
       // Checking if the tokens are received successfully
-      if (amount == '2' && newBal >= Number(transferAmount) * 10 * decimals + oldBal) {
+      if (amount == '2' && newBal >= Number(transferAmount) * 10 ** decimals + oldBal) {
         console.log('tokens transferred successfully');
 
         return `tx Hash: ${transferRes.id.hash}`;
@@ -317,13 +317,13 @@ async function main(){
 
   const transferRes: Transaction = await tokenWallet.methods
     .transferToWallet({
-      amount: transferAmount * 10 * decimals,
+      amount: transferAmount * 10 ** decimals,
       recipientTokenWallet: RecipientTokenWallet.address,
       remainingGasTo: providerAddress,
       notify: false,
       payload: '',
     })
-    .send({ from: providerAddress, amount: 3 * 10 * 9, bounce: true });
+    .send({ from: providerAddress, amount: 3 * 10 ** 9, bounce: true });
   
   /**
    * Checking the tokens are transferred and the receiver balance is more than before 

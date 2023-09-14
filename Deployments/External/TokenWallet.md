@@ -158,11 +158,11 @@ async function main(){
     .deployWallet({
       answerId: 0,
       walletOwner: providerAddress,
-      deployWalletValue: 2 * 10 * 9 ,
+      deployWalletValue: 2 * 10 ** 9 ,
     })
     .send({
       from: providerAddress,
-      amount: 4 * 10 * 9,
+      amount: 4 * 10 ** 9,
       bounce: true,
     });
   

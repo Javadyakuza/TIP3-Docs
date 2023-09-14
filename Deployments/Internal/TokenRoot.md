@@ -225,7 +225,7 @@ const deployRes: Transaction = await userRootDeployer.methods
   .deployTokenRoot(params)
   .send({
     from: providerAddress,
-    amount: 2 * 10 * params.decimals, // increase vy 2 or 3 evers if initialSupplyTo != zeroAddress 
+    amount: 2 * 10 ** params.decimals, // increase vy 2 or 3 evers if initialSupplyTo != zeroAddress 
   });
 
 // checking if the token root is deployed successfully by calling one of its methods
@@ -526,8 +526,9 @@ export default defineComponent({
 }
 .llSwitcher{
     padding: 5px 10px;
-    border: 1px solid var(--vp-c-divider);
-    border-bottom: none;
+    border:  0 solid var(--vp-c-divider);
+    border-width: 1px ;
+    border-color: var(--vp-c-divider);
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
     font-weight: 600;
@@ -535,12 +536,16 @@ export default defineComponent({
 }
 .eipSwitcher{
     padding: 5px 10px;
-    border: 1px solid var(--vp-c-divider);
-    border-bottom: none;
+    border:  0 solid var(--vp-c-divider);
+    border-width: 1px ;
+    border-color: var(--vp-c-divider);
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
     font-weight: 600;
     transition: all ease .2s;
+}
+.llSwitcher:hover, .eipSwitcher:hover{
+      border-color: var(--light-color-ts-class);
 }
 .eipAction{
     font-weight: 600;

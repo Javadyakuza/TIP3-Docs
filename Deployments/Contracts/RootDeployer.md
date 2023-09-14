@@ -269,7 +269,7 @@ const stateInit = await provider.getStateInit(rootDeployerAbi, deployParams);
 await provider.sendMessage({
   sender: providerAddress,
   recipient: expectedAddress,
-  amount: 3 * 10 * 9
+  amount: 3 * 10 ** 9
   bounce: false, // It is important to set 'bounce' to false
   // to ensure funds remain in the contract.
   stateInit: stateInit.stateInit,

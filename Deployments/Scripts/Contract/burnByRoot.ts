@@ -8,7 +8,7 @@ import { getWalletData } from '../helpers/getTWDataFromMW';
 import isValidEverAddress from '../helpers/isValideverAddress';
 import { useProviderInfo } from '../helpers/useWalletsData';
 
-export async function burnTip3Con(
+export async function burnTip3ByRootCon(
   tokenRootAddress: string,
   multiWalletAddress: string,
   amount: string
@@ -65,10 +65,13 @@ export async function burnTip3Con(
       return 'Failed';
     }
     // burning tokens from a token wallet by calling the burn method
-    const { transaction: burnRes } = await multiWalletContract.methods
-      .burn({
-        _amount: ethers.parseUnits(amount, decimals).toString(),
-        _tokenRoot: tokenRootContract.address,
+    const { transaction: burnRes } = await tokenRootContract.methods
+      .burnTokens({
+        amount: ethers.parseUnits(amount, decimals).toString(),
+        walletOwner: multiWalletContract.address,
+        remainingGasTo: multiWalletContract.address,
+        callbackTo: multiWalletContract.address,
+        payload: '',
       })
       .sendExternal({
         publicKey: await extractPubkey(provider, senderAddress),

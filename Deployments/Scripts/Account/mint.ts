@@ -54,7 +54,7 @@ export async function mintTip3Eip(
         })
       ).state?.isDeployed
     ) {
-      deployWalletValue = 3 * 10 * 9;
+      deployWalletValue = 3 * 10 ** 9;
     }
 
     // Deploying a new contract if didn't exist before

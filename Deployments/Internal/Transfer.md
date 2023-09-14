@@ -1,389 +1,745 @@
-# Transfer TIP-3 tokens
+<div class="transferToken">
 
-As we learned earlier from [here](../External/Transfer.md), TIP-3 has two implementations of the transfer.
+# Transfer TIP-3 Tokens
 
-```solidity
-/*
-    Transfer tokens and optionally deploy TokenWallet for recipient
-    @dev Can be called only by TokenWallet owner
-    @dev If deployWalletValue !=0 deploy token wallet for recipient using that gas value
-    @param amount How much tokens to transfer
-    @param recipient Tokens recipient address
-    @param deployWalletValue How much EVERs to attach to token wallet deploy
+Now that we have minted some TIP-3 tokens, why not transfer them ?  
+As explained [here](../External/Transfer.md), the transfer concept in the TIP-3 standard has two implementation which we will cover both of them.
+Its noticeable that both of this methods are implemented inside of the MultiWalletTIP-3 contract as well, so we will get our hands dirty with those.   
+
+<span  :class="LLdis" style="font-size: 1.1rem;">
+
+In the code sample below, we will demonstrate how to utilize the transfer functions of the TIP-3 standard using locklift and MultiWalletTIP3 contract:
+
+::: info
+Before we start to write our scripts we need to make sure that there is a file named `04-transfer-tip3.ts` in the `script` folder in the project root.
+:::
+
+</span>
+
+<span :class="EIPdis" style="font-size: 1.1rem;">
+
+Transferring tokens using everscale-inpage-provider MultiWalletTIP3 contract:
+
+:::danger
+
+- Notice that if the `Notify` parameter be true for the transaction, the change will be sent back to the sender accounts `tokenWallet` contract !!\
+  So if you want the change back into your `account contract` leave the Notify `unchecked` !!   
+
+:::
+
+
+</span>
+<br/>
+
+<div class="switcherContainer">
+
+<button @click="llHandler" :class="llSwitcher">locklift</button>
+
+<button @click="eipHandler" :class="eipSwitcher">everscale-inpage-provider </button>
+
+</div>
+
+<div class="codeBlockContainer" >
+
+<span  :class="LLdis">
+
+```typescript
+/**
+ * locklift is a globally declared object  
+ */
+
+import { Address, Contract, Signer, zeroAddress } from "locklift";
+import { EverWalletAccount } from "everscale-standalone-client";
+import { FactorySource, factorySource } from "../build/factorySource";
+
+/**
+ * We develope a method that retrieves the data of the token wallet from the relevant multi wallet contract 
+ */
+async function getWalletData(
+  MWContract: Contract<FactorySource["MultiWalletTIP3"]>,
+  tokenRootAddress: Address,
+): Promise<{ tokenWallet: Address; balance: number }> {
+  const walletData = (await MWContract.methods.wallets().call()).wallets.map(item => {
+    if (item[0].toString() == tokenRootAddress.toString()) {
+      return item[1];
+    }
+  });
+  let balance: number = 0;
+  let tokenWallet: Address = zeroAddress;
+  if (walletData.length != 0) {
+    balance = Number(walletData[0]!.balance);
+    tokenWallet = walletData[0]!.tokenWallet;
+  }
+  return { tokenWallet: tokenWallet, balance: balance };
+}
+
+async function main() {
+
+  const tokenRootAddress: Address = new Address("<YOUR_TOKEN_ROOT_ADDRESS>");
+  const aliceMultiWalletAddress: Address = new Address("<YOUR_MULTI_WALLET_ADDRESS>");
+  const bobMultiWalletAddress: Address = new Address("<YOUR_MULTI_WALLET_ADDRESS>");
+
+  const signerAlice: Signer = (await locklift.keystore.getSigner("0"))!;
+  const signerBob: Signer = (await locklift.keystore.getSigner("1"))!;
+  
+  /**
+   * Making an instance of the wallet account using the signer public key and everscale-standalone-client tool
+  */
+  const aliceEverWallet: EverWalletAccount = await EverWalletAccount.fromPubkey({ publicKey: signerBob.publicKey!, workchain: 0 });
+
+  // Creating the target contracts instances
+  const tokenRootContract: Contract<FactorySource['TokenRoot']> = await locklift.factory.getDeployedContract(
+    "TokenRoot", 
+    tokenRootAddress
+  )
+
+  const aliceMultiWalletContract: Contract<FactorySource['MultiWalletTIP3']> = await locklift.factory.getDeployedContract(
+    "MultiWalletTIP3", 
+    aliceMultiWalletAddress
+  )
+  const bobMultiWalletContract: Contract<FactorySource['MultiWalletTIP3']> = await locklift.factory.getDeployedContract(
+    "MultiWalletTIP3", 
+    bobMultiWalletAddress
+  )
+
+  // Fetching the decimals and symbol
+  const [decimals, symbol] = await Promise.all([
+    Number((await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0),
+    (await tokenRootContract.methods.symbol({ answerId: 0 }).call()).value0,
+  ]);
+
+  // We assume the bob doesn't have a deployed wallet at the first 
+  console.log(`Alice has token wallet ? ${(await getWalletData(aliceMultiWalletContract, tokenRootAddress)).tokenWallet.toString() == zeroAddress.toString()} \n
+   Alice balance before transfer: ${(await getWalletData(aliceMultiWalletContract, tokenRootAddress)).balance / 10 ** decimals}`) // >> true, 200 
+
+  console.log(`Bob has token wallet ? ${(await getWalletData(bobMultiWalletContract, tokenRootAddress)).tokenWallet.toString() == zeroAddress.toString()} \n 
+  Bob balance before transfer: ${(await getWalletData(bobMultiWalletContract, tokenRootAddress)).balance / 10 ** decimals}`) // false, 0
+
+  // Amount to transfer 
+  const transferAmount : number = 100 * 10 ** decimals
+  
+  /* 
+    Transfer with the deployment of a wallet for the recipient account.
+    
+    Don't pay attention to notify and payload yet, we'll get back to them.
+  */
+  await aliceMultiWalletContract.methods.transfer({
+      _amount: transferAmount,
+      _recipient: bobMultiWalletAddress,
+      _deployWalletValue: locklift.utils.toNano(2), // We assume bob doesn't have any token wallet
+      _tokenRoot: tokenRootAddress,
+      }).sendExternal({
+        publicKey : signerAlice.publicKey!, 
+      })
+  
+  // Fetching the balances after the normal transfer function 
+  console.log(`Alice balance after transfer: ${(await getWalletData(aliceMultiWalletContract, tokenRootAddress)).balance / 10 ** decimals}`) // >> 100
+  console.log(`Bob balance after transfer: ${(await getWalletData(bobMultiWalletContract, tokenRootAddress)).balance / 10 ** decimals}`) // >> 100
+  
+  /* 
+     Transfer to deployed token wallet using transferToWallet
+  */
+  const transferToWalletAmount: number = 50 * 10 ** decimals;  
+
+  await aliceMultiWalletContract.methods.transferToWallet({
+      _amount: transferToWalletAmount,
+      _recipientTokenWallet: (await getWalletData(bobMultiWalletContract, tokenRootAddress)).tokenWallet,
+      _tokenRoot: tokenRootAddress        
+      }).sendExternal({
+        publicKey : signerAlice.publicKey!, 
+      })
+      
+  console.log(`Alice balance after transfer to wallet: ${(await getWalletData(aliceMultiWalletContract, tokenRootAddress)).balance / 10 ** decimals}`) // >> 50
+  console.log(`Bob balance after transfer to wallet: ${(await getWalletData(bobMultiWalletContract, tokenRootAddress)).balance / 10 ** decimals}`) // >> 150
+  
+}
+
+main()
+  .then(() => process.exit(0))
+  .catch(e => {
+    console.log(e);
+    process.exit(1);
+  });
+
+```
+
+</span>
+
+<span  :class="EIPdis">
+
+**using `transfer` function:**
+
+````typescript
+import {
+  ProviderRpcClient as PRC,
+  Address,
+  Contract,
+  Transaction,
+} from 'everscale-inpage-provider';
+import * as tip3Artifacts from 'tip3-docs-artifacts';
+const zeroAddress: Address = new Address(
+  '0:0000000000000000000000000000000000000000000000000000000000000000'
+);
+
+/**
+  * We develop two more methods in order to reduce the mass of the script  
 */
+async function extractPubkey(
+  provider: ProviderRpcClient,
+  senderAddress: Address
+): Promise<string> {
+  // Fetching the user public key
+  const accountFullState: FullContractState = (
+    await provider.getFullContractState({ address: senderAddress })
+  ).state!;
 
-function transfer(
-        uint128 _amount,
-        address _recipient,
-        uint128 _deployWalletValue,
-        address _tokenRoot
-    ) public onlyOwner {
-        require(wallets.exists(_tokenRoot), Errors.WALLET_NOT_EXISTS);
-        Wallet wallet = wallets[_tokenRoot];
-        require(wallet.balance >= _amount, Errors.NOT_ENOUGH_BALANCE);
-        tvm.accept();
+  const senderPublicKey: string = await provider.extractPublicKey(accountFullState.boc);
 
-        wallet.balance -= _amount;
-        wallets[_tokenRoot] = wallet;
-
-        TvmCell _empty;
-        ITokenWallet(wallet.tokenWallet).transfer{
-            value: _deployWalletValue + msgFee,
-            flag: TokenMsgFlag.IGNORE_ERRORS,
-            bounce: true
-            } ({
-                amount: _amount,
-                recipient: _recipient,
-                deployWalletValue: _deployWalletValue,
-                remainingGasTo: address(this),
-                notify: true,
-                payload: _empty
-        });
-
-    }
-```
-
-#### Finally, it's time to talk about important bounce and notify
-
-:::tip 
-To understand how notifications work, let's build a message chain in the transfer
-:::
-
-<img src="/file.drawing(1).svg" alt="Successful Transfer" class="gitbook-drawing">
-
-:::tip 
-Bounce  - if it's set and transaction (generated by the internal outbound message) falls (only at the computing phase, not at the action phase!) then funds will be returned. Otherwise, (flag isn't set or transaction terminated successfully) the address accepts the funds even if the account doesn't exist or is frozen. Defaults to `true`.
-:::
-
-Let's add bounce handling to our code
-
-```solidity
-onBounce(TvmSlice body) external {
-    tvm.rawReserve(_reserve(), 2);
-
-    uint32 functionId = body.load(uint32);
-
-    if (functionId == tvm.functionId(ITokenWallet.transfer)) {
-        uint128 amount = body.load(uint128);
-        require(tokenRoots.exists(msg.sender), Errors.NOT_TOKEN_WALLET);
-
-        address tokenRoot = tokenRoots[msg.sender];
-        Wallet wallet = wallets[tokenRoot];
-        wallet.balance += amount;
-        wallets[tokenRoot] = wallet;
-    }
+  return senderPublicKey;
 }
-```
+interface walletData = {
 
-:::tip 
-`onBounce` function is executed when contract receives a bounced inbound internal message. The message is generated by the network if the contract sends an internal message with `bounce: true` and either
+    tokenWallet: Address,
+    balance: number
+}
+export async function getWalletData(
+  MWContract: Contract<tip3Artifacts.FactorySource['MultiWalletTIP3']>,
+  tokenRootAddress: Address
+): Promise<walletData> {
+  const walletData = (await MWContract.methods.wallets().call()).wallets.map(item => {
+    if (item[0].toString() == tokenRootAddress.toString()) {
+      return item[1];
+    }
+  });
+  let balance: number = 0;
+  let tokenWallet: Address = zeroAddress;
+  if (walletData.length != 0) {
+    balance = Number(walletData[0]!.balance);
+    tokenWallet = walletData[0]!.tokenWallet;
+  }
+  return { tokenWallet: tokenWallet, balance: balance };
+}
 
-* called contract doesn't exist;
-* called contract fails at the storage/credit/computing phase (not at the action phase!)
+async function main(){
 
-The message is generated only if the remaining message value is enough for sending one back.
+  // Initiate the TVM provider
+  try {
+    
+  const tokenRootAddress: Address = "<YOUR_TOKEN_ROOT_ADDRESS>";
+  const receiverMWAddress: Address = "<RECEIVER_MULTI_WALLET_ADDRESS>";
+  const senderMWAddress: Address = "<SENDER_MULTI_WALLET_ADDRESS>";
 
-`body` is empty or contains at most **256** data bits of the original message (without references). The function id takes **32** bits and parameters can take at most **224** bits. It depends on the network config. If `onBounce` function is not defined then the contract does nothing on receiving a bounced inbound internal message.
+    // creating an instance of the target contracts
+    const tokenRootContract: Contract<tip3Artifacts.FactorySources["TokenRoot"]> = new provider.Contract(
+      tip3Artifacts.factorySource['TokenRoot'],
+      new Address(tokenRootAddress)
+    );
 
-If the `onBounce` function throws an exception then another bounced messages are not generated.
-:::
-
-<img src="/file.drawing.svg" alt="Failed Transfer on Sender side" class="gitbook-drawing">
-
-
-
-:::tip 
-As we have already figured out, the bounce works only if an error occurred on the called contract.
-
-Using the transfer method as an example, what happens if the recipient runs out of Gas or some other error?
-
-If you look at the source code of the wallet token, then when you call the AcceptTransfer function on the recipient of the tokens, a bounce with the value of true is passed. Then the Token Wallet of the recipient will bounce to the Token Wallet of the sender.
-
-And in the original TIP-3 repository, we can observe that the wallet token calls the wallet owner method `onBounceTokensTransfer`\
-
-:::
-
-```solidity
-onBounce(TvmSlice body) external {
-    tvm.rawReserve(_reserve(), 2);
-
-    uint32 functionId = body.load(uint32);
-
-    if (functionId == tvm.functionId(ITokenWallet.acceptTransfer)) {
-        uint128 amount = body.load(uint128);
-        balance_ += amount;
-        IBounceTokensTransferCallback(owner_).onBounceTokensTransfer{
-            value: 0,
-            flag: TokenMsgFlag.ALL_NOT_RESERVED + TokenMsgFlag.IGNORE_ERRORS,
-            bounce: false
-        }(
-            root_,
-            amount,
-            msg.sender
+    const senderMWContract: Contract<tip3Artifacts.FactorySource['MultiWalletTIP3']> =
+      new provider.Contract(
+        tip3Artifacts.factorySource['MultiWalletTIP3'],
+        new Address(senderMWAddress)
       );
-```
 
+    const receiverMWContract: Contract<tip3Artifacts.FactorySource['MultiWalletTIP3']> =
+      new provider.Contract(
+        tip3Artifacts.factorySource['MultiWalletTIP3'],
+        new Address(receiverMWAddress)
+      );
+    const [decimals, symbol] = await Promise.all([
+      Number((await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0),
+      (await tokenRootContract.methods.symbol({ answerId: 0 }).call()).value0,
+    ]);
+    
+    const tokenAmount: number  = 10 * 10 ** decimals;
+    
+    // checking if the sender has enough tokens to send
+    if (
+      (await getWalletData(senderMWContract, tokenRootContract.address)).balance <
+      tokenAmount * 10 ** decimals
+    ) {
+      console.log('Low balance !');
 
-
-<img src="/file.drawing(3).svg" alt="Failed Transfer or recipient side" class="gitbook-drawing">
-
-Let's develop a method
-
-```solidity
-function onBounceTokensTransfer(
-        address tokenRoot,
-        uint128 amount,
-        address revertedFrom
-    ) public onlyTokenWallet(tokenRoot) {
-        tvm.accept();
-        Wallet wallet = wallets[tokenRoot];
-        wallet.balance += amount;
-        wallets[tokenRoot] = wallet;
-        revertedFrom;
+      return 'Failed';
     }
-```
+    const senderPubkey: string = await extractPubkey(provider, senderAddress);
+    if (senderPubkey != (await senderMWContract.methods.owner({}).call()).owner) {
+      console.log('You are not the owner of the sender multi wallet contract !');
 
-
-
-Let's add another method so that we know about the replenishment of our wallets, and see what happens by connecting everything together
-
-```solidity
-pragma ton-solidity >= 0.61.2;
-pragma AbiHeader expire;
-pragma AbiHeader pubkey;
-
-import '@broxus/contracts/contracts/utils/CheckPubKey.sol';
-import '@broxus/contracts/contracts/utils/RandomNonce.sol';
-import '@broxus/contracts/contracts/access/ExternalOwner.sol';
-import "@broxus/tip3/contracts/interfaces/ITokenRoot.sol";
-import "@broxus/tip3/contracts/interfaces/ITokenWallet.sol";
-import "@broxus/tip3/contracts/libraries/TokenMsgFlag.sol";
-
-import "./libraries/Errors.sol";
-
-contract MultiWalletTIP3 is CheckPubKey, ExternalOwner, RandomNonce {
-    uint128 constant msgFee = 0.5 ever;
-    uint128 constant computeFee = 0.1 ever;
-
-    struct Wallet {
-        address tokenWallet;
-        uint256 balance;
+      return 'Failed';
     }
-    // tokenRoot => Wallet
-    mapping (address => Wallet) public wallets;
+    // Checking recipient has a deploy wallet of that token root
+    const oldBal: number = (await getWalletData(
+      receiverMWContract,
+      tokenRootContract.address
+    )).balance;
 
-    //mapping (address => address[]) public allowances;
+    let deployWalletValue: string = '0';
 
-    // tokenWallet => TokenRoot
-    mapping (address => address) public tokenRoots;
-
-    address awaitedRoot;
-
-    modifier onlyTokenRoot(address _tokenRoot) {
-      require(wallets.exists(_tokenRoot), Errors.NOT_TOKEN_ROOT);
-      _;
+    if (recipientOldWalletData.tokenWallet.toString() == zeroAddress) {
+      deployWalletValue = 2 * 10 ** 9;
     }
 
-    modifier onlyTokenWallet(address _tokenRoot) {
-      require(msg.sender == wallets[_tokenRoot].tokenWallet, Errors.NOT_TOKEN_WALLET);
-      _;
+    // Transferring token
+    const { transaction: transferRes } = await senderMWContract.methods
+      .transfer({
+        _amount: tokenAmount * 10 ** decimals,
+        _recipient: receiverMWContract.address,
+        _deployWalletValue: deployWalletValue,
+        _tokenRoot: tokenRootContract.address,
+      })
+      .sendExternal({ publicKey: senderPubkey });
+
+    if (transferRes.aborted) {
+      console.log(`Transaction aborted !: ${transferRes.exitCode}`);
+
+      return `Failed ${transferRes.exitCode}`;
+    } else {
+      const newBal: number = (await getWalletData(receiverMWContract, tokenRootContract.address)).balance;
+      // Checking if the tokens are received successfully
+      if (newBal > oldBal) {
+        console.log(`${tokenAmount} ${symbol}'s transferred successfully`);
+
+        return `tx Hash: ${transferRes.id.hash}`;
+      } else {
+        console.log('Transferring tokens failed');
+
+        return `tx Hash: ${(transferRes.exitCode, transferRes.exitCode)}`;
+      }
     }
-    constructor(
-    ) public checkPubKey {
-        tvm.accept();
-        setOwnership(msg.pubkey());
-    }
+  } catch (e: any) {
+    console.log(e.message);
 
-    function deployWallet(
-        uint128 _deployWalletBalance,
-        address _tokenRoot
-    ) public onlyOwner {
-        require(!wallets.exists(_tokenRoot), Errors.WALLET_EXISTS);
-        tvm.accept();
-
-        awaitedRoot = _tokenRoot;
-        ITokenRoot(_tokenRoot).deployWallet{
-            value: _deployWalletBalance + msgFee,
-            flag: 2,
-            callback: MultiWalletTIP3.receiveTokenWalletAddress
-        }(
-            address(this), // Now the owner of the wallet token will be TIP3Account
-            _deployWalletBalance
-        );
-    }
-
-    function receiveTokenWalletAddress(address wallet) external {
-        //require(msg.sender == awaitedRoot, 200, "Sender is not awaited Token Root");
-        wallets[msg.sender] = Wallet(wallet, 0);
-        tokenRoots[wallet] = awaitedRoot;
-        awaitedRoot = address(0);
-    }
-    /*
-        @notice Transfer tokens and optionally deploy TokenWallet for recipient
-        @dev Can be called only by TokenWallet owner
-        @dev If deployWalletValue !=0 deploy token wallet for recipient using that gas value
-        @param amount How much tokens to transfer
-        @param recipient Tokens recipient address
-        @param deployWalletValue How much EVERs to attach to token wallet deploy
-    */
-    function transfer(
-        uint128 _amount,
-        address _recipient,
-        uint128 _deployWalletValue,
-        address _tokenRoot
-    ) public onlyOwner {
-        require(wallets.exists(_tokenRoot), 222);
-        Wallet wallet = wallets[_tokenRoot];
-        require(wallet.balance >= _amount, 202);
-        tvm.accept();
-
-        wallet.balance -= _amount;
-        wallets[_tokenRoot] = wallet;
-
-        TvmCell _empty;
-        ITokenWallet(wallet.tokenWallet).transfer{
-            value: _deployWalletValue + msgFee,
-            flag: TokenMsgFlag.IGNORE_ERRORS,
-            bounce: true
-            } ({
-                amount: _amount,
-                recipient: _recipient,
-                deployWalletValue: _deployWalletValue,
-                remainingGasTo: address(this),
-                notify: true,
-                payload: _empty
-        });
-
-    }
-
-    function onAcceptTokensTransfer(
-        address tokenRoot,
-        uint128 amount,
-        address sender,
-        address senderWallet,
-        address remainingGasTo,
-        TvmCell payload
-    ) external onlyTokenWallet(tokenRoot) {
-        Wallet wallet = wallets[tokenRoot];
-        wallet.balance += amount;
-        wallets[tokenRoot] = wallet;
-
-        tokenRoot;
-        sender;
-        senderWallet;
-        remainingGasTo;
-        payload;
-    }
-
-
-    function onBounceTokensTransfer(
-        address tokenRoot,
-        uint128 amount,
-        address revertedFrom
-    ) public onlyTokenWallet(tokenRoot) {
-        tvm.accept();
-        Wallet wallet = wallets[tokenRoot];
-        wallet.balance += amount;
-        wallets[tokenRoot] = wallet;
-        revertedFrom;
-    }
-
-    onBounce(TvmSlice body) external {
-        tvm.rawReserve(_reserve(), 2);
-
-        uint32 functionId = body.load(uint32);
-
-        if (functionId == tvm.functionId(ITokenWallet.transfer)) {
-            uint128 amount = body.load(uint128);
-            require(tokenRoots.exists(msg.sender), Errors.NOT_TOKEN_WALLET);
-
-            address tokenRoot = tokenRoots[msg.sender];
-            Wallet wallet = wallets[tokenRoot];
-            wallet.balance += amount;
-            wallets[tokenRoot] = wallet;
-        }
-    }
-    function _reserve() public pure returns(uint128 reserve){
-        return msgFee + computeFee;
-    }
-
+    return 'Failed';
+  }
 }
 
+````
+
+**using `transferToWallet` function:**
+
+
+```` typescript
+
+/**
+ * We use the previous code block states
+ */
+
+async function main() {
+  try {
+    // Checking recipient has a deploy wallet of that token root
+    const recipientOldWalletData: walletData = await getWalletData(
+      receiverMWContract,
+      tokenRootContract.address
+    );
+
+    const oldBal: number = recipientOldWalletData.balance;
+
+    // Transferring token
+    const { transaction: transferRes } = await senderMWContract.methods
+      .transferToWallet({
+        _amount: tokenAmount * 10 ** decimals,
+        _recipientTokenWallet: recipientOldWalletData.tokenWallet,
+        _tokenRoot: tokenRootContract.address,
+      })
+      .sendExternal({ publicKey: senderPubkey });
+
+    if (transferRes.aborted) {
+      console.log(`Transaction aborted !: ${transferRes.exitCode}`);
+
+      return `Failed ${transferRes.exitCode}`;
+    } else {
+      const newBal = (await getWalletData(receiverMWContract, tokenRootContract.address)).balance;
+
+      // Checking if the tokens are received successfully
+      if (newBal > oldBal) {
+        console.log(`${tokenAmount} ${symbol}'s transferred successfully`);
+
+        return `tx Hash: ${transferRes.id.hash}`;
+      } else {
+        console.log('Transferring tokens failed');
+
+        return `tx Hash: ${(transferRes.exitCode, transferRes.exitCode)}`;
+      }
+    }
+  } catch (e: any) {
+    console.log(e.message);
+
+    return 'Failed';
+  }
+}
+
+
+````
+
+</span>
+
+</div>
+
+
+<div class="action">
+<div :class="llAction">
+
+Use this command to transfer TIP-3 tokens:
+
+```shell
+npx locklift run -s ./scripts/04-transfer-tip3.ts -n local
 ```
 
-:::tip 
-Since `onBounces` has an implicit implementation, we can be sure that the sender will always be a trusted contract.
+![](</transferTokenFromMW.png>)
 
-In contrast, from cases where our callback methods can call everything, and we need to check msg.sender
-:::
+Congratulations, you have successfully transferred TIP-3 tokens from one to another Wallet using a custom contract.
+
+</div>
+
+<div :class="eipAction" >
+
+<div :class="transfer">
+
+## Transfer TIP-3 tokens  
+
+<p class=actionInName style="margin-bottom: 0;">Token Root address</p> 
+<input ref="actionTokenRootAddress" class="action Ain" type="text"/>
+
+<p class=actionInName style="margin-bottom: 0;">Sender multi wallet address</p> 
+<input ref="actionSenderAddress" class="action Ain" type="text"/>
+
+<p class=actionInName style="margin-bottom: 0;">Recipient multi wallet address</p> 
+<input ref="actionRecipientAddress" class="action Ain" type="text"/>
+
+<p class=actionInName style="margin-bottom: 0;">Amount</p> 
+<input ref="actionAmount" class="action Ain" type="text"/>
 
 
+<button @click="transferTokens" class="transferTokenBut" >Transfer Tokens</button>
+</div>
+<p id="output-p" :class="EIPdis" ref="transferTokenOutput"></p>
 
-And in the end, let's look at the implementation of the transfer to TokenWallet.
+<div :class="transferToWallet">
 
-In fact, the implementation differs only in that there is no deployWalletValue and we indicate the recipient Token Wallet, and not its owner
+## Transfer TIP-3 tokens to Token Wallet  
 
-```solidity
-    /*
-        @notice Transfer tokens using another TokenWallet address, that wallet must be deployed previously
-        @dev Can be called only by token wallet owner
-        @param amount How much tokens to transfer
-        @param recipientWallet Recipient TokenWallet address
-    */
-    function transferToWallet(
-        address _tokenRoot,
-        uint128 _amount,
-        address _recipientTokenWallet
-    ) public onlyOwner {
-        require(wallets.exists(_tokenRoot), Errors.WALLET_NOT_EXISTS);
-        Wallet wallet = wallets[_tokenRoot];
-        require(wallet.balance >= _amount, Errors.NOT_ENOUGH_BALANCE);
-        tvm.accept();
+<p class=actionInName style="margin-bottom: 0;">Token Root address</p> 
+<input ref="actionWalletTokenRootAddress" class="action Ain" type="text"/>
 
-        wallet.balance -= _amount;
-        wallets[_tokenRoot] = wallet;
+<p class=actionInName style="margin-bottom: 0;">Sender multi wallet address</p> 
+<input ref="actionWalletSenderAddress" class="action Ain" type="text"/>
 
-        TvmCell _empty;
-        ITokenWallet(wallet.tokenWallet).transferToWallet{
-            value: msgFee,
-            flag: TokenMsgFlag.IGNORE_ERRORS,
-            bounce: true
-            } ({
-                amount: _amount,
-                recipientTokenWallet: _recipientTokenWallet,
-                remainingGasTo: address(this),
-                notify: true,
-                payload: _empty
-        });
+<p class=actionInName style="margin-bottom: 0;">Recipient multi wallet address</p> 
+<input ref="actionWalletRecipientAddress" class="action Ain" type="text"/>
 
+<p class=actionInName style="margin-bottom: 0;">Amount</p> 
+<input ref="actionWalletAmount" class="action Ain" type="text"/>
+
+
+<button @click="transferTokensToWallet" class="transferTokenBut" >Transfer Tokens to Wallet</button>
+</div>
+</div>
+
+</div>
+
+<p id="output-p" :class="EIPdis" ref="WalletTransferTokenOutput"></p>
+
+</div>
+
+<script lang="ts" >
+import { defineComponent, ref, onMounted } from "vue";
+import {toast} from "/src/helpers/toast";
+import {transferTokenCon, transferTokenToWalletCon} from "../Scripts/Contract/transfer"
+
+export default defineComponent({
+  name: "transferToken",
+  data(){
+    return{
+        LLdis: "cbShow",
+        EIPdis: "cbHide",
+        llSwitcher:"llSwitcher on",
+        eipSwitcher: "eipSwitcher off",
+        llAction: "llAction cbShow",
+        eipAction: "eipAction cbHide"
+    }
+  },
+  setup() {
+    
+    function llHandler(e){
+        if(this.LLdis == "cbHide")  
+        {
+            this.llSwitcher = "llSwitcher on";
+            this.eipSwitcher = "eipSwitcher off"
+        };
+        this.EIPdis = "cbHide"
+        this.LLdis = "cbShow"
+        this.llAction = "llAction cbShow"
+        this.eipAction = "eipAction cbHide"
+}   
+    async function eipHandler(e){
+        if(this.EIPdis == "cbHide")  
+        {
+            this.llSwitcher = "llSwitcher off";
+            this.eipSwitcher = "eipSwitcher on"
+        };
+        this.LLdis = "cbHide"
+        this.EIPdis = "cbShow"
+        this.llAction = "llAction cbHide"
+        this.eipAction = "eipAction cbShow"
+    }
+  async function transferTokens(){
+          this.$refs.transferTokenOutput.innerHTML = "Processing ..."
+        // checking of all the values are fully filled 
+        if (
+            this.$refs.actionTokenRootAddress.value == ""
+
+        ){
+            toast("Token root address field is required !",0)
+            this.$refs.transferTokenOutput.innerHTML = "Failed"
+            return
+        }
+        if (
+            this.$refs.actionRecipientAddress.value == ""
+
+        ){
+            toast("Recipient multi wallet address field is required !",0)
+            this.$refs.transferTokenOutput.innerHTML = "Failed"
+            return
+        }        
+        if (
+            this.$refs.actionSenderAddress.value == ""
+
+        ){
+            toast("Sender multi wallet address field is required !",0)
+            this.$refs.transferTokenOutput.innerHTML = "Failed"
+            return
+        }     
+        if (
+            this.$refs.actionAmount.value == ""
+
+        ){
+            toast("Amount field is required !",0)
+            this.$refs.transferTokenOutput.innerHTML = "Failed"
+            return
+        }
+        let transferTokenRes = await transferTokenCon(
+          this.$refs.actionTokenAddress.value,       
+          this.$refs.actionRecipientAddress.value,
+          this.$refs.actionSenderAddress.value,
+          this.$refs.actionAmount.value,
+        )
+
+        // Rendering the output     
+        transferTokenRes = !transferTokenRes ? "Failed" :  transferTokenRes;
+        this.$refs.transferTokenOutput.innerHTML = transferTokenRes;
+  }
+
+   async function transferTokensToWallet(){
+          this.$refs.WalletTransferTokenOutput.innerHTML = "Processing ..."
+        if (
+            this.$refs.actionWalletTokenRootAddress.value == ""
+
+        ){
+            toast("Token root address field is required !",0)
+            this.$refs.actionWalletAmount.innerHTML = "Failed"
+            return
+        }      
+        if (
+            this.$refs.actionWalletRecipientAddress.value == ""
+
+        ){
+            toast("Recipient multi wallet address field is required !",0)
+            this.$refs.actionWalletAmount.innerHTML = "Failed"
+            return
+        }       
+        if (
+            this.$refs.actionWalletSenderAddress.value == ""
+
+        ){
+            toast("Sender multi wallet address field is required !",0)
+            this.$refs.actionWalletAmount.innerHTML = "Failed"
+            return
+        }
+        if (
+            this.$refs.actionWalletNotify.value == ""
+
+        ){
+            toast("Amount field is required !",0)
+            this.$refs.WalletTransferTokenOutput.innerHTML = "Failed"
+            return
+        }
+        let transferTokenRes = await transferTokenToWalletCon(
+          this.$refs.actionWalletTokenAddress.value,       
+          this.$refs.actionWalletRecipientAddress.value,
+          this.$refs.actionWalletSenderAddress.value,
+          this.$refs.actionWalletAmount.value,
+          )
+          // Rendering the output     
+          transferTokenRes = !transferTokenRes ? "Failed" :  transferTokenRes;
+          this.$refs.WalletTransferTokenOutput.innerHTML = transferTokenRes;
+  }
+  
+return {
+        eipHandler,
+        llHandler,
+        transferTokens,
+        transferTokensToWallet
+    };
+  },
+});
+
+</script>
+
+<style>
+.transferTokens{
+  font-size: 1.1rem;
+}
+.action{
+    display:inline-block;
+}
+
+.actionInName{
+    font-size: .9rem;
+}
+
+.transferTokenBut, .switcherContainer, .codeBlockContainer, .Ain
+{
+  background-color: var(--vp-c-bg-mute);
+  transition: background-color 0.1s;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  font-weight: 600;
+  cursor : pointer;
+}
+.Ain{
+    padding-left : 10px;
+    margin : 0;
+}
+.transferTokenBut{
+    cursor:pointer;
+    padding: 5px 12px;
+    display: flex;
+    transition: all ease .3s;
+}
+
+.transferTokenBut:hover{
+      border: 1px solid var(--light-color-ts-class);
+}
+
+#output-p{
+    /* height: 30px; */
+    padding: 2px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--vp-c-divider);
     }
 
-```
+.text{padding-left: 5px;font-size:1rem;}
 
+.switcherContainer{
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    display: flex;
+    border: none;
+    padding: 0px;
+}
+.switcherContainer > p{
+    margin: 0px;
+    padding : 0px;
+}
+.codeBlockContainer{
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    padding: 8px 12px;
+}
+.cbShow{
+    display: block;
+}
+.cbHide{
+    display: none;
+}
+.llSwitcher{
+    padding: 5px 10px;
+    border:  0 solid var(--vp-c-divider);
+    border-width: 1px ;
+    border-color: var(--vp-c-divider);
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    font-weight: 600;
+    transition: all ease .2s;
+}
+.eipSwitcher{
+    padding: 5px 10px;
+    border:  0 solid var(--vp-c-divider);
+    border-width: 1px ;
+    border-color: var(--vp-c-divider);
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    font-weight: 600;
+    transition: all ease .2s;
+}
+.llSwitcher:hover, .eipSwitcher:hover{
+      border-color: var(--light-color-ts-class);
+}
+.eipAction{
+    font-weight: 600;
+}
+.on{
+    color : var(--light-color-ts-class);
+}
+.off{
+    color : var(--vp-c-bg-mute);
+}
 
+* {box-sizing: border-box;}
+ 
+.container {
+  display: flex;
+  position: relative;
+  margin-bottom: 12px;
+  font-size: .9rem;
+}
 
+.container .checkboxInput {
+  position: absolute;
+  opacity: 0;
+  height: 0;
+  width: 0;
+  
+}
 
+.checkmark {
+  cursor: pointer;
+  position: relative;
+  top: 0;
+  left: 0;
+  height: 25px;
+  width: 25px;
+  background-color: var(--vp-c-bg-mute);
+  border: 1px solid var(--vp-c-divider);
+  border-radius : 8px;
+  margin-left: 10px;
+}
 
-:::tip 
-You probably noticed that we have a new TМM method in the code -&#x20;
+.container input:checked ~ .checkmark {
+  background-color: var(--light-color-ts-class);
+}
 
-`tvm.rawReserve(uint value, uint8 flag);`
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
 
+.container input:checked ~ .checkmark:after {
+  display: block;
+}
 
+.container .checkmark:after {
+  left: 9px;
+  top: 5px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
 
-Creates an output action that reserves **reserve** nanotons. It is roughly equivalent to create an outbound message carrying **reserve** nanotons to oneself, so that the subsequent output actions would not be able to spend more money than the remainder. It's a wrapper for opcodes "RAWRESERVE" and "RAWRESERVEX". See [TVM](https://test.ton.org/tvm.pdf).\
-
-:::
-
-:::tip 
-`By tvm.accept` and `tvm.rawReserve`is determined by an external function or internal.\
-\
-Note: If the function has `tvm.rawReserve`then only a smart contract can call it.
-
-But if the function has an acceptance, then it can be called by an external message and an internal one.\
-\
-If you need to make the function available only for external messages, add a&#x20;
-
-require(msg.sender == address(0))
-:::
-
+</style>

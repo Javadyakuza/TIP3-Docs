@@ -87,8 +87,8 @@ import { FactorySource, factorySource } from "../build/factorySource";
   ]);
 
   // Preparing the params 
-  const burnAmount: number = 100 * 10 * decimals;
-  const burnByRootAmount: number = 50 * 10 * decimals;
+  const burnAmount: number = 100 * 10 ** decimals;
+  const burnByRootAmount: number = 50 * 10 ** decimals;
   
   const aliceTWCon: Contract<FactorySource["TokenWallet"]> = locklift.factory.getDeployedContract(
     "TokenWallet",
@@ -111,7 +111,7 @@ import { FactorySource, factorySource } from "../build/factorySource";
           })
           .call()
       ).value0
-      / 10 ^ decimals,
+      / 10 ** decimals,
   ); // >> 200
   
   // burning tokens by calling the "burn" method in the alice's token wallet 
@@ -137,7 +137,7 @@ import { FactorySource, factorySource } from "../build/factorySource";
           })
           .call()
       ).value0
-      / 10 ^ decimals,
+      / 10 ** decimals,
   ); // >> 200
 
   // burning tokens by calling the "burnTokens" on the token root 
@@ -162,7 +162,7 @@ import { FactorySource, factorySource } from "../build/factorySource";
           })
           .call()
       ).value0
-      / 10 ^ decimals,
+      / 10 ** decimals,
   ); // >> 50 
 
 ````
@@ -206,11 +206,11 @@ async function main()
       (await tokenRootContract.methods.symbol({ answerId: 0 }).call()).value0,
     ]);
 
-    const burnAmount: number = 100 * 10  * decimals
+    const burnAmount: number = 100 * 10  ** decimals
 
     const oldBal: number = 
       (await tokenWalletContract.methods.balance({ answerId: 0 }).call()).value0
-      / 10 ^ decimals
+      / 10 ** decimals
     
 
     // burning tokens from a token wallet by calling the burn method
@@ -223,7 +223,7 @@ async function main()
       })
       .send({
         from: providerAddress,
-        amount: 3 * 10 * 9,
+        amount: 3 * 10 ** 9,
       });
 
     if (burnRes.aborted) {
@@ -236,7 +236,7 @@ async function main()
 
     const newBal: number = 
     (await tokenWalletContract.methods.balance({ answerId: 0 }).call()).value0
-      / 10 ^ decimals
+      / 10 ** decimals
 
     if (oldBal >= newBal) {
       console.log(`${amount} ${symbol}'s successfully burnt !`);
@@ -305,11 +305,11 @@ async function main(){
       (await tokenRootContract.methods.symbol({ answerId: 0 }).call()).value0,
     ]);
 
-    const burnByRootAmount: number  = 50 * 10 * decimals;
+    const burnByRootAmount: number  = 50 * 10 ** decimals;
 
     const oldBal: number = 
     (await tokenWalletContract.methods.balance({ answerId: 0 }).call()).value0
-      / 10 ^ decimals
+      / 10 ** decimals
     
 
     // Deploying a new contract if didn't exist before
@@ -323,7 +323,7 @@ async function main(){
       })
       .send({
         from: providerAddress,
-        amount: 3 * 10 * 9,
+        amount: 3 * 10 ** 9,
       });
 
     if (burnByRotRes.aborted) {
@@ -336,7 +336,7 @@ async function main(){
 
     const newBal: number = 
     (await tokenWalletContract.methods.balance({ answerId: 0 }).call()).value0
-      / 10 ^ decimals
+      / 10 ** decimals
 
     if (oldBal >= newBal) {
       console.log(`${amount} ${symbol}'s successfully burnt`);

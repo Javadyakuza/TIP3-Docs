@@ -71,7 +71,7 @@ export async function burnByRootTip3Eip(
 
     // Fetching the decimals
     const [decimals, symbol] = await Promise.all([
-      (await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0,
+      Number((await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0),
       (await tokenRootContract.methods.symbol({ answerId: 0 }).call()).value0,
     ]);
 

@@ -102,7 +102,7 @@ async function main() {
     },
     constructorParams: {
       initialSupplyTo: initialSupplyTo,
-      initialSupply: initialSupply * 10 * decimals,
+      initialSupply: initialSupply * 10 ** decimals,
       deployWalletValue: locklift.utils.toNano(2),
       mintDisabled: disableMint,
       burnByRootDisabled: disableBurnByRoot,
@@ -181,7 +181,7 @@ async function main(){
       initialSupply: 0
   } // Or get them from user 
 
-  const deployWalletValue: number = params.initialSupplyTo = zeroAddress ? 2 * 10 * params.decimals : 0  
+  const deployWalletValue: number = params.initialSupplyTo = zeroAddress ? 2 * 10 ** params.decimals : 0  
 
   // Amount to attach to the tx 
   const amount: number = params.initialSupplyTo == zeroAddress ? 2 : 4;
@@ -227,7 +227,7 @@ async function main(){
   await provider.sendMessage({
     sender: providerAddress,
     recipient: expectedAddress,
-    amount: amount * 10 * 9, 
+    amount: amount * 10 ** 9, 
     bounce: false, // it's important to set this param to keep the evers in the contract  
     stateInit: stateInit.stateInit,
   });

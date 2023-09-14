@@ -46,8 +46,7 @@ export async function deployRootDeployerCon(): Promise<
     const senderPublicKey: string = await provider.extractPublicKey(accountFullState.boc);
 
     // Preparing the deployment params
-    const randomNonce_ = 1;
-
+    const randomNonce_ = (Math.random() * 6400) | 0;
     const deployParams: DeployParams<tip3Artifacts.FactorySource['RootDeployer']> = {
       tvc: RDArt.tvc,
       workchain: 0,

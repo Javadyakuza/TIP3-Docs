@@ -76,7 +76,7 @@ async function main() {
     await locklift.factory.getDeployedContract("MultiWalletTIP3", tokenRootAddress),
   ])
 
-   const [decimals, symbol] = await Promise.all([
+  const [decimals, symbol] = await Promise.all([
     Number((await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0),
     (await tokenRootContract.methods.symbol({ answerId: 0 }).call()).value0,
   ]);
@@ -94,14 +94,14 @@ async function main() {
   if (tokenWalletData[0]!.tokenWallet.toString() != zeroAddress.toString()){
     // means that the token wallet is deployed for the user
     tokenWalletContract = locklift.factory.getDeployedContract("TokenWallet", tokenWalletData[0]!.tokenWallet);
-    console.log("Token Wallet is deployed, balance before mint: ", Number(tokenWalletData[0]!.balance) / 10 ^ decimals);
+    console.log("Token Wallet is deployed, balance before mint: ", Number(tokenWalletData[0]!.balance) / 10 ** decimals);
     deployWalletValue = locklift.utils.toNano("2");
   }else{
     console.log("Token Wallet is not deployed, balance before mint: 0");
   }
 
 
-  const mintAmount: number = 50 * 10 * decimals;
+  const mintAmount: number = 50 * 10 ** decimals;
 
   // Minting tokens for Alice
   await tokenRootContract.methods
@@ -118,7 +118,7 @@ async function main() {
   // confirming that its received
   console.log(
     "balance after mint:",
-    Number((await tokenWalletContract.methods.balance({ answerId: 0 }).call({})).value0) / 10 ^ decimals,
+    Number((await tokenWalletContract.methods.balance({ answerId: 0 }).call({})).value0) / 10 ** decimals,
   ); 
 }
 
@@ -173,16 +173,16 @@ async function main(){
 
     let deployWalletValue: number = 0;
 
-    const oldBal: number = Number(tokenWalletData[0]!.balance) / 10 ^ decimals;
+    const oldBal: number = Number(tokenWalletData[0]!.balance) / 10 ** decimals;
 
     if (tokenWalletData[0]!.tokenWallet.toString() == zeroAddress) {
-      deployWalletValue = 2 * 10 * 9;
+      deployWalletValue = 2 * 10 ** 9;
     }
 
     // Deploying a new contract if didn't exist before
     const deployWalletRes: Transaction = await tokenRootContract.methods
       .mint({
-        amount: mintAmount * 10 * decimals,
+        amount: mintAmount * 10 ** decimals,
         deployWalletValue: deployWalletValue,
         remainingGasTo: senderAddress,
         recipient: multiWalletAddress,
@@ -191,7 +191,7 @@ async function main(){
       })
       .send({
         from: senderAddress,
-        amount: 2 * 10 * 9 + deployWalletValue,
+        amount: 2 * 10 ** 9 + deployWalletValue,
         bounce: true, 
       });
       
@@ -206,7 +206,7 @@ async function main(){
         return item[1];
       }
     });
-    const newBal: number = Number(tokenWalletData[0]!.balance) / 10 ^ decimals;
+    const newBal: number = Number(tokenWalletData[0]!.balance) / 10 ** decimals;
 
     if (newBal >= oldBal) {
       console.log(`${mintAmount} ${symbol}'s minted successfully `);
@@ -433,8 +433,9 @@ return {
 }
 .llSwitcher{
     padding: 5px 10px;
-    border: 1px solid var(--vp-c-divider);
-    border-bottom: none;
+    border:  0 solid var(--vp-c-divider);
+    border-width: 1px ;
+    border-color: var(--vp-c-divider);
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
     font-weight: 600;
@@ -442,12 +443,16 @@ return {
 }
 .eipSwitcher{
     padding: 5px 10px;
-    border: 1px solid var(--vp-c-divider);
-    border-bottom: none;
+    border:  0 solid var(--vp-c-divider);
+    border-width: 1px ;
+    border-color: var(--vp-c-divider);
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
     font-weight: 600;
     transition: all ease .2s;
+}
+.llSwitcher:hover, .eipSwitcher:hover{
+      border-color: var(--light-color-ts-class);
 }
 .eipAction{
     font-weight: 600;

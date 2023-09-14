@@ -138,12 +138,12 @@ export async function main(){
     // Deploying a new contract if didn't exist before
     const deployWalletRes: Transaction = await MultiWalletContract.methods
       .deployWallet({
-        _deployWalletBalance: 2 * 10 * 9,
+        _deployWalletBalance: 2 * 10 ** 9,
         _tokenRoot: tokenRootContract.address,
       })
       .send({
         from: senderAddress,
-        amount: 4 * 10 * 9,
+        amount: 4 * 10 ** 9,
         bounce: true, 
       });
 
@@ -364,8 +364,9 @@ return {
 }
 .llSwitcher{
     padding: 5px 10px;
-    border: 1px solid var(--vp-c-divider);
-    border-bottom: none;
+    border:  0 solid var(--vp-c-divider);
+    border-width: 1px ;
+    border-color: var(--vp-c-divider);
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
     font-weight: 600;
@@ -373,12 +374,16 @@ return {
 }
 .eipSwitcher{
     padding: 5px 10px;
-    border: 1px solid var(--vp-c-divider);
-    border-bottom: none;
+    border:  0 solid var(--vp-c-divider);
+    border-width: 1px ;
+    border-color: var(--vp-c-divider);
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
     font-weight: 600;
     transition: all ease .2s;
+}
+.llSwitcher:hover, .eipSwitcher:hover{
+      border-color: var(--light-color-ts-class);
 }
 .eipAction{
     font-weight: 600;
