@@ -15,14 +15,14 @@ pragma ton-solidity >= 0.61.2;
 pragma AbiHeader expire;
 pragma AbiHeader pubkey;
 
-import '@broxus/contracts/contracts/utils/CheckPubKey.sol';
-import '@broxus/contracts/contracts/utils/RandomNonce.sol';
-import '@broxus/contracts/contracts/access/ExternalOwner.sol';
-import "@broxus/tip3/contracts/interfaces/ITokenRoot.sol";
-import "@broxus/tip3/contracts/interfaces/ITokenWallet.sol";
-import "@broxus/tip3/contracts/libraries/TokenMsgFlag.sol";
+import '@broxus/contracts/contracts/utils/CheckPubKey.tsol';
+import '@broxus/contracts/contracts/utils/RandomNonce.tsol';
+import '@broxus/contracts/contracts/access/ExternalOwner.tsol';
+import "@broxus/tip3/contracts/interfaces/ITokenRoot.tsol";
+import "@broxus/tip3/contracts/interfaces/ITokenWallet.tsol";
+import "@broxus/tip3/contracts/libraries/TokenMsgFlag.tsol";
 
-import "./libraries/Errors.sol";
+import "./libraries/Errors.tsol";
 
 contract MultiWalletTIP3 is CheckPubKey, ExternalOwner, RandomNonce {
     uint128 constant msgFee = 0.5 ever;
@@ -305,7 +305,7 @@ You probably noticed that we have a new TVM method in the code -&#x20;
 
 
 
-Creates an output action that reserves **reserve** nanotons. It is roughly equivalent to create an outbound message carrying **reserve** nanotons to oneself, so that the subsequent output actions would not be able to spend more money than the remainder. It's a wrapper for opcodes "RAWRESERVE" and "RAWRESERVEX". See [TVM](https://test.ton.org/tvm.pdf).\
+Creates an output action that reserves **reserve** nanotons. It is roughly equivalent to create an outbound message carrying **reserve** nanotons to oneself, so that the subsequent output actions would not be able to spend more money than the remainder. It's a wrapper for opcodes "RAWRESERVE" and "RAWRESERVEX". See [TVM](https://test.ton.org/tvm.pdf).
 
 :::
 
@@ -381,7 +381,7 @@ require(msg.sender == address(0))
 
 ## Burn
 
-**Now let's talk about the `burn` method. `Burn` has two implementations as well as the transfer method:**
+Now let's talk about the `burn` method. `Burn` has two implementations as well as the transfer method:
 
 - `burn`: This function will be called on the token wallet contract and only the owner of the token wallet can call it which is the  Multi Wallet contract.
 - `burnByRoot`:  This function can be call on the token root and only the owner of the token root can call it, Notice that the owner of the token root is not the Root Deployer contract as we specify the `rootOwner` at the time of deploying the token root contact.   
@@ -405,6 +405,29 @@ function burn(uint128 _amount, address _tokenRoot, address _remainingGasTo, TvmC
       payload: _payload
     });
   }
+````
+
+## Error Codes
+
+Let's create a library to store our Error codes and use them inside of the contracts.
+Save the below content in a file named `Errors.tsol` and import the library from the file path.  
+
+```` solidity 
+pragma ever-solidity >= 0.61.2;
+
+library Errors {
+    // Access
+    uint16 constant NOT_TOKEN_WALLET = 1101;
+    uint16 constant NOT_TOKEN_ROOT = 1102;
+    uint16 constant NOT_AWAITED_ROOT = 1103;
+
+    // Utils
+    uint16 constant WALLET_EXISTS = 1201;
+    uint16 constant WALLET_NOT_EXISTS = 1202;
+    uint16 constant NOT_ENOUGH_BALANCE = 1203;
+
+}
+
 ````
 
 ## Whole Code

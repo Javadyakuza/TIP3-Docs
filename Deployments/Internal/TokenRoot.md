@@ -3,10 +3,10 @@
 
 <div class="DeployTokenRoot">
 
-In this section, we will learn a little more about the memory structure in ~~TON~~ Threaded Virtual Machine (TVM), and deploy our token through a smart contract.
+In this section, we will learn a little more about the memory structure in  Threaded Virtual Machine (TVM), and deploy our token through a smart contract.
 
 ::: tip 
-TVM memory and persistent storage consist of cells. Recall that the TVM memory and persistent storage consist of (TVM) cells. Each cell contains up to 1023 bits of data and up to four references to other cells. Circular references are forbidden and cannot be created by means of TVM. In this way, all cells kept in TVM memory and persistent storage constitute a directed acyclic graph (DAG).
+TVM memory and persistent storage consist of cells. Remember that the TVM memory and persistent storage consist of (TVM) cells
 :::
 
 ::: tip 

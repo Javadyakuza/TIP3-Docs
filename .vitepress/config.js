@@ -93,6 +93,11 @@ module.exports = {
             ],
           },
           {
+            text: 'local environment',
+            collapsable: false,
+            link: '/Docs/QuickStart/HelperScripts.md',
+          },
+          {
             text: 'Deploy Account',
             collapsable: false,
             link: '/Docs/QuickStart/DeployAccount.md',
