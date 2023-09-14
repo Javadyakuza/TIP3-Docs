@@ -1,10 +1,22 @@
 # Deploy Account
 
-Let's write a simple script that will use locklift to deploy our Account.&#x20;
+In this section we will learn how to deploy an Account smart contract.
 
-Take a TIP3 script from the repository as a basis, and rewrite it for a typescript and a newer version of Locklift
+
+## step 1: Write a Deployment Script 
+
+Let's write a simple script in typescript that will use locklift to deploy our Account.&#x20;
+
+::: info 
+Before we start to write our scripts we need to make sure that there is a file named `00-deploy-account.ts` in the `script` folder in the project root.
+:::
 
 ``` typescript
+
+/*
+  locklift is a globally declared variable 
+*/
+
 async function main() {
 
   // each mnemonic can generate more that just one key pair, so we specify which pair do we want.
@@ -24,23 +36,15 @@ async function main() {
 
   const signer = (await locklift.keystore.getSigner(keyNumber))!;
   
-  /* Get a accountFactory from contract name. You can provide your own implementation of account 
-      if needed, there is only one constraint - custom contract
-    should include SendTransaction method */
-  let accountsFactory = locklift.factory.getAccountsFactory("Account");
-  
-  /* Deploy new Account. 
-    @params value: Initial balance in EVERs, received from giver.
-  */
-  const { account: Account } = await accountsFactory.deployNewAccount({
+  const {contract: Account} = locklift.factory.deployContract({
+    contract: "Account",
     publicKey: signer.publicKey,
-    initParams: {
-      _randomNonce: locklift.utils.getRandomNonce(), 
-    },
     constructorParams: {},
-    value: locklift.utils.toNano(10),
+    initParams: { _randomNonce: locklift.utils.getRandomNonce() },
+    value: locklift.utils.toNano(balance),
   });
-  console.log(`Account deployed at: ${Account.address}`);
+
+  console.log(`Account deployed at: ${Account.address.toString()}`);
 }
 
 main()
@@ -61,11 +65,12 @@ has a pre-installed contract with the initial amount of EVERs. For other network
 If you need a permanent address for testing, then set the `_randomNonce` constant. By changing  `_randomNonce` you change the byte code of the contract, and the final address.
 :::
 
+## Step 2: Deploy the Account
 
 Use this command and deploy account:
 
 ```shell
-npx locklift run -s ./scripts/00-deploy-account.js -n local
+npx locklift run -s ./scripts/00-deploy-account.ts -n local
 ```
 
 ![](< /image(13).png>)

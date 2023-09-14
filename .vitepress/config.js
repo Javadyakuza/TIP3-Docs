@@ -90,11 +90,6 @@ module.exports = {
                 collapsable: false,
                 link: '/Docs/QuickStart/LockliftConfigSetting.md',
               },
-              {
-                text: 'Helper Scripts',
-                collapsable: false,
-                link: '/Docs/QuickStart/HelperScripts.md',
-              },
             ],
           },
           {

@@ -1,22 +1,17 @@
-#### Here you can find the explained topics in this section:
+# Quick Start 
+In this section we will walk through on how to deploy an Account smart contract and how to set up a basic project for the TIP-3 contracts.
+
+**Here you can find the explained topics in this section:**
 
 <div class="sections-container">
   <div class="bridge-section-row">
-    <a href="/Docs/QuickStart/Prerequisites.html">
-      <span class="bridge-section">Prerequisites</span>
-    </a>
     <a href="/Docs/QuickStart/BasicProjectSetup.html">
       <span class="bridge-section">Basic Project Setup</span>
     </a>
-  </div>
-  <div class="bridge-section-row">
     <a href="/Docs/QuickStart/LockliftConfigSetting.html">
       <span class="bridge-section">Locklift Config Setup</span>
     </a>
-    <a href="/Docs/QuickStart/HelperScripts.html">
-      <span class="bridge-section">Helper Scripts</span>
-    </a>
-  </div> 
+  </div>
   <div class="bridge-section-row">
     <a href="/Docs/QuickStart/DeployAccount.html">
       <span class="bridge-section">Deploy Account</span>

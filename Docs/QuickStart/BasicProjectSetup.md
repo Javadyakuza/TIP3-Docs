@@ -40,5 +40,8 @@ npm i @broxus/contracts tip3
 
 And that's it! You've set up a project with TIP3 contracts and prepared it for multiwallet integration.
 
-You can also watch the tutorial video for more guidance.https://www.youtube.com/watch?v=SLNEeDrnTB8
+You can also refer to below provided links for more guidance.
 
+https://www.youtube.com/watch?v=SLNEeDrnTB8
+
+https://docs.locklift.io/
