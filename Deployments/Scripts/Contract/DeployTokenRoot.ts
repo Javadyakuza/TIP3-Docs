@@ -55,7 +55,7 @@ export async function deployTokenRootFromContract(
       throw new Error('RootDeployerAddress address is not valid !!');
     }
 
-    /* 
+    /*
     Returns compilation artifacts based on the .sol file name
       or name from value config.externalContracts[pathToLib].
   */

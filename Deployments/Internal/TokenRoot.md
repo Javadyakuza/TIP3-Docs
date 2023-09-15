@@ -1,15 +1,14 @@
+<div class="DeployTokenRoot">
 
 # Deploy Token Root
 
-<div class="DeployTokenRoot">
+In this section, we will learn a little more about the memory structure and StateInit in the Threaded Virtual Machine (TVM), and deploy our token root contract through a smart contract.
 
-In this section, we will learn a little more about the memory structure in  Threaded Virtual Machine (TVM), and deploy our token through a smart contract.
+## Memory structure and State init
 
-::: tip 
-TVM memory and persistent storage consist of cells. Remember that the TVM memory and persistent storage consist of (TVM) cells
-:::
+TVM memory and persistent storage consist of cells. Remember that the TVM memory and persistent storage consist of (TVM) cells.
 
-::: tip 
+
 `tvm.buildStateInit` - Generates a `StateInit` from `code` and `data` `TvmCell`s. Member `splitDepth` of the tree of cell `StateInit`:
 
 1. is not set. Has no value.
@@ -21,13 +20,9 @@ TVM memory and persistent storage consist of cells. Remember that the TVM memory
 7. `pubkey` (`uint256`) - defines the public key of the new contract. Conflicts with `data`. Can be omitted, default value is 0.
 8. `varInit` (`initializer list`) - used to set [static](https://github.com/tonlabs/TON-Solidity-Compiler/blob/master/API.md#keyword-static) variables of the contract. Conflicts with `data` and requires `contr` to be set. Can be omitted.
 9. `contr` (`contract`) - defines the contract whose `StateInit` is being built. Mandatory to be set if the option `varInit` is specified.
-:::
 
-
-<br/>
+## Write Deployment Script
 <span  :class="LLdis"  >
-
-
 
 Follow the instructions below to deploy a `TokenRoot` using the `rootDeployer` contract with the locklift tool:
 
@@ -62,83 +57,88 @@ The parameter `initialSupply` must be set to zero if the `initialSupplyTo` is **
 
 <span  :class="LLdis">
 
-```` typescript
+````typescript
 /**
- * locklift is a globally declared object  
+ * locklift is a globally declared object
  */
 
 import { EverWalletAccount } from "everscale-standalone-client";
-import { Address, zeroAddress, Signer, Contract} from "locklift";
+import { Address, zeroAddress, Signer, Contract } from "locklift";
+import { FactorySource } from "../build/factorySource";
 
 async function main() {
+  // Setting up the signer and wallet
+  const signer: Signer = (await locklift.keystore.getSigner("0"))!;
 
-    // Setting up the signer and wallet
-    const signer: Signer = (await locklift.keystore.getSigner("0"))!;
-  
-    const everWallet: EverWalletAccount = await EverWalletAccount.fromPubkey({ publicKey: signer.publicKey!, workchain: 0 });
-  
-    const rootDeployerAddress: Address =new Address('<YOUR_ROOT_DEPLOYER_ADDRESS>')
+  const everWallet: EverWalletAccount = await EverWalletAccount.fromPubkey({
+    publicKey: signer.publicKey!,
+    workchain: 0,
+  });
 
-    const rootDeployerAbi: FactorySource['RootDeployer'] = tip3Artifacts.factorySource['RootDeployer'];
+  const rootDeployerAddress: Address = new Address("<YOUR_ROOT_DEPLOYER_ADDRESS>");
 
-    const rootDeployerContract: Contract<FactorySource["RootDeployer"]> =  await locklift.factory.getDeployedContract(rootDeployerAbi, rootDeployerAddress)
+  const rootDeployerContract: Contract<FactorySource["RootDeployer"]> = locklift.factory.getDeployedContract(
+    "RootDeployer",
+    rootDeployerAddress,
+  );
 
-    // Preparing the params 
-    export interface deployRootParams {
+  // Preparing the params
+  interface deployRootParams {
     initialSupplyTo: Address;
     rootOwner: Address;
     name: string;
     symbol: string;
     decimals: number;
-    disableMint: boolean;
-    disableBurnByRoot: boolean;
-    pauseBurn: boolean;
+    mintDisabled: boolean;
+    burnByRootDisabled: boolean;
+    burnPaused: boolean;
     initialSupply: number;
+    deployWalletValue: number;
     randomNonce: number;
-    }
+    remainingGasTo: Address;
+  }
 
-    const deployRootFromDeployerParams :deployRootParams = {
-        name: "Tip3OnboardingToken",
-        decimals: 6,
-        initialSupplyTo: zeroAddress,
-        initialSupply: 0,
-        deployWalletValue: 0,
-        symbol: "TOT",
-        mintDisabled: false,
-        rootOwner: everWallet.address,
-        randomNonce: (Math.random() * 6400) | 0, 
-        burnByRootDisabled: false,
-        burnPaused: false,
-        remainingGasTo: everWallet.address,
-    }
+  const deployRootFromDeployerParams: deployRootParams = {
+    name: "Tip3OnboardingToken",
+    decimals: 6,
+    initialSupplyTo: zeroAddress,
+    initialSupply: 0,
+    deployWalletValue: 0,
+    symbol: "TOT",
+    mintDisabled: false,
+    rootOwner: everWallet.address,
+    randomNonce: locklift.utils.getRandomNonce(),
+    burnByRootDisabled: false,
+    burnPaused: false,
+    remainingGasTo: everWallet.address,
+  };
 
+  await rootDeployerContract.methods.deployTokenRoot(deployRootFromDeployerParams).sendExternal({
+    publicKey: signer.publicKey,
+  });
 
-    await rootDeployerContract.methods
-      .deployTokenRoot(deployRootFromDeployerParams)
-      .send({
-        from: everWallet.address,
-        amount: locklift.utils.toNano("4"),
-      });
+  // Confirming tha that the token root is deployed by calling the name method on it
+  // making an instance of the contract , the deployment confirmation will be recognized here as well but we prefer getting the name of the contract
+  const tokenRoot: Contract<FactorySource["TokenRoot"]> = locklift.factory.getDeployedContract(
+    "TokenRoot",
+    (
+      await rootDeployerContract.methods
+        .getExpectedTokenRootAddress({
+          name: deployRootFromDeployerParams.name,
+          decimals: deployRootFromDeployerParams.decimals,
+          symbol: deployRootFromDeployerParams.symbol,
+          rootOwner: deployRootFromDeployerParams.rootOwner,
+          randomNonce: deployRootFromDeployerParams.randomNonce,
+        })
+        .call()
+    ).value0,
+  );
 
-    // Confirming tha that the token root is deployed by calling the name method on it 
-    // making an instance of the contract , the deployment confirmation will be recognized here as well but we prefer getting the name of the contract 
-    const tokenRoot: Contract<FactorySource['TokenRoot']>= locklift.factory.getDeployedContract(
-        "TokenRoot",
-         (await rootDeployer.methods
-              .getExpectedTokenRootAddress(
-                name: deployRootFromDeployerParams.name,
-                decimals: deployRootFromDeployerParams.decimals,
-                symbol: deployRootFromDeployerParams.symbol,
-                rootOwner: deployRootFromDeployerParams.rootOwner,
-                randomNonce: deployRootFromDeployerParams.randomNonce,
-              )
-              .call()
-          ).value0
-        )
-
-
-    console.log(`Token Root address : ${tokenRoot.address.toString()} \n Token Root name: ${(tokenRoot.methods.name({ answerId: 0 })
-        .call()).value0}`) // >> Tip3OnboardingToken
+  console.log(
+    `Token Root address : ${tokenRoot.address.toString()} \n Token Root name: ${
+      (await tokenRoot.methods.name({ answerId: 0 }).call()).value0
+    }`,
+  ); // >> Tip3OnboardingToken
 }
 
 main()
@@ -150,15 +150,13 @@ main()
 
 ````
 
-
 </span>
 
 <span  :class="EIPdis">
 
 ```` typescript
-
 import {
-  ProviderRpcClient as PRC,
+  ProviderRpcClient,
   Address,
   GetExpectedAddressParams,
   Contract,
@@ -166,104 +164,106 @@ import {
   FullContractState,
 } from 'everscale-inpage-provider';
 import * as tip3Artifacts from 'tip3-docs-artifacts';
+import { provider, providerAddress } from './useProvider';
+
+/**
+ * We develop two more methods in order to reduce the mass of the script
+ */
+async function extractPubkey(provider: ProviderRpcClient, senderAddress: Address): Promise<string> {
+  // Fetching the user public key
+  const accountFullState: FullContractState = (
+    await provider.getFullContractState({ address: senderAddress })
+  ).state!;
+
+  const senderPublicKey: string = await provider.extractPublicKey(accountFullState.boc);
+
+  return senderPublicKey;
+}
 
 async function main() {
+  // Initiate the TVM provider
 
-// Initiate the TVM provider
+  // Token Root contracts abis
+  const tokenRootAbi: tip3Artifacts.FactorySource['TokenRoot'] =
+    tip3Artifacts.factorySource['TokenRoot'];
 
-// Token Root contracts abis
-const tokenRootAbi: tip3Artifacts.FactorySource["TokenRoot"] = tip3Artifacts.factorySource['TokenRoot'];
+  // Fetching the root deployer
+  const rootDeployerAddress: Address = new Address('<YOUR_ROOT_DEPLOYER_ADDRESS>');
 
-// Token Root and Wallet artifacts  
-const tokenRootArtifacts: typeof tip3Artifacts.artifacts.TokenRoot = tip3Artifacts.artifacts.TokenRoot;
-const tokenWalletArtifacts; typeof tip3Artifacts.artifacts.TokenWallet = tip3Artifacts.artifacts.TokenWallet;
+  const rootDeployerAbi: tip3Artifacts.FactorySource['RootDeployer'] =
+    tip3Artifacts.factorySource['RootDeployer'];
 
-const zeroAddress: Address = new Address('0:0000000000000000000000000000000000000000000000000000000000000000');
+  const rootDeployerContract: Contract<tip3Artifacts.FactorySource['RootDeployer']> =
+    new provider.Contract(rootDeployerAbi, rootDeployerAddress);
 
-// Fetching the root deployer 
-const rootDeployerAddress: Address =new Address('<YOUR_ROOT_DEPLOYER_ADDRESS>')
-  
-const rootDeployerAbi: tip3Artifacts.FactorySource['RootDeployer'] = tip3Artifacts.factorySource['RootDeployer'];
-  
-const rootDeployerContract: Contract<tip3Artifacts.FactorySource["RootDeployer"]> =  await locklift.factory.getDeployedContract(rootDeployerAbi, rootDeployerAddress)
+  // Preparing the params
+  interface deployRootParams {
+    initialSupplyTo: Address;
+    rootOwner: Address;
+    name: string;
+    symbol: string;
+    decimals: number;
+    mintDisabled: boolean;
+    burnByRootDisabled: boolean;
+    burnPaused: boolean;
+    initialSupply: number;
+    deployWalletValue: number;
+    randomNonce: number;
+    remainingGasTo: Address;
+  }
 
-// Preparing the params 
-export interface deployFromRootDeployerParams {
-  initialSupplyTo: Address;
-  rootOwner: Address;
-  randomNonce: number;
-  deployWalletValue: string;
-  name: string;
-  symbol: string;
-  decimals: number;
-  mintDisabled: boolean;
-  burnByRootDisabled: boolean;
-  burnPaused: boolean;
-  initialSupply: number;
-  remainingGasTo: Address;
-}
+  const params: deployRootParams = {
+    initialSupplyTo: tip3Artifacts.zeroAddress,
+    rootOwner: providerAddress,
+    randomNonce: (Math.random() * 6400) | 0,
+    deployWalletValue: 0,
+    name: 'Tip3OnboardingToken',
+    symbol: 'TOT',
+    decimals: 6,
+    mintDisabled: false,
+    burnByRootDisabled: false,
+    burnPaused: false,
+    initialSupply: 0,
+    remainingGasTo: providerAddress,
+  };
 
-const initialSupplyTo: Address = zeroAddress;
+  // Deploying the tokenRoot
+  const { transaction: deployRes } = await rootDeployerContract.methods
+    .deployTokenRoot(params)
+    .sendExternal({
+      publicKey: await extractPubkey(provider, providerAddress),
+    });
 
-const params: deployFromRootDeployerParams = {
-  initialSupplyTo: initialSupplyTo,
-  rootOwner: providerAddress,
-  randomNonce: (Math.random() * 6400) | 0,
-  deployWalletValue: 0,
-  name: "Tip3OnboardingToken",
-  symbol: "TOT",
-  decimals: 6,
-  mintDisabled: false,
-  burnByRootDisabled: false,
-  burnPaused: false,
-  initialSupply: 0,
-  remainingGasTo: providerAddress,
-};
+  // checking if the token root is deployed successfully by calling one of its methods
+  if (deployRes.aborted) {
+    throw new Error(`transaction aborted ${(deployRes.exitCode, deployRes.resultCode)}`);
+  }
 
-// Deploying the tokenRoot
-const deployRes: Transaction = await userRootDeployer.methods
-  .deployTokenRoot(params)
-  .send({
-    from: providerAddress,
-    amount: 2 * 10 ** params.decimals, // increase vy 2 or 3 evers if initialSupplyTo != zeroAddress 
-  });
+  // Fetching the address of the token root
+  const tokenRootAddr: Address = (
+    await rootDeployerContract.methods
+      .getExpectedTokenRootAddress({
+        name: params.name,
+        decimals: params.decimals,
+        symbol: params.symbol,
+        rootOwner: params.rootOwner,
+        randomNonce: params.randomNonce,
+      })
+      .call()
+  ).value0;
 
-// checking if the token root is deployed successfully by calling one of its methods
-if (deployRes.aborted) {
-  console.log(
-    `transaction aborted ${
-      (deployRes.exitCode, deployRes.resultCode)
-    }`
-  );
-  return `Failed ${(deployRes.exitCode, deployRes.resultCode)}`;
-}
+  // making an instance of the token root
+  const tokenRootContract: Contract<tip3Artifacts.FactorySource['TokenRoot']> =
+    new provider.Contract(tokenRootAbi, tokenRootAddr);
 
-// Fetching the address of the token root
-const tokenRootAddr: Address = (
-  await userRootDeployer.methods
-    .getExpectedTokenRootAddress({
-      name: params.name,
-      decimals: params.decimals,
-      symbol: params.symbol,
-      rootOwner: params.rootOwner,
-      randomNonce: params.randomNonce,
-    })
-    .call()
-).value0;
+  const tokenName: string = (await tokenRootContract.methods.name({ answerId: 0 }).call({})).value0;
 
-// making an instance of the token root
-const tokenRootContract: Contract<tip3Artifacts.FactorySource['TokenRoot']> = new provider.Contract(TokenRoot, tokenRootAddr);
-
-const tokenName: string = (await tokenRootContract.methods.name({ answerId: 0 }).call({}))
-  .value0;
-
-if (tokenName == params.name) {
-  console.log(`${params.symbol} Token deployed successfully`);
-  return `${params.symbol} deployed to ${tokenRootAddr.toString()}`;
-} else {
-  console.log(`${params.symbol} Token deployment failed !${deployRes.exitCode}`);
-  return `Failed ${deployRes.exitCode}`;
-}
+  if (tokenName == params.name) {
+    console.log(`${params.symbol} Token deployed successfully`);
+    return `${params.symbol} deployed to ${tokenRootAddr.toString()}`;
+  } else {
+    throw new Error(`${params.symbol} Token deployment failed !${deployRes.exitCode}`);
+  }
 }
 
 ````
@@ -272,6 +272,8 @@ if (tokenName == params.name) {
 
 </div>
 
+
+## Deploy Token Root
 
 <div class="action">
 <div :class="llAction">
@@ -284,18 +286,16 @@ npx locklift run -s ./scripts/01-deploy-root-deployer.ts -n local
 
 ![](/image(101).png)
 
-Congratulations, you have deployed your first TIP3 Token Root!
+Congratulations, you have deployed your first TIP3 Token Root through the Root Deployer contract!
 
 </div>
 
 <div :class="eipAction" >
 
-## Deploy a Token Root from Root Deployer
-
-<p class=actionInName style="margin-bottom: 0;">Root deployer</p> 
+<p class=actionInName style="margin-bottom: 0;">Root deployer</p>
 <input ref="actionRootDeployer" class="action Ain" type="text"/>
 
-<p class=actionInName style="margin-bottom: 0;">initialSupplyTo</p> 
+<p class=actionInName style="margin-bottom: 0;">initialSupplyTo</p>
 <input ref="actionInitialSupplyTo" class="action Ain" type="text"/>
 
 <p class=actionInName style="margin-bottom: 0;">rootOwner</p>
@@ -358,9 +358,9 @@ export default defineComponent({
     }
   },
   setup() {
-    
+
     function llHandler(e){
-        if(this.LLdis == "cbHide")  
+        if(this.LLdis == "cbHide")
         {
             this.llSwitcher = "llSwitcher on";
             this.eipSwitcher = "eipSwitcher off"
@@ -369,9 +369,9 @@ export default defineComponent({
         this.LLdis = "cbShow"
         this.llAction = "llAction cbShow"
         this.eipAction = "eipAction cbHide"
-}   
+}
     async function eipHandler(e){
-        if(this.EIPdis == "cbHide")  
+        if(this.EIPdis == "cbHide")
         {
             this.llSwitcher = "llSwitcher off";
             this.eipSwitcher = "eipSwitcher on"
@@ -384,7 +384,7 @@ export default defineComponent({
 
     async function deployTokenRoot(){
       this.$refs.deployTokenRootOutput.innerHTML = "Processing ..."
-        // checking of all the values are fully filled 
+        // checking of all the values are fully filled
         if (
             this.$refs.actionRootDeployer.value == ""
 
@@ -400,7 +400,7 @@ export default defineComponent({
             toast("Name field is required !",0)
             this.$refs.deployTokenRootOutput.innerHTML = "Failed"
             return
-        }        
+        }
         if (
             this.$refs.actionSymbol.value == ""
         ){
@@ -419,14 +419,14 @@ export default defineComponent({
         if (
             this.$refs.actionInitialSupplyTo.value == "" &&
             this.$refs.actionInitialSupply.value != 0
-          
+
         ){
             toast("initialSupply must be empty for zeroAddress supply receiver !",0)
             this.$refs.deployTokenRootOutput.innerHTML = "Failed"
             return
         }
 
-        // fetching the params values 
+        // fetching the params values
         const deployTokenRootParams: deployRootParams = {
             initialSupplyTo: this.$refs.actionInitialSupplyTo.value,
             rootOwner: this.$refs.actionRootOwner.value,
@@ -440,7 +440,7 @@ export default defineComponent({
         }
         let deployedTokenAddr =
         await deployTokenRootFromContract(deployTokenRootParams, this.$refs.actionRootDeployer.value);
-        // Rendering the output     
+        // Rendering the output
         deployedTokenAddr = !deployedTokenAddr ? "Failed" :  deployedTokenAddr;
         this.$refs.deployTokenRootOutput.innerHTML = deployedTokenAddr;
 
@@ -449,7 +449,7 @@ export default defineComponent({
     return {
         eipHandler,
         llHandler,
-        deployTokenRoot, 
+        deployTokenRoot,
     };
   },
 });
@@ -457,9 +457,7 @@ export default defineComponent({
 </script>
 
 <style>
-.DeployTokenRoot{
-  font-size: 1.1rem;
-}
+
 .action{
     display:inline-block;
 }
@@ -558,7 +556,7 @@ export default defineComponent({
 }
 
 * {box-sizing: border-box;}
- 
+
 .container {
   display: flex;
   position: relative;
@@ -571,7 +569,7 @@ export default defineComponent({
   opacity: 0;
   height: 0;
   width: 0;
-  
+
 }
 
 .checkmark {

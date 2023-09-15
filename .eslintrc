@@ -58,7 +58,7 @@
         "functions": "never"
       }
     ],
-
+    "camelcase": "error",
     "import/no-default-export": "off",
     "import/default": "off",
     "no-restricted-exports": ["error", { "restrictedNamedExports": ["default"] }],

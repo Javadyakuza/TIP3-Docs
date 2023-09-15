@@ -1,6 +1,12 @@
 # Multi Wallet TIP-3
+In this section we will walk through to waht tis the multi wallet TIP-3 contract,it's contract code specificationand how to deploy it using tools `locklift` or `everscale-inpage-provider`.
 
-**We have developed another contract that facilitates interaction with token wallets. Each individual can have one of these contracts to manage various token wallets associated with different token roots. This contract provides several features, such as deploying a token wallet for a token root, performing transfer operations based on the TIP-3 standard, tracking each root's token wallet and balance and more.\ Contributors can add additional functionalities based on different use cases to the contract such as adding a name to each multi wallet contract or increasing the owners to more than one account and more**
+## What is Multi Wallet TIP-3 ?
+
+We have developed another contract that facilitates interaction with token wallets. Each individual can have one of these contracts to manage various token wallets associated with different token roots.
+This contract provides several features, such as deploying a token wallet for a token root, performing transfer operations based on the TIP-3 standard, tracking each root's token wallet and balance and more.
+
+Contributors can add additional functionalities based on different use cases to the contract such as adding a name to each multi wallet contract or increasing the owners to more than one account and more
 
 ## Contract Specifications and Code
 
@@ -69,7 +75,7 @@ In simple terms, when we call a contract from outside, we cannot pay for gas, be
 
 :::
 
-## Deploy Wallet
+### Deploy Wallet
 
 **Now let's write a function to deploy a new wallet. The function will take two parameters: the initial amount of EVERs on the new wallet and the address of the Token Root**
 <details>
@@ -110,7 +116,7 @@ function deployWallet(
 
 <br/>
 
-# Transfer TIP-3 tokens
+### Transfer TIP-3 tokens
 
 **As we learned earlier from [here](../External/Transfer.md), TIP-3 has two implementations of the transfer.**
 <details>
@@ -158,9 +164,9 @@ function transfer(
 ```
 </details>
 
-## Bounce and Notify
+### Bounce and Notify
 
-#### Finally, it's time to talk about important bounce and notify
+Finally, it's time to talk about important bounce and notify
 
 :::tip
 To understand how notifications work, let's build a message chain in the transfer
@@ -276,7 +282,7 @@ In contrast, from cases where our callback methods can call everything, and we n
 :::
 
 
-## Transfer to Wallet
+### Transfer to Wallet
 
 And in the end, let's look at the implementation of the transfer to TokenWallet.
 
@@ -322,7 +328,6 @@ In fact, the implementation differs only in that there is no deployWalletValue a
 ```
 </details>
 
-:::tip
 You probably noticed that we have a new TVM method in the code -&#x20;
 
 `tvm.rawReserve(uint value, uint8 flag);`
@@ -331,10 +336,9 @@ You probably noticed that we have a new TVM method in the code -&#x20;
 
 Creates an output action that reserves **reserve** nanotons. It is roughly equivalent to create an outbound message carrying **reserve** nanotons to oneself, so that the subsequent output actions would not be able to spend more money than the remainder. It's a wrapper for opcodes "RAWRESERVE" and "RAWRESERVEX". See [TVM](https://test.ton.org/tvm.pdf).
 
-:::
 
 :::tip
-`By tvm.accept` and `tvm.rawReserve`is determined by an external function or internal.\
+`tvm.accept` and `tvm.rawReserve`is determined by an external function or internal.\
 \
 Note: If the function has `tvm.rawReserve`then only a smart contract can call it.
 
@@ -347,11 +351,13 @@ require(msg.sender == address(0))
 
 ---
 
-::: info
- To maintain the integrity of the Token Wallet contract, it is essential to update its state whenever TIP-3 tokens are either minted or burnt. As the contract's state is updated automatically when TIP-3 tokens are transferred to the token wallet, we have added two additional methods to handle the minting and burning of tokens.
-:::
+To maintain the integrity of the Token Wallet contract, it is essential to update its state whenever TIP-3 tokens are either minted or burnt. As the contract's state is updated automatically when TIP-3 tokens are transferred to the token wallet, we have added two additional methods to handle the minting and burning of tokens.
 
-## onAcceptTokensMint
+
+### onAcceptTokensMint
+
+<br/>
+
 <details>
 <summary> show code </summary>
 
@@ -384,7 +390,10 @@ require(msg.sender == address(0))
 
 </details>
 
-## onAcceptTokensBurn
+### onAcceptTokensBurn
+
+<br/>
+
 <details>
 <summary> show code </summary>
 
@@ -409,8 +418,13 @@ require(msg.sender == address(0))
 ````
 </details>
 
+::: warning
+Please note that the state of this contract will only be updated when receiving callback functions from the token root or wallet. As a result, certain operations, such as minting tokens during calling the constructor of the token root by setting the  `initialSupply`  and  `initialSupplyTo`  parameters, will not invoke a callback function. Therefore, it is recommended to use the mint function separately with the `notify` parameter set to `true`  when using the multi-wallet tip-3 contract, to ensure optimal performance.
 
-## Burn
+Furthermore, it is important to emphasize that all operations related to the token wallet must be performed through this contract. This includes actions such as burning or transferring tokens, which are necessary to keep the contract state updated. In cases where direct transactions are made through the token wallet contract, it is advised to set the  `notify`  parameter to  `true`.
+:::
+
+### Burn
 
 Now let's talk about the `burn` method. `Burn` has two implementations as well as the transfer method:
 
@@ -441,7 +455,7 @@ We only implement the `burn` function in our contract so let's look at it real q
 ````
 </details>
 
-## Error Codes
+### Error Codes
 
 Let's create a library to store our Error codes and use them inside of the contracts.
 Save the below content in a file named `Errors.tsol` and import the library from the file path.
@@ -467,7 +481,8 @@ library Errors {
 ````
 </details>
 
-## Whole Code
+### Whole Code
+
 At the end the whole contract will look like this:
 <details>
 <summary> show code </summary>
@@ -743,7 +758,7 @@ contract MultiWalletTIP3 is CheckPubKey, ExternalOwner, RandomNonce {
 
 </details>
 
-## Deploy
+## Deploy Multi Wallet TIP-3
 
 <div class="DeployMultiWalletTip3">
 
@@ -782,12 +797,11 @@ The code samples below demonstrate how to deploy a Multi Wallet TIP3 contract us
  locklift is a globally declared object.
 */
 
-import { EverWalletAccount } from "everscale-standalone-client";
-import { Address, WalletTypes, zeroAddress, Signer } from "locklift";
+import { Signer } from "locklift";
 
 async function main() {
   // Setting up the signers and the wallets
-  const signer: Signer  = (await locklift.keystore.getSigner("0"))!;
+  const signer: Signer = (await locklift.keystore.getSigner("0"))!;
 
   // Deploying two MultiWalletTIP3 contracts
   // We send a bit more Ever than usual since the transaction fees will be spent from the contract balance and all of initiator the tx's are external.
@@ -795,13 +809,13 @@ async function main() {
     contract: "MultiWalletTIP3",
     publicKey: signer.publicKey,
     initParams: {
-      _randomNonce: (Math.random() * 6400) | 0,
+      _randomNonce: locklift.utils.getRandomNonce(0),
     },
     constructorParams: { _walletCode: locklift.factory.getContractArtifacts("TokenWallet").code },
     value: locklift.utils.toNano("20"),
   });
 
-  console.log("Multi Wallet TIP-3 deployed to: ", multiWalletTip3Contract.address.toString());
+  console.log("Multi Wallet TIP-3 address: ", multiWalletTip3Contract.address.toString());
 }
 
 main()
@@ -810,6 +824,7 @@ main()
     console.log(e);
     process.exit(1);
   });
+
 
 ````
 
@@ -820,26 +835,24 @@ main()
 ````typescript
 import {
   ProviderRpcClient as PRC,
-  Address,
   GetExpectedAddressParams,
   Contract,
-  Transaction,
   FullContractState,
 } from 'everscale-inpage-provider';
 import * as tip3Artifacts from 'tip3-docs-artifacts';
+import { provider, providerAddress } from './useProvider';
 
-
-export async function main(){
-
-    // Initiate the TVM provider
+export async function main() {
+  // Initiate the TVM provider
 
   try {
-
     // Multi wallet contract Abi
-    const multiWalletTip3Abi: tip3Artifacts.FactorySource['MultiWalletTIP3'] = tip3Artifacts.factorySource['MultiWalletTIP3'];
-    const multiWalletTip3Artifacts : typeof tip3Artifacts.artifacts.RootDeployer = tip3Artifacts.artifacts.MultiWalletTIP3;
-    const tokenWalletArtifacts : typeof tip3Artifacts.artifacts.TokenWallet = tip3Artifacts.artifacts.TokenWallet;
-
+    const multiWalletTip3Abi: tip3Artifacts.FactorySource['MultiWalletTIP3'] =
+      tip3Artifacts.factorySource['MultiWalletTIP3'];
+    const multiWalletTip3Artifacts: typeof tip3Artifacts.artifacts.MultiWalletTIP3 =
+      tip3Artifacts.artifacts.MultiWalletTIP3;
+    const tokenWalletArtifacts: typeof tip3Artifacts.artifacts.TokenWallet =
+      tip3Artifacts.artifacts.TokenWallet;
 
     // define the deployParams type
     type DeployParams<Abi> = GetExpectedAddressParams<Abi> & {
@@ -867,12 +880,11 @@ export async function main(){
     // Get the state init
     const stateInit = await provider.getStateInit(multiWalletTip3Abi, deployParams);
 
-
     // Send the coins to the address
     await provider.sendMessage({
       sender: providerAddress,
       recipient: expectedAddress,
-      amount: 20 * 10 ** 9,
+      amount: String(20 * 10 ** 9),
       bounce: false, // It is important to set 'bounce' to false
       // to ensure funds remain in the contract.
       stateInit: stateInit.stateInit,
@@ -881,10 +893,8 @@ export async function main(){
     console.log('Fund sent to the Calculated address !');
 
     // Create a contract instance
-    const multiWalletTip3Contract: Contract<tip3Artifacts.FactorySource['MultiWalletTIP3']> = new provider.Contract(
-      multiWalletTip3Abi,
-      expectedAddress
-    );
+    const multiWalletTip3Contract: Contract<tip3Artifacts.FactorySource['MultiWalletTIP3']> =
+      new provider.Contract(multiWalletTip3Abi, expectedAddress);
 
     console.log('Sending stateInit to the Calculated address ...');
 
@@ -900,9 +910,9 @@ export async function main(){
 
     // returning the tx response as a string if aborted
     if (deployRes.aborted) {
-      console.log(`Transaction aborted ! ${deployRes.exitCode, deployRes.resultCode}`);
+      console.log(`Transaction aborted ! ${(deployRes.exitCode, deployRes.resultCode)}`);
 
-      return `Failed ${deployRes.exitCode, deployRes.resultCode}`;
+      return `Failed ${(deployRes.exitCode, deployRes.resultCode)}`;
     }
 
     // checking if the token root is deployed successfully by calling one of its methods
@@ -918,14 +928,12 @@ export async function main(){
 
       return `Multi Wallet Tip3 deployed to ${expectedAddress.toString()}`;
     } else {
-      console.log(`Multi Wallet Tip3 deployment failed !${deployRes.exitCode, deployRes.resultCode}`);
-
-      return `Failed ${deployRes.exitCode, deployRes.resultCode}`;
+      throw new Error(
+        `Multi Wallet Tip3 deployment failed !${(deployRes.exitCode, deployRes.resultCode)}`
+      );
     }
   } catch (e: any) {
-    console.log(e.message);
-
-    return 'Failed';
+    throw new Error(`Failed ${e.message}`);
   }
 }
 
