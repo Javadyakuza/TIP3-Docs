@@ -1,134 +1,110 @@
-// Import the required libraries
-import {
-  ProviderRpcClient as PRC,
-  Address,
-  Contract,
-  Transaction,
-} from 'everscale-inpage-provider';
+import { Address, Contract, Transaction } from 'everscale-inpage-provider';
 import * as tip3Artifacts from 'tip3-docs-artifacts';
 import { provider, providerAddress } from './useProvider';
+
 async function main() {
-  // Initiate the TVM provider
+  try {
+    const tokenRootAddress: Address = new Address('<YOUR_TOKEN_WALLET_ADDRESS>');
 
-  // Preparing the params
-  const tokenRootAddress: Address = new Address('<YOUR_TOKEN_ROOT_ADDRESS>');
-  const recipientAddress: Address = new Address('<RECIPIENT_ACCOUNT_ADDRESS>');
+    // Fetching the required contracts
+    const tokenRootContract: Contract<tip3Artifacts.FactorySource['TokenRoot']> =
+      new provider.Contract(tip3Artifacts.factorySource['TokenRoot'], tokenRootAddress);
+    const tokenWalletAddress: Address = (
+      await tokenRootContract.methods
+        .walletOf({ answerId: 0, walletOwner: providerAddress })
+        .call({})
+    ).value0;
 
-  // creating an instance of the target token root contracts
-  const tokenRootContract: Contract<tip3Artifacts.FactorySource['TokenRoot']> =
-    new provider.Contract(tip3Artifacts.factorySource['TokenRoot'], tokenRootAddress);
+    const tokenWalletContract: Contract<tip3Artifacts.FactorySource['TokenWallet']> =
+      new provider.Contract(tip3Artifacts.factorySource['TokenWallet'], tokenWalletAddress);
 
-  // getting the decimals of the token
-  const decimals: number = Number(
-    (await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0
-  );
+    // Fetching the decimals
+    const [decimals, symbol] = await Promise.all([
+      Number((await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0),
+      (await tokenRootContract.methods.symbol({ answerId: 0 }).call()).value0,
+    ]);
 
-  // creating an instance of the sender token wallet contract
-  const tokenWallet: Contract<tip3Artifacts.FactorySource['TokenWallet']> = new provider.Contract(
-    tip3Artifacts.factorySource['TokenWallet'],
-    (
-      await tokenRootContract.methods.walletOf({ answerId: 0, walletOwner: providerAddress }).call()
-    ).value0
-  );
+    const burnAmount: number = 100 * 10 ** decimals;
 
-  /**
-   * we will make an instance of the recipient token wallet contract and we assign value to it if the token wallet was already deployed
-   * the amount attached to the tx varies based on the mentioned subject.
-   */
-  let recipientTokenWallet: Contract<tip3Artifacts.FactorySource['TokenWallet']> | undefined =
-    undefined;
+    const oldBal: number =
+      Number((await tokenWalletContract.methods.balance({ answerId: 0 }).call()).value0) /
+      10 ** decimals;
 
-  const receiverTokenWalletAddress = (
-    await tokenRootContract.methods.walletOf({ answerId: 0, walletOwner: recipientAddress }).call()
-  ).value0;
-
-  let txFee: number = 3 * 10 ** 9;
-  let oldBal: number = 0;
-  let deployWalletValue: number = 0;
-
-  if (
-    !(
-      await provider.getFullContractState({
-        address: receiverTokenWalletAddress,
+    // burning tokens from a token wallet by calling the burn method
+    const burnRes: Transaction = await tokenWalletContract.methods
+      .burn({
+        amount: burnAmount,
+        payload: '',
+        remainingGasTo: providerAddress,
+        callbackTo: tip3Artifacts.zeroAddress,
       })
-    ).state?.isDeployed
-  ) {
-    txFee = 5 * 10 ** 9;
-    deployWalletValue = 2 * 10 ** 9;
-  } else {
-    recipientTokenWallet = new provider.Contract(
-      // Transferring the token
-      tip3Artifacts.factorySource['TokenWallet'],
-      receiverTokenWalletAddress
-    );
+      .send({
+        from: providerAddress,
+        amount: String(3 * 10 ** 9),
+      });
 
-    oldBal = Number((await recipientTokenWallet.methods.balance({ answerId: 0 }).call({})).value0);
-  }
+    if (burnRes.aborted) {
+      throw new Error(`Transaction aborted ! ${(burnRes.exitCode, burnRes.resultCode)}`);
+    }
+    // Checking if the user already doesn't have the any wallet of that token root
+    // Getting the recipient balance
 
-  let transferAmount: number = 10 ** (10 ** decimals);
+    const newBal: number =
+      Number((await tokenWalletContract.methods.balance({ answerId: 0 }).call()).value0) /
+      10 ** decimals;
 
-  // Transferring token
-  const transferRes: Transaction = await tokenWallet.methods
-    .transfer({
-      amount: transferAmount,
-      recipient: recipientAddress,
-      deployWalletValue: deployWalletValue,
-      remainingGasTo: providerAddress,
-      notify: false, // true if the change must be sent back to the sender wallet account not the sender token wallet
-      payload: '',
-    })
-    .send({ from: providerAddress, amount: String(txFee), bounce: true });
+    if (oldBal >= newBal) {
+      console.log(`${burnAmount / 10 ** decimals} ${symbol}'s successfully burnt !`);
 
-  /**
-   * We first verify if the transfer transaction was aborted. If it was not aborted, we proceed to check the balance of the recipient's token wallet. We compare this balance to the sum of the previous balance (oldBalance) and the amount transferred only If the user had already deployed a token wallet prior to the transfer transaction, and it was not deployed before the transaction it must have been deployed during the transaction, so we create an instance of the recipient's token wallet contract and confirm that its balance is greater than zero.
-   */
-  if (transferRes.aborted) {
-    throw new Error(`Transaction aborted !: ${(transferRes.exitCode, transferRes.resultCode)}`);
-  }
-  // In this case the recipient didn't have any token wallet and one is deployed during the transfer, so we fetch it since we haven't before
-  recipientTokenWallet = new provider.Contract(
-    // Transferring the token
-    tip3Artifacts.factorySource['TokenWallet'],
-    receiverTokenWalletAddress
-  );
+      return `Hash: ${burnRes.id.hash} \n old Balance  ${oldBal} \n New balance: ${newBal}`;
+    } else {
+      console.error(`Failed \n
+      ${(burnRes.exitCode, burnRes.resultCode)}`);
+    }
 
-  const newBal: number = Number(
-    (await recipientTokenWallet.methods.balance({ answerId: 0 }).call({})).value0
-  );
-  // Checking if the tokens are received successfully
-  if (newBal >= Number(transferAmount) * 10 ** decimals + oldBal) {
-    console.log('tokens transferred successfully');
-  } else {
-    throw new Error(
-      ` Transferring tokens failed \n tx Hash: ${(transferRes.exitCode, transferRes.resultCode)}`
-    );
-  }
+    /*
+     Using burnByRoot function
 
-  // transferring token to wallet
-  const transferToWalletRes: Transaction = await tokenWallet.methods
-    .transferToWallet({
-      amount: transferAmount * 10 ** decimals,
-      recipientTokenWallet: recipientTokenWallet.address,
-      remainingGasTo: providerAddress,
-      notify: false,
-      payload: '',
-    })
-    .send({ from: providerAddress, amount: String(3 * 10 ** 9), bounce: true });
+    */
+    const burnByRootAmount: number = 50 * 10 ** decimals;
 
-  /**
-   * Checking the tokens are transferred and the receiver balance is more than before
-   */
-  if (transferToWalletRes.aborted) {
-    throw new Error(`Transaction aborted !: ${transferRes.exitCode}`);
-  }
+    const oldBalance: number =
+      Number((await tokenWalletContract.methods.balance({ answerId: 0 }).call()).value0) /
+      10 ** decimals;
 
-  // newBal is actually the old balance and its fetched before utilizing the "transferToWallet" the function
-  if (
-    Number((await recipientTokenWallet.methods.balance({ answerId: 0 }).call({})).value0) > newBal
-  ) {
-    console.log('tokens transferred successfully');
-    return `tx Hash: ${transferRes.id.hash}`;
-  } else {
-    throw new Error(`Transferring tokens failed, tx Hash: ${transferRes.id.hash}`);
+    // Deploying a new contract if didn't exist before
+    const burnByRotRes: Transaction = await tokenRootContract.methods
+      .burnTokens({
+        amount: burnByRootAmount,
+        walletOwner: providerAddress,
+        payload: '',
+        remainingGasTo: providerAddress,
+        callbackTo: tip3Artifacts.zeroAddress,
+      })
+      .send({
+        from: providerAddress,
+        amount: String(3 * 10 ** 9),
+      });
+
+    if (burnByRotRes.aborted) {
+      throw new Error(`Transaction aborted ! ${(burnByRotRes.exitCode, burnByRotRes.resultCode)}`);
+    }
+    // Checking if the user already doesn't have the any wallet of that token root
+    // Getting the recipient balance
+
+    const newBalance: number =
+      Number((await tokenWalletContract.methods.balance({ answerId: 0 }).call()).value0) /
+      10 ** decimals;
+
+    if (oldBal >= newBal) {
+      console.log(`${burnByRootAmount / 10 ** decimals} ${symbol}'s successfully burnt`);
+
+      return `Hash: ${burnByRotRes.id.hash} \n old Balance  ${oldBal} \n New balance: ${newBal}`;
+    } else {
+      throw new Error(`Failed \n
+       ${(burnByRotRes.exitCode, burnByRotRes.resultCode)}`);
+    }
+  } catch (e: any) {
+    throw new Error(`Failed: ${e.message}`);
   }
 }

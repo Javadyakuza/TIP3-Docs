@@ -422,6 +422,7 @@ Congratulations, you have successfully transferred TIP-3 tokens from one to anot
 
 <div :class="transfer">
 
+### Transfer TIP-3 tokens
 
 <p class=actionInName style="margin-bottom: 0;">Token Root address</p>
 <input ref="actionTokenRootAddress" class="action Ain" type="text"/>
@@ -586,9 +587,6 @@ return {
 </script>
 
 <style>
-.transferTokens{
-  font-size: 1.1rem;
-}
 .action{
     display:inline-block;
 }
