@@ -230,7 +230,7 @@ async function main(){
   const senderMWAddress: Address = "<SENDER_MULTI_WALLET_ADDRESS>";
 
     // creating an instance of the target contracts
-    const tokenRootContract: Contract<tip3Artifacts.FactorySources["TokenRoot"]> = new provider.Contract(
+    const tokenRootContract: Contract<tip3Artifacts.FactorySource["TokenRoot"]> = new provider.Contract(
       tip3Artifacts.factorySource['TokenRoot'],
       new Address(tokenRootAddress)
     );

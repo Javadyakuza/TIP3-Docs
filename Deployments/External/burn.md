@@ -188,13 +188,13 @@ async function main()
   try {
 
     // Fetching the required contracts
-    const tokenRootContract: Contract<tip3Artifacts.factorySources["TokenRoot"]> = new provider.Contract(
+    const tokenRootContract: Contract<tip3Artifacts.FactorySource["TokenRoot"]> = new provider.Contract(
       tip3Artifacts.factorySource['TokenRoot'],
       tokenRootAddress
     );
     const tokenWalletAddress : Address = (await tokenRootContract.methods.walletOf({answerId: 0, walletOwner: providerAddress}).call({})).value0
     
-    const tokenWalletContract: Contract<tip3Artifacts.factorySources["TokenWallet"]> = new provider.Contract(
+    const tokenWalletContract: Contract<tip3Artifacts.FactorySource["TokenWallet"]> = new provider.Contract(
       tip3Artifacts.factorySource['TokenWallet'],
       tokenWalletAddress
     );
@@ -272,7 +272,7 @@ async function main(){
   const tokenRootAddress: Address = new Address("<YOUR_TOKEN_WALLET_ADDRESS>");
 
   try {
-    const tokenRootContract: : Contract<tip3Artifacts.factorySources["TokenRoot"]> = new provider.Contract(
+    const tokenRootContract: : Contract<tip3Artifacts.FactorySource["TokenRoot"]> = new provider.Contract(
       tip3Artifacts.factorySource['TokenRoot'],
       tokenRootAddress
     );
@@ -294,7 +294,7 @@ async function main(){
     }
 
     // creating an instance of the token root contract
-    const tokenWalletContract: Contract<tip3Artifacts.factorySources["TokenWallet"]> = new provider.Contract(
+    const tokenWalletContract: Contract<tip3Artifacts.FactorySource["TokenWallet"]> = new provider.Contract(
       tip3Artifacts.factorySource['TokenWallet'],
       tokenWalletAddress
     );
