@@ -3,26 +3,26 @@
 In this section we will learn how to deploy an Account smart contract.
 
 
-## step 1: Write a Deployment Script 
+## step 1: Write a Deployment Script
 
 Let's write a simple script in typescript that will use locklift to deploy our Account.&#x20;
 
-::: info 
+::: info
 Before we start to write our scripts we need to make sure that there is a file named `00-deploy-account.ts` in the `script` folder in the project root.
 :::
 
 ``` typescript
 
 /*
-  locklift is a globally declared variable 
+  locklift is a globally declared variable
 */
 
 async function main() {
 
   // each mnemonic can generate more that just one key pair, so we specify which pair do we want.
   const keyNumber = "0";
-  const balance = 300;
-  
+  const balance = 30;
+
   /* We get a pair of private and public keys,
       which we get from the mnemonic from the config
     SimpleSigner {
@@ -35,8 +35,8 @@ async function main() {
   */
 
   const signer = (await locklift.keystore.getSigner(keyNumber))!;
-  
-  const {contract: Account} = locklift.factory.deployContract({
+
+  const {contract: Account} = await locklift.factory.deployContract({
     contract: "Account",
     publicKey: signer.publicKey,
     constructorParams: {},
@@ -56,12 +56,12 @@ main()
 
 ```
 
-:::tip 
+:::tip
 Giver - is a contract that has a `sendTransaction` method.\
 The local-node already
 has a pre-installed contract with the initial amount of EVERs. For other networks, you can configure your giver in `locklift.config.ts`
 :::
-:::tip 
+:::tip
 If you need a permanent address for testing, then set the `_randomNonce` constant. By changing  `_randomNonce` you change the byte code of the contract, and the final address.
 :::
 

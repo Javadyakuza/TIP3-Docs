@@ -1,4 +1,4 @@
-# Accounts 
+# Accounts
 
 In EVM, accounts can either be externally owned (controlled by anyone with private keys) or implemented as smart contracts. However, in TVM-based blockchains, there is no distinction between accounts and smart contracts. Every account is essentially a smart contract, equipped with its own code. The concept of an externally-owned account, in the traditional sense, does not exist.
 

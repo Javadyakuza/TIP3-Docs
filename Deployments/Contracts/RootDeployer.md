@@ -1,4 +1,4 @@
-# Root Deployer 
+# Root Deployer
 We have developed a smart contract written in [t-solidity](https://github.com/tonlabs/TON-Solidity-Compiler) that facilitates the deployment of the  `TokenRoot`  contract and enables us to obtain the address of an already deployed  `TokenRoot`  contract.
 
 Deploying a token root contract using this smart contract is easier than deploying it through an Account. Contributors can also customize the contract to suit different needs, such as keeping track of all deployed token roots or implementing other functionalities.
@@ -12,9 +12,12 @@ To retrieve the address of your deployed token root via the root deployer's `get
 :::
 
 
-## Contract Code 
+## Contract Code
 
-```` solidity 
+<details>
+<summary> show code </summary>
+
+```` solidity
 
 pragma ever-solidity >= 0.61.2;
 pragma AbiHeader expire;
@@ -43,11 +46,11 @@ contract RootDeployer {
         walletCode_ =  _walletCode;
     }
 
-    function getExpectedTokenRootAddress(        
+    function getExpectedTokenRootAddress(
         string name,
         string symbol,
         uint8 decimals,
-        address rootOwner, 
+        address rootOwner,
         uint32 randomNonce
         ) public view returns(address){
         return address(tvm.hash(tvm.buildStateInit({
@@ -113,7 +116,7 @@ contract RootDeployer {
     }
 }
 ````
-
+</details>
 
 ::: tip
 
@@ -143,7 +146,7 @@ Before we start to write our scripts we need to make sure that there is file nam
 
 <span  :class="EIPdis"  >
 
-Deploying a contract using the `everscale-inpage-provider` is a bit tricky, Please follow the steps below in order to have a successful contract deployment using this tool.   
+Deploying a contract using the `everscale-inpage-provider` is a bit tricky, Please follow the steps below in order to have a successful contract deployment using this tool.
 
 
 </span>
@@ -163,7 +166,7 @@ Deploying a contract using the `everscale-inpage-provider` is a bit tricky, Plea
 
 ```` typescript
 /**
- * locklift is a globally declared object  
+ * locklift is a globally declared object
  */
 
 import { Address, zeroAddress, factory, Signer} from "locklift";
@@ -173,9 +176,9 @@ async function main() {
 
   // Fetching the signer key pair from locklift.config.ts
   const signer: Signer = (await locklift.keystore.getSigner("0"))!;
-  
+
   /**
-   * Making an instance of the wallet account using the signer public key and everscale-standalone-client tool 
+   * Making an instance of the wallet account using the signer public key and everscale-standalone-client tool
   */
   const myAccount: EverWalletAccount = await EverWalletAccount.fromPubkey({ publicKey: signer.publicKey!, workchain: 0 });
 
@@ -365,9 +368,9 @@ export default defineComponent({
     }
   },
   setup() {
-    
+
     function llHandler(e){
-        if(this.LLdis == "cbHide")  
+        if(this.LLdis == "cbHide")
         {
             this.llSwitcher = "llSwitcher on";
             this.eipSwitcher = "eipSwitcher off"
@@ -376,9 +379,9 @@ export default defineComponent({
         this.LLdis = "cbShow"
         this.llAction = "llAction cbShow"
         this.eipAction = "eipAction cbHide"
-}   
+}
     async function eipHandler(e){
-        if(this.EIPdis == "cbHide")  
+        if(this.EIPdis == "cbHide")
         {
             this.llSwitcher = "llSwitcher off";
             this.eipSwitcher = "eipSwitcher on"
@@ -418,7 +421,7 @@ export default defineComponent({
     font-size: .9rem;
 }
 
-.DeployRootDeployerBut, .switcherContainer, .codeBlockContainer, .Ain
+.DeployRootDeployerBut, .switcherContainer, .codeBlockContainer, .Ain, details
 {
   background-color: var(--vp-c-bg-mute);
   transition: background-color 0.1s;
@@ -426,6 +429,9 @@ export default defineComponent({
   border-radius: 8px;
   font-weight: 600;
   cursor : pointer;
+}
+details {
+  padding-left : 10px;
 }
 .Ain{
     padding-left : 10px;
@@ -509,7 +515,7 @@ export default defineComponent({
 }
 
 * {box-sizing: border-box;}
- 
+
 .container {
   display: flex;
   position: relative;
@@ -522,7 +528,7 @@ export default defineComponent({
   opacity: 0;
   height: 0;
   width: 0;
-  
+
 }
 
 .checkmark {
