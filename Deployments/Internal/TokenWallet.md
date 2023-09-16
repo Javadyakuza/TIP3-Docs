@@ -198,8 +198,7 @@ Use this command and deploy token wallet
 ```shell
 npx locklift run -s ./scripts/02-deploy-wallet.ts -n local
 ```
-
-![](</deployTokenWalletFromMW.png>)
+<ImgContainer src= '/deployTokenWalletFromMW.png' width="100%" altText="buildStructure" />
 
 Congratulations, you have deployed a TIP3 Token Wallet from the Multi Wallet TIP-3 contract 🎉
 
@@ -228,9 +227,13 @@ import { defineComponent, ref, onMounted } from "vue";
 import {deployRootParams} from "../Scripts/types";
 import {toast} from "/src/helpers/toast";
 import {deployTokenWalletCon} from "../Scripts/Contract/tokenWallet"
+import ImgContainer from "../../.vitepress/theme/components/shared/BKDImgContainer.vue"
 
 export default defineComponent({
   name: "DeployTokenWallet",
+    components :{
+    ImgContainer
+  },
   data(){
     return{
         LLdis: "cbShow",

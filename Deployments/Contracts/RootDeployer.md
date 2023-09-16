@@ -322,8 +322,7 @@ Let's run our script using locklift
 ```` shell
 npx locklift run -s ./scripts/01-deploy-root-deployer.ts -n local
 ````
-
-![](/deployRootDeployer.png)
+<ImgContainer src= '/deployRootDeployer.png' width="100%" altText="deployRootDeployerOutput" />
 
 Congratulations, you have deployed a Root Deployer contract 🎉
 
@@ -349,9 +348,12 @@ import { defineComponent, ref, onMounted } from "vue";
 import {deployRootParams} from "../Scripts/types";
 import {toast} from "/src/helpers/toast";
 import {deployRootDeployerCon} from  "../Scripts/Contract/RootDeployer";
-
+import ImgContainer from "../../.vitepress/theme/components/shared/BKDImgContainer.vue"
 export default defineComponent({
   name: "DeployRootDeployer",
+      components :{
+    ImgContainer
+  },
   data(){
     return{
         LLdis: "cbShow",

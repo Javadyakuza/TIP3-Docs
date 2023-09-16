@@ -411,7 +411,7 @@ Use this command to transfer TIP-3 tokens:
 ```shell
 npx locklift run -s ./scripts/04-transfer-tip3.ts -n local
 ```
-<ImgContainer src= '/transferTip3.png' width="100%" altText="EverEVMNativeCoin" />
+<ImgContainer src= '/transferTip3.png' width="100%" altText="transferTip3Output" />
 
 Congratulations, you have successfully transferred TIP-3 tokens from one to another Wallet 🎉
 

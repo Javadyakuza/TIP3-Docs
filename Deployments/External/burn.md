@@ -325,7 +325,7 @@ Use this command to burn TIP-3 tokens:
 ```shell
 npx locklift run -s ./scripts/05-burn-tip3.ts -n local
 ```
-<ImgContainer src= '/burnTip3.png' width="100%" altText="EverEVMNativeCoin" />
+<ImgContainer src= '/burnTip3.png' width="100%" altText="burnTip3Output" />
 
 Congratulations, you have successfully burned TIP-3 tokens from a token wallet 🎉
 

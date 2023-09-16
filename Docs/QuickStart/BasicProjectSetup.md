@@ -27,7 +27,7 @@ npx locklift init
 
 We should get such a project structure:
 
-<ImgContainer src= '/image(7).png' width="100%" altText="EverEVMNativeCoin" />
+<ImgContainer src= '/image(7).png' width="100%" altText="locklift structure after initialization" />
 
 ## Step 3: Install Packages
 

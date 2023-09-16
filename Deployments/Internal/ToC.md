@@ -2,11 +2,11 @@
 In this section we will utilize **custom** smart contracts to deploy TIP-3 standard smart contracts and interact with them.
 :::
 
-::: danger 
+::: danger
 It is crucial to exercise caution and carefully manage the numbers and amounts associated with the transactions in this section. Avoid simply copying and pasting the code without thorough review and understanding.
 :::
 
-## Smart Contract specification  
+## Smart Contract Specification
 <div class="sections-container">
   <div class="bridge-section-row">
     <a href="/Deployments/Contracts/RootDeployer.html">

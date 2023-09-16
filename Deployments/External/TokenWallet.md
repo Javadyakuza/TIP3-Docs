@@ -201,7 +201,7 @@ Use this command and deploy token wallet
 ```shell
 npx locklift run -s ./scripts/02-deploy-wallet.ts -n local
 ```
-<ImgContainer src= '/image(17).png' width="100%" altText="EverEVMNativeCoin" />
+<ImgContainer src= '/image(17).png' width="100%" altText="deployTokenWalletOutput" />
 
 Congratulations, you have deployed your first TIP3 Token Wallet 🎉
 

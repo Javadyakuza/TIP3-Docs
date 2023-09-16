@@ -27,7 +27,8 @@ npx locklift build
 After completing the process there should be a folder named **_build_** with this structure:
 
 
-<ImgContainer src= '/llStructure.png' width="100%" altText="EverEVMNativeCoin" />
+<ImgContainer src= '/llStructure.png' width="100%" altText="buildStructure" />
+
 ::: tip
 For further information kindly refer to locklift documentation.
 

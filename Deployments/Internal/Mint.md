@@ -268,8 +268,7 @@ Use this command to mint TIP-3 tokens:
 ```shell
 npx locklift run -s ./scripts/03-mint-tip3.ts -n local
 ```
-
-![](</mintForTWFromMW.png>)
+<ImgContainer src= '/mintForTWFromMW.png' width="100%" altText="buildStructure" />
 
 Congratulations, you have successfully minted TIP-3 tokens for a token wallet deployed by a custom contract 🎉
 
@@ -306,9 +305,13 @@ Congratulations, you have successfully minted TIP-3 tokens for a token wallet de
 import { defineComponent, ref, onMounted } from "vue";
 import {toast} from "/src/helpers/toast";
 import {mintTokenCon} from "../Scripts/Contract/mint"
+import ImgContainer from "../../.vitepress/theme/components/shared/BKDImgContainer.vue"
 
 export default defineComponent({
   name: "mintToken",
+    components :{
+    ImgContainer
+  },
   data(){
     return{
         LLdis: "cbShow",

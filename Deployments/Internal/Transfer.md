@@ -372,8 +372,7 @@ Use this command to transfer TIP-3 tokens:
 ```shell
 npx locklift run -s ./scripts/04-transfer-tip3.ts -n local
 ```
-
-![](</transferTokenFromMW.png>)
+<ImgContainer src= '/transferTokenFromMW.png' width="100%" altText="buildStructure" />
 
 Congratulations, you have successfully transferred TIP-3 tokens from one to another Wallet using a custom contract 🎉
 
@@ -433,9 +432,12 @@ Congratulations, you have successfully transferred TIP-3 tokens from one to anot
 import { defineComponent, ref, onMounted } from "vue";
 import {toast} from "/src/helpers/toast";
 import {transferTokenCon, transferTokenToWalletCon} from "../Scripts/Contract/transfer"
-
+import ImgContainer from "../../.vitepress/theme/components/shared/BKDImgContainer.vue"
 export default defineComponent({
   name: "transferToken",
+    components :{
+    ImgContainer
+  },
   data(){
     return{
         LLdis: "cbShow",

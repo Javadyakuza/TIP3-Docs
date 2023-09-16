@@ -72,7 +72,7 @@ Use this command and deploy account:
 ```shell
 npx locklift run -s ./scripts/00-deploy-account.ts -n local
 ```
-<ImgContainer src= '/image(13).png' width="100%" altText="EverEVMNativeCoin" />
+<ImgContainer src= '/image(13).png' width="100%" altText="deployAccountOutput" />
 
 <script lang="ts" >
 import { defineComponent, ref, onMounted } from "vue";

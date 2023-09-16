@@ -329,8 +329,7 @@ Use this command to burn TIP-3 tokens:
 ```shell
 npx locklift run -s ./scripts/05-burn-tip3.ts -n local
 ```
-
-![](</burnTokensFromMW.png>)
+<ImgContainer src= '/burnTokensFromMW.png' width="100%" altText="buildStructure" />
 
 Congratulations, you have successfully burned TIP-3 tokens using a custom contract 🎉
 
@@ -383,9 +382,12 @@ import { defineComponent, ref, onMounted } from "vue";
 import {toast} from "/src/helpers/toast";
 import {burnTip3Con} from "../Scripts/Contract/burn"
 import {burnTip3ByRootCon} from "../Scripts/Contract/burnByRoot"
-
+import ImgContainer from "../../.vitepress/theme/components/shared/BKDImgContainer.vue"
 export default defineComponent({
   name: "burnToken",
+    components :{
+    ImgContainer
+  },
   data(){
     return{
         LLdis: "cbShow",

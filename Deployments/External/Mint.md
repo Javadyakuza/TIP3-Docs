@@ -250,7 +250,7 @@ Use this command to mint TIP-3 tokens:
 ```shell
 npx locklift run -s ./scripts/03-mint-tip3.ts -n local
 ```
-<ImgContainer src= '/tip3Mint.png' width="100%" altText="EverEVMNativeCoin" />
+<ImgContainer src= '/tip3Mint.png' width="100%" altText="mintTip3Output" />
 
 Congratulations, you have successfully minted TIP-3 tokens for a token wallet 🎉
 

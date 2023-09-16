@@ -283,8 +283,7 @@ Let's run our script using locklift
 ```` shell
 npx locklift run -s ./scripts/01-deploy-root-deployer.ts -n local
 ````
-
-![](/image(101).png)
+<ImgContainer src= '/image(101).png' width="100%" altText="buildStructure" />
 
 Congratulations, you have deployed a TIP3 Token Root through the Root Deployer contract 🎉
 
@@ -344,9 +343,12 @@ import { defineComponent, ref, onMounted } from "vue";
 import {deployRootParams} from "../Scripts/types";
 import {toast} from "/src/helpers/toast";
 import {deployTokenRootFromContract} from  "../Scripts/Contract/DeployTokenRoot";
-
+import ImgContainer from "../../.vitepress/theme/components/shared/BKDImgContainer.vue"
 export default defineComponent({
   name: "DeployTokenRoot",
+    components :{
+    ImgContainer
+  },
   data(){
     return{
         LLdis: "cbShow",
