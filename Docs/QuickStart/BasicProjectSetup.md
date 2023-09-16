@@ -23,25 +23,43 @@ Locklift is a tool that simplifies the development and management of smart contr
 ``` shell
 npx locklift init
 ```
-
-![](< /image(12).png>)
+<ImgContainer src= '/image(12).png' width="100%" altText="locklift initialization output" />
 
 We should get such a project structure:
 
-![](< /image(7).png>)
+<ImgContainer src= '/image(7).png' width="100%" altText="EverEVMNativeCoin" />
 
-## Step 3: Install TIP-3 Contracts and @broxus/contracts
+## Step 3: Install Packages
 
 Next, we'll install the `TIP-3` contracts and the `@broxus/contracts` package. `TIP-3` contracts represent token contracts for the TON network, and `@broxus/contracts`provides smart contract interfaces.
 
 ```` shell
-npm i @broxus/contracts tip3 
+npm i @broxus/contracts tip3
 ````
 
 And that's it! You've set up a project with TIP3 contracts and prepared it for multiwallet integration.
 
+::: tip
 You can also refer to below provided links for more guidance.
 
 https://www.youtube.com/watch?v=SLNEeDrnTB8
 
 https://docs.locklift.io/
+:::
+
+<script lang="ts" >
+import { defineComponent, ref, onMounted } from "vue";
+import ImgContainer from "../../.vitepress/theme/components/shared/BKDImgContainer.vue"
+
+export default defineComponent({
+  name: "Diagrams",
+  components :{
+    ImgContainer
+  },
+  setup() {
+    return {
+    };
+  },
+});
+
+</script>

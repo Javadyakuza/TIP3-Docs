@@ -1,6 +1,6 @@
-<div class="mintToken">
-
 # Mint TIP-3 Tokens
+
+<div class="mintToken">
 
 In previous section we have learned to deploy a token root and wallet using the our custom contract.&#x20;
 

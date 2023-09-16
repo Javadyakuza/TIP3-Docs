@@ -1,6 +1,6 @@
-<div class="DeployTokenWallet">
+# Deploy Token Wallet
 
-# Deploy token wallet
+<div class="DeployTokenWallet">
 
 In this section we will learn how to deploy a token wallet of an existing token root contract.
 
@@ -201,8 +201,7 @@ Use this command and deploy token wallet
 ```shell
 npx locklift run -s ./scripts/02-deploy-wallet.ts -n local
 ```
-
-![](</image(17).png>)
+<ImgContainer src= '/image(17).png' width="100%" altText="EverEVMNativeCoin" />
 
 Congratulations, you have deployed your first TIP3 Token Wallet 🎉
 
@@ -228,9 +227,12 @@ import { defineComponent, ref, onMounted } from "vue";
 import {deployRootParams} from "../Scripts/types";
 import {toast} from "/src/helpers/toast";
 import {deployTokenWalletEip} from "../Scripts/Account/TokenWallet"
-
+import ImgContainer from "../../.vitepress/theme/components/shared/BKDImgContainer.vue"
 export default defineComponent({
   name: "DeployTokenWallet",
+      components :{
+    ImgContainer
+  },
   data(){
     return{
         LLdis: "cbShow",

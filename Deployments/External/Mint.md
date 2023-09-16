@@ -1,7 +1,6 @@
+# Mint TIP-3 Tokens
 
 <div class="mintToken">
-
-# Mint TIP-3 Tokens
 
 In previous section we have learned to deploy a token root and wallet using An account smart contract.&#x20;
 
@@ -251,8 +250,7 @@ Use this command to mint TIP-3 tokens:
 ```shell
 npx locklift run -s ./scripts/03-mint-tip3.ts -n local
 ```
-
-![](</tip3Mint.png>)
+<ImgContainer src= '/tip3Mint.png' width="100%" altText="EverEVMNativeCoin" />
 
 Congratulations, you have successfully minted TIP-3 tokens for a token wallet 🎉
 
@@ -295,9 +293,12 @@ In order to be able to mint token for a token wallet you must be the token root 
 import { defineComponent, ref, onMounted } from "vue";
 import {toast} from "/src/helpers/toast";
 import {mintTip3Eip} from "../Scripts/Account/mint"
-
+import ImgContainer from "../../.vitepress/theme/components/shared/BKDImgContainer.vue"
 export default defineComponent({
   name: "mintToken",
+      components :{
+    ImgContainer
+  },
   data(){
     return{
         LLdis: "cbShow",

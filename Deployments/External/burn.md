@@ -1,6 +1,6 @@
-<div class="burnToken">
-
 # Burn TIP-3 Tokens
+
+<div class="burnToken">
 
 let's burn some tokens 🔥.&#x20;
 
@@ -325,8 +325,7 @@ Use this command to burn TIP-3 tokens:
 ```shell
 npx locklift run -s ./scripts/05-burn-tip3.ts -n local
 ```
-
-![](</burnTip3.png>)
+<ImgContainer src= '/burnTip3.png' width="100%" altText="EverEVMNativeCoin" />
 
 Congratulations, you have successfully burned TIP-3 tokens from a token wallet 🎉
 
@@ -381,10 +380,13 @@ import { defineComponent, ref, onMounted } from "vue";
 import {toast} from "/src/helpers/toast";
 import {burnTip3Eip} from "../Scripts/Account/burn"
 import {burnByRootTip3Eip} from "../Scripts/Account/burnByRoot"
-
+import ImgContainer from "../../.vitepress/theme/components/shared/BKDImgContainer.vue"
 
 export default defineComponent({
   name: "burnToken",
+      components :{
+    ImgContainer
+  },
   data(){
     return{
         LLdis: "cbShow",

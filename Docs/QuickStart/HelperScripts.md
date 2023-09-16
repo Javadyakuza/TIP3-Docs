@@ -1,9 +1,9 @@
-# local environment
+# Local Environment
 
 ::: tip
 The locklift tool has its own local node to make transaction locally.
- 
-But if you want to play around with the local node the front end we will be needing a sandbox as explained below. 
+
+But if you want to play around with the local node the front end we will be needing a sandbox as explained below.
 :::
 
 Add this scripts to your `package.json` scripts sections.

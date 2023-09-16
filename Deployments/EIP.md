@@ -2,11 +2,10 @@
 
 ## Packages
 
-In order to perform the operations mentioned in this documentation using  `everscale-inpage-provider` , the target contracts artifacts, including the contract tvc and code, are required. These artifacts can be obtained using the locklift build command, which generates the necessary files.
+In order to perform the operations mentioned in this documentation using  [`everscale-inpage-provider`](https://github.com/broxus/everscale-inpage-provider) , the target contracts artifacts, including the contract tvc and code, are required. These artifacts can be obtained using the `locklift build` command, which generates the necessary files.
 
-For the sake of simplicity, a simple npm package named `tip3-docs-artifacts` has been provided that contains the required artifacts of the  `TokenRoot` ,  `TokenWallet` ,  `Wallet` , and the default  `custom smart contract` .
+For the sake of simplicity, a simple npm package named `tip3-docs-artifacts` has been provided that contains the required artifacts of the  `TokenRoot` ,  `TokenWallet` ,  `Wallet` , and the default custom smart contract.
 
-You can also refer to the [everscale-inpgae-provider Docs](https://provider-docs.broxus.com/guides/deploy.html#deploy-a-contract) for detailed instructions.
 
 The necessary npm packages are as follows:
 
@@ -28,7 +27,6 @@ Here is the propose of using the mentioned packages in our scripts:
 To install these packages, run the following command in your shell:
 
 ```` shell
-shell
 npm install --save-dev everscale-inpage-provider everscale-standalone-client tip3-docs-artifacts
 ````
 
@@ -40,7 +38,7 @@ The following steps are only required when building Dapps and using decentralize
 
 The  `everscale-inpage-provider`  is used as a provider for TVM based blockchains such as [Venom](https://venom.foundation/) and [Everscale](https://everscale.network/). Follow the steps below to initialize and use  `everscale-inpage-provider`  in your scripts.
 
-You can also refer to the [everscale-inpgae-provider Docs](https://provider-docs.broxus.com/guides/deploy.html#deploy-a-contract) for detailed instructions.
+You can also refer to the [everscale-inpage-provider Docs](https://provider-docs.broxus.com/guides/deploy.html#deploy-a-contract) for detailed instructions.
 
 ### Step 1: Create the module
 
@@ -75,3 +73,9 @@ export {provider,  providerAddress};
 
 From now we can use the provider object and the provider address in our scripts by just simply importing them.
 
+::: tip
+You can also refer to the Documentation of the everscale-inpage-provider.
+
+https://provider-docs.broxus.com/guides/deploy.html#deploy-a-contract
+
+:::

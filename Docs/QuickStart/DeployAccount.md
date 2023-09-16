@@ -3,7 +3,7 @@
 In this section we will learn how to deploy an Account smart contract.
 
 
-## step 1: Write a Deployment Script
+## Step 1: Write a Deployment Script
 
 Let's write a simple script in typescript that will use locklift to deploy our Account.&#x20;
 
@@ -72,5 +72,21 @@ Use this command and deploy account:
 ```shell
 npx locklift run -s ./scripts/00-deploy-account.ts -n local
 ```
+<ImgContainer src= '/image(13).png' width="100%" altText="EverEVMNativeCoin" />
 
-![](< /image(13).png>)
+<script lang="ts" >
+import { defineComponent, ref, onMounted } from "vue";
+import ImgContainer from "../../.vitepress/theme/components/shared/BKDImgContainer.vue"
+
+export default defineComponent({
+  name: "Diagrams",
+  components :{
+    ImgContainer
+  },
+  setup() {
+    return {
+    };
+  },
+});
+
+</script>

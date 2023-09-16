@@ -1,5 +1,5 @@
 # Multi Wallet TIP-3
-In this section we will walk through to waht tis the multi wallet TIP-3 contract,it's contract code specificationand how to deploy it using tools `locklift` or `everscale-inpage-provider`.
+In this section we will walk through to waht tis the multi wallet TIP-3 contract,it's contract code specification and how to deploy it using tools `locklift` or `everscale-inpage-provider`.
 
 ## What is Multi Wallet TIP-3 ?
 

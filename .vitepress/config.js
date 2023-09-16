@@ -93,7 +93,7 @@ module.exports = {
             ],
           },
           {
-            text: 'local environment',
+            text: 'Local Environment',
             collapsable: false,
             link: '/Docs/QuickStart/HelperScripts.md',
           },

@@ -1,6 +1,6 @@
-<div class="transferToken">
-
 # Transfer TIP-3 Tokens
+
+<div class="transferToken">
 
 We have already learned how to send messages to a contract through an account.&#x20;
 
@@ -411,8 +411,7 @@ Use this command to transfer TIP-3 tokens:
 ```shell
 npx locklift run -s ./scripts/04-transfer-tip3.ts -n local
 ```
-
-![](</transferTip3.png>)
+<ImgContainer src= '/transferTip3.png' width="100%" altText="EverEVMNativeCoin" />
 
 Congratulations, you have successfully transferred TIP-3 tokens from one to another Wallet 🎉
 
@@ -471,9 +470,12 @@ Congratulations, you have successfully transferred TIP-3 tokens from one to anot
 import { defineComponent, ref, onMounted } from "vue";
 import {toast} from "/src/helpers/toast";
 import {transferTokenEip, transferTokenToWalletEip} from "../Scripts/Account/Transfer"
-
+import ImgContainer from "../../.vitepress/theme/components/shared/BKDImgContainer.vue"
 export default defineComponent({
   name: "transferToken",
+      components :{
+    ImgContainer
+  },
   data(){
     return{
         LLdis: "cbShow",

@@ -1,4 +1,4 @@
-# TIP-3 Standard 
+# TIP-3 Standard
 
 TIP-3 is the technical standard for all fungible tokens of the [TVM(Threaded virtual machine)](https://everkit.org/en/articles/the-virtual-machine-tvm-1) based blockchains.
 
@@ -8,14 +8,14 @@ The suggested standard differs considerably from Ethereum ERC20 and other smart 
 
 The ERC20 sharding implementation (with an idea to simply shard its registry) has drawbacks mainly related to complicated and expansive management. TIP-3 is fully distributed and implies separate storage of each user’s balance.
 
-## What's Inside  
+## What's Inside
 
 In this onboarding, we will get acquainted with TVM based blockchains smart contracts. We take the [TIP-3](https://github.com/broxus/tip3) token and look at two ways to interact with the TIP-3 Token.
 
-We will use default Account and typescript. And in the second case, we will write our custom smart contract which can handle the  the TIP-3 Token deployment.
+We will use default Account and TypeScript. And in the second case, we will write our custom smart contract which can handle the  the TIP-3 Token deployment.
 
 
-::: tip 
+::: tip
 
 TIP-3 standard describes basic principles of building smart token contracts.
 
@@ -31,8 +31,8 @@ TIP-3 standard describes basic principles of building smart token contracts.
 
 ## Useful Links
 
-- [Tokens and Assets (Venom Foundation)](https://docs.venom.foundation/learn/tokens-and-assets) 
-
+- [Tokens and Assets (Venom Foundation)](https://docs.venom.foundation/learn/tokens-and-assets)
+s
 - [What is TIP? (Everscale)](https://docs.everscale.network/standard/workflow)
 
 - [TIP-3 Implementation (Broxus)](https://github.com/broxus/tip3)

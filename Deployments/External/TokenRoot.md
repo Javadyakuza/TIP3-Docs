@@ -1,7 +1,6 @@
+# Deploy Token Root
 
 <div class="DeployTokenRoot">
-
-# Deploy Token Root
 
 In this section, we will provide a simple, step-by-step guide on deploying the token root contract.
 
@@ -286,8 +285,8 @@ Let's run our script using locklift:
 ```` shell
 npx locklift run -s ./scripts/01-deploy-token.ts -n local
 ````
+<ImgContainer src= '/image(15).png' width="100%" altText="EverEVMNativeCoin" />
 
-![](/image(15).png)
 
 Congratulations, you have deployed your first TIP3 Token Root 🎉
 
@@ -345,9 +344,13 @@ import { defineComponent, ref, onMounted } from "vue";
 import {deployRootParams} from "../Scripts/types";
 import {toast} from "/src/helpers/toast";
 import {deployTokenRootEip} from  "../Scripts/Account/TokenRoot";
+import ImgContainer from "../../.vitepress/theme/components/shared/BKDImgContainer.vue"
 
 export default defineComponent({
   name: "DeployTokenRoot",
+    components :{
+    ImgContainer
+  },
   data(){
     return{
         LLdis: "cbShow",

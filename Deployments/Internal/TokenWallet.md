@@ -1,9 +1,6 @@
-
+# Deploy Token Wallet
 
 <div class="DeployTokenWallet">
-
-# Deploy token wallet
-
 
 In this section, we will explore an important aspect of deploying the TIP-3 standard contracts, which involves deploying a token wallet from a smart contract other than the token root contract. Specifically, we will focus on deploying a token wallet using the  MultiWalletTIP3  contract.
 

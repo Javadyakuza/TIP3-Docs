@@ -1,6 +1,6 @@
 # Locklift config setting
 
-In this section we will learn how to use the TIP-3 contracts inside of our locklift project 
+In this section we will learn how to use the TIP-3 contracts inside of our locklift project
 
 ## Step 1: Add the External Contracts
 
@@ -16,14 +16,37 @@ externalContracts: {
  },
 ```
 
-## Step 2: Build the Artifacts 
+## Step 2: Build the Artifacts
 
 To generate the necessary artifacts for these three contracts, including .abi.json, .tvc, .code, and .base64 files, execute the following command in your shell.
 
 ````shell
-npx locklift build 
+npx locklift build
 ````
 
 After completing the process there should be a folder named **_build_** with this structure:
 
-![](/llStructure.png)
+
+<ImgContainer src= '/llStructure.png' width="100%" altText="EverEVMNativeCoin" />
+::: tip
+For further information kindly refer to locklift documentation.
+
+https://docs.locklift.io/
+:::
+
+<script lang="ts" >
+import { defineComponent, ref, onMounted } from "vue";
+import ImgContainer from "../../.vitepress/theme/components/shared/BKDImgContainer.vue"
+
+export default defineComponent({
+  name: "Diagrams",
+  components :{
+    ImgContainer
+  },
+  setup() {
+    return {
+    };
+  },
+});
+
+</script>
