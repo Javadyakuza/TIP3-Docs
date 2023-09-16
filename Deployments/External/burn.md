@@ -328,7 +328,7 @@ npx locklift run -s ./scripts/05-burn-tip3.ts -n local
 
 ![](</burnTip3.png>)
 
-Congratulations, you have successfully burned TIP-3 tokens from a token wallet.
+Congratulations, you have successfully burned TIP-3 tokens from a token wallet 🎉
 
 </div>
 

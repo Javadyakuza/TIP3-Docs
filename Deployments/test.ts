@@ -1,110 +1,88 @@
-import {
-  ProviderRpcClient,
-  Address,
-  GetExpectedAddressParams,
-  Contract,
-  Transaction,
-  FullContractState,
-} from 'everscale-inpage-provider';
+import { ProviderRpcClient, Address, Transaction, Contract } from 'everscale-inpage-provider';
 import * as tip3Artifacts from 'tip3-docs-artifacts';
 import { provider, providerAddress } from './useProvider';
 
-/**
- * We develop two more methods in order to reduce the mass of the script
- */
-async function extractPubkey(provider: ProviderRpcClient, senderAddress: Address): Promise<string> {
-  // Fetching the user public key
-  const accountFullState: FullContractState = (
-    await provider.getFullContractState({ address: senderAddress })
-  ).state!;
-
-  const senderPublicKey: string = await provider.extractPublicKey(accountFullState.boc);
-
-  return senderPublicKey;
+// We use the getWalletData function to extract the token wallet data from the multi wallet contract
+async function getWalletData(
+  MWContract: Contract<tip3Artifacts.FactorySource['MultiWalletTIP3']>,
+  tokenRootAddress: Address
+): Promise<{ tokenWallet: Address; balance: number }> {
+  const walletData = (await MWContract.methods.wallets().call()).wallets.map(item => {
+    if (item[0].toString() == tokenRootAddress.toString()) {
+      return item[1];
+    }
+  });
+  let balance: number = 0;
+  let tokenWallet: Address = tip3Artifacts.zeroAddress;
+  if (walletData.length != 0) {
+    balance = Number(walletData[0]!.balance);
+    tokenWallet = walletData[0]!.tokenWallet;
+  }
+  return { tokenWallet: tokenWallet, balance: balance };
 }
 
 async function main() {
   // Initiate the TVM provider
+  const tokenRootAddress: Address = new Address('<YOUR_TOKEN_ROOT_ADDRESS>');
+  const multiWalletAddress: Address = new Address('<YOUR_MULTI_WALLET_ADDRESS>');
 
-  // Token Root contracts abis
-  const tokenRootAbi: tip3Artifacts.FactorySource['TokenRoot'] =
-    tip3Artifacts.factorySource['TokenRoot'];
+  try {
+    // creating an instance of the token root contract
+    const tokenRootContract: Contract<tip3Artifacts.FactorySource['TokenRoot']> =
+      new provider.Contract(tip3Artifacts.factorySource['TokenRoot'], tokenRootAddress);
+    // creating an instance of the token root contract
+    const MultiWalletContract: Contract<tip3Artifacts.FactorySource['MultiWalletTIP3']> =
+      new provider.Contract(tip3Artifacts.factorySource['MultiWalletTIP3'], multiWalletAddress);
+    // Fetching the decimals and symbol
+    const [decimals, symbol] = await Promise.all([
+      Number((await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0),
+      (await tokenRootContract.methods.symbol({ answerId: 0 }).call()).value0,
+    ]);
 
-  // Fetching the root deployer
-  const rootDeployerAddress: Address = new Address('<YOUR_ROOT_DEPLOYER_ADDRESS>');
+    const mintAmount: number = 50 * 10 ** decimals;
 
-  const rootDeployerAbi: tip3Artifacts.FactorySource['RootDeployer'] =
-    tip3Artifacts.factorySource['RootDeployer'];
+    // Checking if the user already doesn't have the any wallet of that token root
+    let tokenWalletData = await getWalletData(MultiWalletContract, tokenRootContract.address);
 
-  const rootDeployerContract: Contract<tip3Artifacts.FactorySource['RootDeployer']> =
-    new provider.Contract(rootDeployerAbi, rootDeployerAddress);
+    let deployWalletValue: number = 0;
 
-  // Preparing the params
-  interface deployRootParams {
-    initialSupplyTo: Address;
-    rootOwner: Address;
-    name: string;
-    symbol: string;
-    decimals: number;
-    mintDisabled: boolean;
-    burnByRootDisabled: boolean;
-    burnPaused: boolean;
-    initialSupply: number;
-    deployWalletValue: number;
-    randomNonce: number;
-    remainingGasTo: Address;
-  }
+    const oldBal: number = Number(tokenWalletData.balance) / 10 ** decimals;
 
-  const params: deployRootParams = {
-    initialSupplyTo: tip3Artifacts.zeroAddress,
-    rootOwner: providerAddress,
-    randomNonce: (Math.random() * 6400) | 0,
-    deployWalletValue: 0,
-    name: 'Tip3OnboardingToken',
-    symbol: 'TOT',
-    decimals: 6,
-    mintDisabled: false,
-    burnByRootDisabled: false,
-    burnPaused: false,
-    initialSupply: 0,
-    remainingGasTo: providerAddress,
-  };
-
-  // Deploying the tokenRoot
-  const { transaction: deployRes } = await rootDeployerContract.methods
-    .deployTokenRoot(params)
-    .sendExternal({
-      publicKey: await extractPubkey(provider, providerAddress),
-    });
-
-  // checking if the token root is deployed successfully by calling one of its methods
-  if (deployRes.aborted) {
-    throw new Error(`transaction aborted ${(deployRes.exitCode, deployRes.resultCode)}`);
-  }
-
-  // Fetching the address of the token root
-  const tokenRootAddr: Address = (
-    await rootDeployerContract.methods
-      .getExpectedTokenRootAddress({
-        name: params.name,
-        decimals: params.decimals,
-        symbol: params.symbol,
-        rootOwner: params.rootOwner,
-        randomNonce: params.randomNonce,
+    if (tokenWalletData.tokenWallet.toString() == tip3Artifacts.zeroAddress.toString()) {
+      deployWalletValue = 2 * 10 ** 9;
+    }
+    const txFee: string = String(2 * 10 ** 9 + deployWalletValue);
+    // Deploying a new contract if didn't exist before
+    const mintRes: Transaction = await tokenRootContract.methods
+      .mint({
+        amount: mintAmount,
+        deployWalletValue: deployWalletValue,
+        remainingGasTo: providerAddress,
+        recipient: multiWalletAddress,
+        notify: true, // to update the MW contract state
+        payload: '',
       })
-      .call()
-  ).value0;
+      .send({
+        from: providerAddress,
+        amount: txFee,
+        bounce: true,
+      });
 
-  // making an instance of the token root
-  const tokenRootContract: Contract<tip3Artifacts.FactorySource['TokenRoot']> =
-    new provider.Contract(tokenRootAbi, tokenRootAddr);
+    if (mintRes.aborted) {
+      throw new Error(`Transaction aborted ! ${(mintRes.exitCode, mintRes.resultCode)}`);
+    }
 
-  const tokenName: string = (await tokenRootContract.methods.name({ answerId: 0 }).call({})).value0;
+    tokenWalletData = await getWalletData(MultiWalletContract, tokenRootContract.address);
+    const newBal: number = Number(tokenWalletData.balance) / 10 ** decimals;
 
-  if (tokenName == params.name) {
-    console.log(`${params.symbol} Token deployed successfully`);
-    return `${params.symbol} deployed to ${tokenRootAddr.toString()}`;
-  } else {
-    throw new Error(`${params.symbol} Token deployment failed !${deployRes.exitCode}`);
+    if (newBal >= oldBal) {
+      console.log(`${mintAmount} ${symbol}'s minted successfully `);
+
+      return `Old balance: ${oldBal} \n New balance: ${newBal}`;
+    } else {
+      throw new Error(`Failed ${(mintRes.exitCode, mintRes.resultCode)}`);
+    }
+  } catch (e: any) {
+    throw new Error(`Failed ${e.message}`);
   }
 }

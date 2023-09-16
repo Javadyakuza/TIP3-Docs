@@ -204,7 +204,7 @@ npx locklift run -s ./scripts/02-deploy-wallet.ts -n local
 
 ![](</image(17).png>)
 
-Congratulations, you have deployed your first TIP3 Token Wallet !
+Congratulations, you have deployed your first TIP3 Token Wallet 🎉
 
 </div>
 

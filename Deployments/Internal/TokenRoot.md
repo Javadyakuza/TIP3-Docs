@@ -21,7 +21,7 @@ TVM memory and persistent storage consist of cells. Remember that the TVM memory
 8. `varInit` (`initializer list`) - used to set [static](https://github.com/tonlabs/TON-Solidity-Compiler/blob/master/API.md#keyword-static) variables of the contract. Conflicts with `data` and requires `contr` to be set. Can be omitted.
 9. `contr` (`contract`) - defines the contract whose `StateInit` is being built. Mandatory to be set if the option `varInit` is specified.
 
-## Write Deployment Script
+## Step 1: Write Deployment Script
 <span  :class="LLdis"  >
 
 Follow the instructions below to deploy a `TokenRoot` using the `rootDeployer` contract with the locklift tool:
@@ -273,7 +273,7 @@ async function main() {
 </div>
 
 
-## Deploy Token Root
+## Step 2: Deploy Token Root
 
 <div class="action">
 <div :class="llAction">
@@ -286,7 +286,7 @@ npx locklift run -s ./scripts/01-deploy-root-deployer.ts -n local
 
 ![](/image(101).png)
 
-Congratulations, you have deployed your first TIP3 Token Root through the Root Deployer contract!
+Congratulations, you have deployed a TIP3 Token Root through the Root Deployer contract 🎉
 
 </div>
 

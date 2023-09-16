@@ -2,9 +2,9 @@
 
 # Transfer TIP-3 Tokens
 
-Now that we have minted some TIP-3 tokens, why not transfer them ?  
+Now that we have minted some TIP-3 tokens, why not transfer them ?
 As explained [here](../External/Transfer.md), the transfer concept in the TIP-3 standard has two implementation which we will cover both of them.
-Its noticeable that both of this methods are implemented inside of the MultiWalletTIP-3 contract as well, so we will get our hands dirty with those.   
+Its noticeable that both of this methods are implemented inside of the MultiWalletTIP-3 contract as well, so we will get our hands dirty with those.
 
 <span  :class="LLdis"  >
 
@@ -23,7 +23,7 @@ Transferring tokens using everscale-inpage-provider MultiWalletTIP3 contract:
 :::danger
 
 - Notice that if the `Notify` parameter be true for the transaction, the change will be sent back to the sender accounts `tokenWallet` contract !!\
-  So if you want the change back into your `account contract` leave the Notify `unchecked` !!   
+  So if you want the change back into your `account contract` leave the Notify `unchecked` !!
 
 :::
 
@@ -45,7 +45,7 @@ Transferring tokens using everscale-inpage-provider MultiWalletTIP3 contract:
 
 ```typescript
 /**
- * locklift is a globally declared object  
+ * locklift is a globally declared object
  */
 
 import { Address, Contract, Signer, zeroAddress } from "locklift";
@@ -53,7 +53,7 @@ import { EverWalletAccount } from "everscale-standalone-client";
 import { FactorySource, factorySource } from "../build/factorySource";
 
 /**
- * We develope a method that retrieves the data of the token wallet from the relevant multi wallet contract 
+ * We develope a method that retrieves the data of the token wallet from the relevant multi wallet contract
  */
 async function getWalletData(
   MWContract: Contract<FactorySource["MultiWalletTIP3"]>,
@@ -81,7 +81,7 @@ async function main() {
 
   const signerAlice: Signer = (await locklift.keystore.getSigner("0"))!;
   const signerBob: Signer = (await locklift.keystore.getSigner("1"))!;
-  
+
   /**
    * Making an instance of the wallet account using the signer public key and everscale-standalone-client tool
   */
@@ -89,16 +89,16 @@ async function main() {
 
   // Creating the target contracts instances
   const tokenRootContract: Contract<FactorySource['TokenRoot']> = await locklift.factory.getDeployedContract(
-    "TokenRoot", 
+    "TokenRoot",
     tokenRootAddress
   )
 
   const aliceMultiWalletContract: Contract<FactorySource['MultiWalletTIP3']> = await locklift.factory.getDeployedContract(
-    "MultiWalletTIP3", 
+    "MultiWalletTIP3",
     aliceMultiWalletAddress
   )
   const bobMultiWalletContract: Contract<FactorySource['MultiWalletTIP3']> = await locklift.factory.getDeployedContract(
-    "MultiWalletTIP3", 
+    "MultiWalletTIP3",
     bobMultiWalletAddress
   )
 
@@ -108,19 +108,19 @@ async function main() {
     (await tokenRootContract.methods.symbol({ answerId: 0 }).call()).value0,
   ]);
 
-  // We assume the bob doesn't have a deployed wallet at the first 
+  // We assume the bob doesn't have a deployed wallet at the first
   console.log(`Alice has token wallet ? ${(await getWalletData(aliceMultiWalletContract, tokenRootAddress)).tokenWallet.toString() == zeroAddress.toString()} \n
-   Alice balance before transfer: ${(await getWalletData(aliceMultiWalletContract, tokenRootAddress)).balance / 10 ** decimals}`) // >> true, 200 
+   Alice balance before transfer: ${(await getWalletData(aliceMultiWalletContract, tokenRootAddress)).balance / 10 ** decimals}`) // >> true, 200
 
-  console.log(`Bob has token wallet ? ${(await getWalletData(bobMultiWalletContract, tokenRootAddress)).tokenWallet.toString() == zeroAddress.toString()} \n 
+  console.log(`Bob has token wallet ? ${(await getWalletData(bobMultiWalletContract, tokenRootAddress)).tokenWallet.toString() == zeroAddress.toString()} \n
   Bob balance before transfer: ${(await getWalletData(bobMultiWalletContract, tokenRootAddress)).balance / 10 ** decimals}`) // false, 0
 
-  // Amount to transfer 
+  // Amount to transfer
   const transferAmount : number = 100 * 10 ** decimals
-  
-  /* 
+
+  /*
     Transfer with the deployment of a wallet for the recipient account.
-    
+
     Don't pay attention to notify and payload yet, we'll get back to them.
   */
   await aliceMultiWalletContract.methods.transfer({
@@ -129,29 +129,29 @@ async function main() {
       _deployWalletValue: locklift.utils.toNano(2), // We assume bob doesn't have any token wallet
       _tokenRoot: tokenRootAddress,
       }).sendExternal({
-        publicKey : signerAlice.publicKey!, 
+        publicKey : signerAlice.publicKey!,
       })
-  
-  // Fetching the balances after the normal transfer function 
+
+  // Fetching the balances after the normal transfer function
   console.log(`Alice balance after transfer: ${(await getWalletData(aliceMultiWalletContract, tokenRootAddress)).balance / 10 ** decimals}`) // >> 100
   console.log(`Bob balance after transfer: ${(await getWalletData(bobMultiWalletContract, tokenRootAddress)).balance / 10 ** decimals}`) // >> 100
-  
-  /* 
+
+  /*
      Transfer to deployed token wallet using transferToWallet
   */
-  const transferToWalletAmount: number = 50 * 10 ** decimals;  
+  const transferToWalletAmount: number = 50 * 10 ** decimals;
 
   await aliceMultiWalletContract.methods.transferToWallet({
       _amount: transferToWalletAmount,
       _recipientTokenWallet: (await getWalletData(bobMultiWalletContract, tokenRootAddress)).tokenWallet,
-      _tokenRoot: tokenRootAddress        
+      _tokenRoot: tokenRootAddress
       }).sendExternal({
-        publicKey : signerAlice.publicKey!, 
+        publicKey : signerAlice.publicKey!,
       })
-      
+
   console.log(`Alice balance after transfer to wallet: ${(await getWalletData(aliceMultiWalletContract, tokenRootAddress)).balance / 10 ** decimals}`) // >> 50
   console.log(`Bob balance after transfer to wallet: ${(await getWalletData(bobMultiWalletContract, tokenRootAddress)).balance / 10 ** decimals}`) // >> 150
-  
+
 }
 
 main()
@@ -182,7 +182,7 @@ const zeroAddress: Address = new Address(
 );
 
 /**
-  * We develop two more methods in order to reduce the mass of the script  
+  * We develop two more methods in order to reduce the mass of the script
 */
 async function extractPubkey(
   provider: ProviderRpcClient,
@@ -224,7 +224,7 @@ async function main(){
 
   // Initiate the TVM provider
   try {
-    
+
   const tokenRootAddress: Address = "<YOUR_TOKEN_ROOT_ADDRESS>";
   const receiverMWAddress: Address = "<RECEIVER_MULTI_WALLET_ADDRESS>";
   const senderMWAddress: Address = "<SENDER_MULTI_WALLET_ADDRESS>";
@@ -250,9 +250,9 @@ async function main(){
       Number((await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0),
       (await tokenRootContract.methods.symbol({ answerId: 0 }).call()).value0,
     ]);
-    
+
     const tokenAmount: number  = 10 * 10 ** decimals;
-    
+
     // checking if the sender has enough tokens to send
     if (
       (await getWalletData(senderMWContract, tokenRootContract.address)).balance <
@@ -388,7 +388,7 @@ npx locklift run -s ./scripts/04-transfer-tip3.ts -n local
 
 ![](</transferTokenFromMW.png>)
 
-Congratulations, you have successfully transferred TIP-3 tokens from one to another Wallet using a custom contract.
+Congratulations, you have successfully transferred TIP-3 tokens from one to another Wallet using a custom contract 🎉
 
 </div>
 
@@ -396,18 +396,18 @@ Congratulations, you have successfully transferred TIP-3 tokens from one to anot
 
 <div :class="transfer">
 
-## Transfer TIP-3 tokens  
+## Transfer TIP-3 tokens
 
-<p class=actionInName style="margin-bottom: 0;">Token Root address</p> 
+<p class=actionInName style="margin-bottom: 0;">Token Root address</p>
 <input ref="actionTokenRootAddress" class="action Ain" type="text"/>
 
-<p class=actionInName style="margin-bottom: 0;">Sender multi wallet address</p> 
+<p class=actionInName style="margin-bottom: 0;">Sender multi wallet address</p>
 <input ref="actionSenderAddress" class="action Ain" type="text"/>
 
-<p class=actionInName style="margin-bottom: 0;">Recipient multi wallet address</p> 
+<p class=actionInName style="margin-bottom: 0;">Recipient multi wallet address</p>
 <input ref="actionRecipientAddress" class="action Ain" type="text"/>
 
-<p class=actionInName style="margin-bottom: 0;">Amount</p> 
+<p class=actionInName style="margin-bottom: 0;">Amount</p>
 <input ref="actionAmount" class="action Ain" type="text"/>
 
 
@@ -417,18 +417,18 @@ Congratulations, you have successfully transferred TIP-3 tokens from one to anot
 
 <div :class="transferToWallet">
 
-## Transfer TIP-3 tokens to Token Wallet  
+## Transfer TIP-3 tokens to Token Wallet
 
-<p class=actionInName style="margin-bottom: 0;">Token Root address</p> 
+<p class=actionInName style="margin-bottom: 0;">Token Root address</p>
 <input ref="actionWalletTokenRootAddress" class="action Ain" type="text"/>
 
-<p class=actionInName style="margin-bottom: 0;">Sender multi wallet address</p> 
+<p class=actionInName style="margin-bottom: 0;">Sender multi wallet address</p>
 <input ref="actionWalletSenderAddress" class="action Ain" type="text"/>
 
-<p class=actionInName style="margin-bottom: 0;">Recipient multi wallet address</p> 
+<p class=actionInName style="margin-bottom: 0;">Recipient multi wallet address</p>
 <input ref="actionWalletRecipientAddress" class="action Ain" type="text"/>
 
-<p class=actionInName style="margin-bottom: 0;">Amount</p> 
+<p class=actionInName style="margin-bottom: 0;">Amount</p>
 <input ref="actionWalletAmount" class="action Ain" type="text"/>
 
 
@@ -460,9 +460,9 @@ export default defineComponent({
     }
   },
   setup() {
-    
+
     function llHandler(e){
-        if(this.LLdis == "cbHide")  
+        if(this.LLdis == "cbHide")
         {
             this.llSwitcher = "llSwitcher on";
             this.eipSwitcher = "eipSwitcher off"
@@ -471,9 +471,9 @@ export default defineComponent({
         this.LLdis = "cbShow"
         this.llAction = "llAction cbShow"
         this.eipAction = "eipAction cbHide"
-}   
+}
     async function eipHandler(e){
-        if(this.EIPdis == "cbHide")  
+        if(this.EIPdis == "cbHide")
         {
             this.llSwitcher = "llSwitcher off";
             this.eipSwitcher = "eipSwitcher on"
@@ -485,7 +485,7 @@ export default defineComponent({
     }
   async function transferTokens(){
           this.$refs.transferTokenOutput.innerHTML = "Processing ..."
-        // checking of all the values are fully filled 
+        // checking of all the values are fully filled
         if (
             this.$refs.actionTokenRootAddress.value == ""
 
@@ -501,7 +501,7 @@ export default defineComponent({
             toast("Recipient multi wallet address field is required !",0)
             this.$refs.transferTokenOutput.innerHTML = "Failed"
             return
-        }        
+        }
         if (
             this.$refs.actionSenderAddress.value == ""
 
@@ -509,7 +509,7 @@ export default defineComponent({
             toast("Sender multi wallet address field is required !",0)
             this.$refs.transferTokenOutput.innerHTML = "Failed"
             return
-        }     
+        }
         if (
             this.$refs.actionAmount.value == ""
 
@@ -519,13 +519,13 @@ export default defineComponent({
             return
         }
         let transferTokenRes = await transferTokenCon(
-          this.$refs.actionTokenAddress.value,       
+          this.$refs.actionTokenAddress.value,
           this.$refs.actionRecipientAddress.value,
           this.$refs.actionSenderAddress.value,
           this.$refs.actionAmount.value,
         )
 
-        // Rendering the output     
+        // Rendering the output
         transferTokenRes = !transferTokenRes ? "Failed" :  transferTokenRes;
         this.$refs.transferTokenOutput.innerHTML = transferTokenRes;
   }
@@ -539,7 +539,7 @@ export default defineComponent({
             toast("Token root address field is required !",0)
             this.$refs.actionWalletAmount.innerHTML = "Failed"
             return
-        }      
+        }
         if (
             this.$refs.actionWalletRecipientAddress.value == ""
 
@@ -547,7 +547,7 @@ export default defineComponent({
             toast("Recipient multi wallet address field is required !",0)
             this.$refs.actionWalletAmount.innerHTML = "Failed"
             return
-        }       
+        }
         if (
             this.$refs.actionWalletSenderAddress.value == ""
 
@@ -565,16 +565,16 @@ export default defineComponent({
             return
         }
         let transferTokenRes = await transferTokenToWalletCon(
-          this.$refs.actionWalletTokenAddress.value,       
+          this.$refs.actionWalletTokenAddress.value,
           this.$refs.actionWalletRecipientAddress.value,
           this.$refs.actionWalletSenderAddress.value,
           this.$refs.actionWalletAmount.value,
           )
-          // Rendering the output     
+          // Rendering the output
           transferTokenRes = !transferTokenRes ? "Failed" :  transferTokenRes;
           this.$refs.WalletTransferTokenOutput.innerHTML = transferTokenRes;
   }
-  
+
 return {
         eipHandler,
         llHandler,
@@ -687,7 +687,7 @@ return {
 }
 
 * {box-sizing: border-box;}
- 
+
 .container {
   display: flex;
   position: relative;
@@ -700,7 +700,7 @@ return {
   opacity: 0;
   height: 0;
   width: 0;
-  
+
 }
 
 .checkmark {

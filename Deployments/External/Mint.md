@@ -254,7 +254,7 @@ npx locklift run -s ./scripts/03-mint-tip3.ts -n local
 
 ![](</tip3Mint.png>)
 
-Congratulations, you have successfully minted TIP-3 tokens for a token wallet.
+Congratulations, you have successfully minted TIP-3 tokens for a token wallet 🎉
 
 </div>
 

@@ -414,7 +414,7 @@ npx locklift run -s ./scripts/04-transfer-tip3.ts -n local
 
 ![](</transferTip3.png>)
 
-Congratulations, you have successfully transferred TIP-3 tokens from one to another Wallet.
+Congratulations, you have successfully transferred TIP-3 tokens from one to another Wallet 🎉
 
 </div>
 

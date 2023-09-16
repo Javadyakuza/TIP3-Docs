@@ -289,7 +289,7 @@ npx locklift run -s ./scripts/01-deploy-token.ts -n local
 
 ![](/image(15).png)
 
-Congratulations, you have deployed your first TIP3 Token Root !
+Congratulations, you have deployed your first TIP3 Token Root 🎉
 
 </div>
 
