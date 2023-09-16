@@ -336,7 +336,7 @@ Congratulations, you have successfully burned TIP-3 tokens from a token wallet ð
 
 <div :class="burn">
 
-## Burn TIP-3 tokens
+### Burn TIP-3 tokens
 
 
 <p class=actionInName style="margin-bottom: 0;">Token Root address</p>
@@ -345,12 +345,12 @@ Congratulations, you have successfully burned TIP-3 tokens from a token wallet ð
 <p class=actionInName style="margin-bottom: 0;">Amount</p>
 <input ref="actionAmount" class="action Ain" type="text"/>
 
-<button @click="burnTokens" class="burnTokenBut" >burn Tokens</button>
+<button @click="burnTokens" class="burnTokenBut" >burn Tokens</button>`
 
 </div>
 <p id="output-p" :class="EIPdis" ref="burnTokenOutput"></p>
 
-## Burn TIP-3 Tokens By root
+### Burn TIP-3 Tokens By root
 
 ::: tip
 In order to utilize the `burnByRoot` you must be the root owner !

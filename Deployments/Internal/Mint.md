@@ -13,7 +13,7 @@ In this section we will learn the how to mint TIP-3 tokens for a deployed token 
 There is a callback function named `onAcceptTokensMint` which will be called on the `MultiWalletTIP-3` by the token wallet and updates its state when the tokens are minted if we set the parameter `notify` to _true_ !
 :::
 
-## Step 1: Write Deployment Script
+## Step 1: Write Minting Script
 
 <span  :class="LLdis"  >
 
@@ -120,23 +120,20 @@ async function main() {
   const mintAmount: number = 50 * 10 ** decimals;
 
   // Minting tokens for Alice
-  console.log(
-    await locklift.tracing.trace(
-      await tokenRootContract.methods
-        .mint({
-          amount: mintAmount,
-          recipient: multiWalletAddress, // the owner of the token wallet is the MW contract
-          deployWalletValue: deployWalletValue,
-          notify: true, // To update the Multi Wallet contract
-          payload: "",
-          remainingGasTo: everWallet.address,
-        })
-        .send({
-          from: everWallet.address,
-          amount: locklift.utils.toNano(5),
-        }),
-    ),
-  );
+
+  await tokenRootContract.methods
+    .mint({
+      amount: mintAmount,
+      recipient: multiWalletAddress, // the owner of the token wallet is the MW contract
+      deployWalletValue: deployWalletValue,
+      notify: true, // To update the Multi Wallet contract
+      payload: "",
+      remainingGasTo: everWallet.address,
+    })
+    .send({
+      from: everWallet.address,
+      amount: locklift.utils.toNano(5),
+    })
 
   // confirming that its received
   console.log(

@@ -2,13 +2,13 @@
 
 # Transfer TIP-3 Tokens
 
-Now that we have minted some TIP-3 tokens, why not transfer them ?
-As explained [here](../External/Transfer.md), the transfer concept in the TIP-3 standard has two implementation which we will cover both of them.
-Its noticeable that both of this methods are implemented inside of the MultiWalletTIP-3 contract as well, so we will get our hands dirty with those.
+Now that we have minted TIP-3 tokens, it's time to transfer them. As explained in the [Transfer Using an Account](../External/Transfer.md) section, the TIP-3 standard has two implementations for the transfer concept, both of which we will cover. It's worth noting that both of these methods are implemented within the MultiWalletTIP-3 contract, so we will be exploring them in detail.
+
+## Step 1: Write Transfer Script
 
 <span  :class="LLdis"  >
 
-In the code sample below, we will demonstrate how to utilize the transfer functions of the TIP-3 standard using locklift and MultiWalletTIP3 contract:
+In the code sample below, we will demonstrate how to utilize both if the transfer functions of the TIP-3 standard using `locklift` tool and MultiWalletTIP3 contract:
 
 ::: info
 Before we start to write our scripts we need to make sure that there is a file named `04-transfer-tip3.ts` in the `script` folder in the project root.
@@ -18,12 +18,13 @@ Before we start to write our scripts we need to make sure that there is a file n
 
 <span :class="EIPdis"  >
 
-Transferring tokens using everscale-inpage-provider MultiWalletTIP3 contract:
+Transferring tokens using `everscale-inpage-provider` MultiWalletTIP3 contract:
 
-:::danger
+::: warning
 
-- Notice that if the `Notify` parameter be true for the transaction, the change will be sent back to the sender accounts `tokenWallet` contract !!\
-  So if you want the change back into your `account contract` leave the Notify `unchecked` !!
+- Notice that if the `notify` parameter be true for the transaction, the change will be sent back to the sender accounts `tokenWallet` contract !!
+
+So if you want the change back into your `account contract` leave the notify `unchecked` !!
 
 :::
 
@@ -43,14 +44,13 @@ Transferring tokens using everscale-inpage-provider MultiWalletTIP3 contract:
 
 <span  :class="LLdis">
 
-```typescript
+````typescript
 /**
  * locklift is a globally declared object
  */
 
 import { Address, Contract, Signer, zeroAddress } from "locklift";
-import { EverWalletAccount } from "everscale-standalone-client";
-import { FactorySource, factorySource } from "../build/factorySource";
+import { FactorySource } from "../build/factorySource";
 
 /**
  * We develope a method that retrieves the data of the token wallet from the relevant multi wallet contract
@@ -74,33 +74,27 @@ async function getWalletData(
 }
 
 async function main() {
-
   const tokenRootAddress: Address = new Address("<YOUR_TOKEN_ROOT_ADDRESS>");
-  const aliceMultiWalletAddress: Address = new Address("<YOUR_MULTI_WALLET_ADDRESS>");
-  const bobMultiWalletAddress: Address = new Address("<YOUR_MULTI_WALLET_ADDRESS>");
+  const aliceMultiWalletAddress: Address = new Address("<SENDER_MULTI_WALLET_ADDRESS>");
+  const bobMultiWalletAddress: Address = new Address("<RECEIVER_MULTI_WALLET_ADDRESS>");
 
   const signerAlice: Signer = (await locklift.keystore.getSigner("0"))!;
-  const signerBob: Signer = (await locklift.keystore.getSigner("1"))!;
-
-  /**
-   * Making an instance of the wallet account using the signer public key and everscale-standalone-client tool
-  */
-  const aliceEverWallet: EverWalletAccount = await EverWalletAccount.fromPubkey({ publicKey: signerBob.publicKey!, workchain: 0 });
 
   // Creating the target contracts instances
-  const tokenRootContract: Contract<FactorySource['TokenRoot']> = await locklift.factory.getDeployedContract(
+  const tokenRootContract: Contract<FactorySource["TokenRoot"]> = await locklift.factory.getDeployedContract(
     "TokenRoot",
-    tokenRootAddress
-  )
+    tokenRootAddress,
+  );
 
-  const aliceMultiWalletContract: Contract<FactorySource['MultiWalletTIP3']> = await locklift.factory.getDeployedContract(
+  const aliceMultiWalletContract: Contract<FactorySource["MultiWalletTIP3"]> = locklift.factory.getDeployedContract(
     "MultiWalletTIP3",
-    aliceMultiWalletAddress
-  )
-  const bobMultiWalletContract: Contract<FactorySource['MultiWalletTIP3']> = await locklift.factory.getDeployedContract(
+    aliceMultiWalletAddress,
+  );
+
+  const bobMultiWalletContract: Contract<FactorySource["MultiWalletTIP3"]> = await locklift.factory.getDeployedContract(
     "MultiWalletTIP3",
-    bobMultiWalletAddress
-  )
+    bobMultiWalletAddress,
+  );
 
   // Fetching the decimals and symbol
   const [decimals, symbol] = await Promise.all([
@@ -109,49 +103,76 @@ async function main() {
   ]);
 
   // We assume the bob doesn't have a deployed wallet at the first
-  console.log(`Alice has token wallet ? ${(await getWalletData(aliceMultiWalletContract, tokenRootAddress)).tokenWallet.toString() == zeroAddress.toString()} \n
-   Alice balance before transfer: ${(await getWalletData(aliceMultiWalletContract, tokenRootAddress)).balance / 10 ** decimals}`) // >> true, 200
+  console.log(`Alice has token wallet ? ${
+    (await getWalletData(aliceMultiWalletContract, tokenRootAddress)).tokenWallet.toString() == zeroAddress.toString()
+  } \n
+   Alice balance before transfer: ${
+     (await getWalletData(aliceMultiWalletContract, tokenRootAddress)).balance / 10 ** decimals
+   }`); // >> true, 200
 
-  console.log(`Bob has token wallet ? ${(await getWalletData(bobMultiWalletContract, tokenRootAddress)).tokenWallet.toString() == zeroAddress.toString()} \n
-  Bob balance before transfer: ${(await getWalletData(bobMultiWalletContract, tokenRootAddress)).balance / 10 ** decimals}`) // false, 0
+  console.log(`Bob has token wallet ? ${
+    (await getWalletData(bobMultiWalletContract, tokenRootAddress)).tokenWallet.toString() == zeroAddress.toString()
+  } \n
+  Bob balance before transfer: ${
+    (await getWalletData(bobMultiWalletContract, tokenRootAddress)).balance / 10 ** decimals
+  }`); // false, 0
 
   // Amount to transfer
-  const transferAmount : number = 100 * 10 ** decimals
+  const transferAmount: number = 100 * 10 ** decimals;
 
   /*
     Transfer with the deployment of a wallet for the recipient account.
 
     Don't pay attention to notify and payload yet, we'll get back to them.
   */
-  await aliceMultiWalletContract.methods.transfer({
+  await aliceMultiWalletContract.methods
+    .transfer({
       _amount: transferAmount,
       _recipient: bobMultiWalletAddress,
       _deployWalletValue: locklift.utils.toNano(2), // We assume bob doesn't have any token wallet
       _tokenRoot: tokenRootAddress,
-      }).sendExternal({
-        publicKey : signerAlice.publicKey!,
-      })
+    })
+    .sendExternal({
+      publicKey: signerAlice.publicKey!,
+    });
 
   // Fetching the balances after the normal transfer function
-  console.log(`Alice balance after transfer: ${(await getWalletData(aliceMultiWalletContract, tokenRootAddress)).balance / 10 ** decimals}`) // >> 100
-  console.log(`Bob balance after transfer: ${(await getWalletData(bobMultiWalletContract, tokenRootAddress)).balance / 10 ** decimals}`) // >> 100
+  console.log(
+    `Alice balance after transfer: ${
+      (await getWalletData(aliceMultiWalletContract, tokenRootAddress)).balance / 10 ** decimals
+    }`,
+  ); // >> 100
+  console.log(
+    `Bob balance after transfer: ${
+      (await getWalletData(bobMultiWalletContract, tokenRootAddress)).balance / 10 ** decimals
+    }`,
+  ); // >> 100
 
   /*
      Transfer to deployed token wallet using transferToWallet
   */
   const transferToWalletAmount: number = 50 * 10 ** decimals;
 
-  await aliceMultiWalletContract.methods.transferToWallet({
+  await aliceMultiWalletContract.methods
+    .transferToWallet({
       _amount: transferToWalletAmount,
       _recipientTokenWallet: (await getWalletData(bobMultiWalletContract, tokenRootAddress)).tokenWallet,
-      _tokenRoot: tokenRootAddress
-      }).sendExternal({
-        publicKey : signerAlice.publicKey!,
-      })
+      _tokenRoot: tokenRootAddress,
+    })
+    .sendExternal({
+      publicKey: signerAlice.publicKey!,
+    });
 
-  console.log(`Alice balance after transfer to wallet: ${(await getWalletData(aliceMultiWalletContract, tokenRootAddress)).balance / 10 ** decimals}`) // >> 50
-  console.log(`Bob balance after transfer to wallet: ${(await getWalletData(bobMultiWalletContract, tokenRootAddress)).balance / 10 ** decimals}`) // >> 150
-
+  console.log(
+    `Alice balance after transfer to wallet: ${
+      (await getWalletData(aliceMultiWalletContract, tokenRootAddress)).balance / 10 ** decimals
+    }`,
+  ); // >> 50
+  console.log(
+    `Bob balance after transfer to wallet: ${
+      (await getWalletData(bobMultiWalletContract, tokenRootAddress)).balance / 10 ** decimals
+    }`,
+  ); // >> 150
 }
 
 main()
@@ -161,46 +182,42 @@ main()
     process.exit(1);
   });
 
-```
+````
 
 </span>
 
 <span  :class="EIPdis">
 
-**using `transfer` function:**
-
 ````typescript
 import {
-  ProviderRpcClient as PRC,
+  ProviderRpcClient,
   Address,
   Contract,
   Transaction,
+  FullContractState,
 } from 'everscale-inpage-provider';
 import * as tip3Artifacts from 'tip3-docs-artifacts';
-const zeroAddress: Address = new Address(
-  '0:0000000000000000000000000000000000000000000000000000000000000000'
-);
+import { provider, providerAddress } from './useProvider';
 
 /**
-  * We develop two more methods in order to reduce the mass of the script
-*/
+ * We develop two more methods in order to reduce the mass of the script
+ */
 async function extractPubkey(
   provider: ProviderRpcClient,
-  senderAddress: Address
+  providerAddress: Address
 ): Promise<string> {
   // Fetching the user public key
   const accountFullState: FullContractState = (
-    await provider.getFullContractState({ address: senderAddress })
+    await provider.getFullContractState({ address: providerAddress })
   ).state!;
 
   const senderPublicKey: string = await provider.extractPublicKey(accountFullState.boc);
 
   return senderPublicKey;
 }
-interface walletData = {
-
-    tokenWallet: Address,
-    balance: number
+interface walletData {
+  tokenWallet: Address;
+  balance: number;
 }
 export async function getWalletData(
   MWContract: Contract<tip3Artifacts.FactorySource['MultiWalletTIP3']>,
@@ -212,7 +229,7 @@ export async function getWalletData(
     }
   });
   let balance: number = 0;
-  let tokenWallet: Address = zeroAddress;
+  let tokenWallet: Address = tip3Artifacts.zeroAddress;
   if (walletData.length != 0) {
     balance = Number(walletData[0]!.balance);
     tokenWallet = walletData[0]!.tokenWallet;
@@ -220,38 +237,27 @@ export async function getWalletData(
   return { tokenWallet: tokenWallet, balance: balance };
 }
 
-async function main(){
-
-  // Initiate the TVM provider
+async function main() {
   try {
-
-  const tokenRootAddress: Address = "<YOUR_TOKEN_ROOT_ADDRESS>";
-  const receiverMWAddress: Address = "<RECEIVER_MULTI_WALLET_ADDRESS>";
-  const senderMWAddress: Address = "<SENDER_MULTI_WALLET_ADDRESS>";
+    const tokenRootAddress: Address = new Address('<YOUR_TOKEN_ROOT_ADDRESS>');
+    const receiverMWAddress: Address = new Address('<RECEIVER_MULTI_WALLET_ADDRESS>');
+    const senderMWAddress: Address = new Address('<SENDER_MULTI_WALLET_ADDRESS>');
 
     // creating an instance of the target contracts
-    const tokenRootContract: Contract<tip3Artifacts.FactorySource["TokenRoot"]> = new provider.Contract(
-      tip3Artifacts.factorySource['TokenRoot'],
-      new Address(tokenRootAddress)
-    );
+    const tokenRootContract: Contract<tip3Artifacts.FactorySource['TokenRoot']> =
+      new provider.Contract(tip3Artifacts.factorySource['TokenRoot'], tokenRootAddress);
 
     const senderMWContract: Contract<tip3Artifacts.FactorySource['MultiWalletTIP3']> =
-      new provider.Contract(
-        tip3Artifacts.factorySource['MultiWalletTIP3'],
-        new Address(senderMWAddress)
-      );
+      new provider.Contract(tip3Artifacts.factorySource['MultiWalletTIP3'], senderMWAddress);
 
     const receiverMWContract: Contract<tip3Artifacts.FactorySource['MultiWalletTIP3']> =
-      new provider.Contract(
-        tip3Artifacts.factorySource['MultiWalletTIP3'],
-        new Address(receiverMWAddress)
-      );
+      new provider.Contract(tip3Artifacts.factorySource['MultiWalletTIP3'], receiverMWAddress);
     const [decimals, symbol] = await Promise.all([
       Number((await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0),
       (await tokenRootContract.methods.symbol({ answerId: 0 }).call()).value0,
     ]);
 
-    const tokenAmount: number  = 10 * 10 ** decimals;
+    const tokenAmount: number = 10 * 10 ** decimals;
 
     // checking if the sender has enough tokens to send
     if (
@@ -262,28 +268,30 @@ async function main(){
 
       return 'Failed';
     }
-    const senderPubkey: string = await extractPubkey(provider, senderAddress);
+    const senderPubkey: string = await extractPubkey(provider, providerAddress);
     if (senderPubkey != (await senderMWContract.methods.owner({}).call()).owner) {
       console.log('You are not the owner of the sender multi wallet contract !');
 
       return 'Failed';
     }
     // Checking recipient has a deploy wallet of that token root
-    const oldBal: number = (await getWalletData(
+    let recipientOldWalletData: walletData = await getWalletData(
       receiverMWContract,
       tokenRootContract.address
-    )).balance;
+    );
 
-    let deployWalletValue: string = '0';
+    let oldBal: number = recipientOldWalletData.balance;
 
-    if (recipientOldWalletData.tokenWallet.toString() == zeroAddress) {
+    let deployWalletValue: number = 0;
+
+    if (recipientOldWalletData.tokenWallet.toString() == tip3Artifacts.zeroAddress.toString()) {
       deployWalletValue = 2 * 10 ** 9;
     }
 
     // Transferring token
     const { transaction: transferRes } = await senderMWContract.methods
       .transfer({
-        _amount: tokenAmount * 10 ** decimals,
+        _amount: tokenAmount,
         _recipient: receiverMWContract.address,
         _deployWalletValue: deployWalletValue,
         _tokenRoot: tokenRootContract.address,
@@ -291,84 +299,61 @@ async function main(){
       .sendExternal({ publicKey: senderPubkey });
 
     if (transferRes.aborted) {
-      console.log(`Transaction aborted !: ${transferRes.exitCode}`);
-
-      return `Failed ${transferRes.exitCode}`;
+      console.log(`Transaction aborted !: ${(transferRes.exitCode, transferRes.resultCode)}`);
     } else {
-      const newBal: number = (await getWalletData(receiverMWContract, tokenRootContract.address)).balance;
+      const newBal: number = (await getWalletData(receiverMWContract, tokenRootContract.address))
+        .balance;
       // Checking if the tokens are received successfully
       if (newBal > oldBal) {
-        console.log(`${tokenAmount} ${symbol}'s transferred successfully`);
+        console.log(`${tokenAmount / 10 ** decimals} ${symbol}'s transferred successfully`);
 
         return `tx Hash: ${transferRes.id.hash}`;
       } else {
-        console.log('Transferring tokens failed');
-
-        return `tx Hash: ${(transferRes.exitCode, transferRes.exitCode)}`;
+        console.error(
+          `Transferring tokens failed, tx Hash: ${(transferRes.exitCode, transferRes.exitCode)}`
+        );
       }
     }
-  } catch (e: any) {
-    console.log(e.message);
 
-    return 'Failed';
-  }
-}
+    /*
+      Using transferToWallet function
+    */
 
-````
+    oldBal = recipientOldWalletData.balance;
 
-**using `transferToWallet` function:**
-
-
-```` typescript
-
-/**
- * We use the previous code block states
- */
-
-async function main() {
-  try {
-    // Checking recipient has a deploy wallet of that token root
-    const recipientOldWalletData: walletData = await getWalletData(
-      receiverMWContract,
-      tokenRootContract.address
-    );
-
-    const oldBal: number = recipientOldWalletData.balance;
-
-    // Transferring token
-    const { transaction: transferRes } = await senderMWContract.methods
+    // Transferring token using the receiver token wallet address
+    const { transaction: transferToWalletRes } = await senderMWContract.methods
       .transferToWallet({
-        _amount: tokenAmount * 10 ** decimals,
+        _amount: tokenAmount,
         _recipientTokenWallet: recipientOldWalletData.tokenWallet,
         _tokenRoot: tokenRootContract.address,
       })
       .sendExternal({ publicKey: senderPubkey });
 
-    if (transferRes.aborted) {
-      console.log(`Transaction aborted !: ${transferRes.exitCode}`);
-
-      return `Failed ${transferRes.exitCode}`;
+    if (transferToWalletRes.aborted) {
+      throw new Error(
+        `Transaction aborted !: ${(transferToWalletRes.exitCode, transferToWalletRes.resultCode)}`
+      );
     } else {
       const newBal = (await getWalletData(receiverMWContract, tokenRootContract.address)).balance;
 
       // Checking if the tokens are received successfully
       if (newBal > oldBal) {
-        console.log(`${tokenAmount} ${symbol}'s transferred successfully`);
+        console.log(`${tokenAmount / 10 ** decimals} ${symbol}'s transferred successfully`);
 
-        return `tx Hash: ${transferRes.id.hash}`;
+        return `tx Hash: ${transferToWalletRes.id.hash}`;
       } else {
-        console.log('Transferring tokens failed');
-
-        return `tx Hash: ${(transferRes.exitCode, transferRes.exitCode)}`;
+        throw new Error(
+          `Transferring tokens failed , tx Hash: ${
+            (transferToWalletRes.exitCode, transferToWalletRes.exitCode)
+          }`
+        );
       }
     }
   } catch (e: any) {
-    console.log(e.message);
-
-    return 'Failed';
+    throw new Error(`Failed ${e.message}`);
   }
 }
-
 
 ````
 
@@ -378,6 +363,8 @@ async function main() {
 
 
 <div class="action">
+
+## Step 2: Transfer Tokens
 <div :class="llAction">
 
 Use this command to transfer TIP-3 tokens:
@@ -396,7 +383,7 @@ Congratulations, you have successfully transferred TIP-3 tokens from one to anot
 
 <div :class="transfer">
 
-## Transfer TIP-3 tokens
+### Transfer TIP-3 tokens
 
 <p class=actionInName style="margin-bottom: 0;">Token Root address</p>
 <input ref="actionTokenRootAddress" class="action Ain" type="text"/>
@@ -417,7 +404,7 @@ Congratulations, you have successfully transferred TIP-3 tokens from one to anot
 
 <div :class="transferToWallet">
 
-## Transfer TIP-3 tokens to Token Wallet
+### Transfer TIP-3 tokens to Token Wallet
 
 <p class=actionInName style="margin-bottom: 0;">Token Root address</p>
 <input ref="actionWalletTokenRootAddress" class="action Ain" type="text"/>
