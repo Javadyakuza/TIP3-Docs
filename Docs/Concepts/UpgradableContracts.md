@@ -2,36 +2,33 @@
 
 ## What are the Upgradable Contracts ?
 
-On EVM, to implement upgradeability for a given A1 you need to deploy at least one additional A2 for your A1. Each upgrade will require at least 1 new Account to be deployed. This approach is well-adopted and known as Upgradeable Proxy Pattern.
+In the EVM (Ethereum Virtual Machine), to enable upgradeability for a specific A1, you must deploy at least one additional A2 for that A1. Each upgrade will necessitate the deployment of a new account. This widely accepted approach is known as the _Upgradeable Proxy Pattern_.
 
-On TVM, there is `SETCODE` instruction, which allows Account to upgrade itself with any code, that it can take from inbound Message, or its own storage. Accounts' address remains unchanged, and the Upgrade requires no extra deployments.
+In the TVM (TON Virtual Machine), there is an instruction called  `SETCODE`  that allows an account to upgrade itself using a code obtained from an inbound message or its own storage. The account's address remains unchanged, and the upgrade does not require any additional deployments.
 
 ::: tip
-You can also refer to the TVM API documentation for better understanding of this instruction.
-
+For a better understanding of this instruction, you can also refer to the TVM API documentation at the following link:
 https://github.com/tonlabs/TON-Solidity-Compiler/blob/master/API.md#tvmsetcode
-
 :::
 
 ## TIP-3 Upgradable Contracts
 
-in case of the TIP-3 standard,there is three contracts related to the upgradeable contracts:
+In the case of the TIP-3 standard, there are three main contracts related to upgradeable contracts:
 
 - [TokenRootUpgradable](https://github.com/broxus/tip3/blob/master/contracts/TokenRootUpgradeable.tsol)
 - [TokenWalletUpgradable](https://github.com/broxus/tip3/blob/master/contracts/TokenWalletUpgradeable.tsol)
 - [TokenWalletPlatform](https://github.com/broxus/tip3/blob/master/contracts/TokenWalletPlatform.tsol)
 
-We will walk through how these smart contracts work and what they are. But before that, let's take a look at the  `Platform` implementation  mentioned earlier.
+We will now explain how these smart contracts function and their purpose. However, before diving into that, let's first examine the implementation of the  `Platform`  mentioned earlier.
 
 ## Token Wallet Platform
 
-in simple words, the Platform base implementation (which is presented as the `TokenWalletPlatform` contract in the TIP-3 standard) initiates the `TokenWalletUpgradeable` contract for us.
+In simpler terms, the base implementation of the Platform (represented by the  `TokenWalletPlatform`  contract in the TIP-3 standard) initializes the  `TokenWalletUpgradeable` contract.
 
-#### Step by Step workflow
+#### workflow
 
-In the following lines we will explain how the `TokenWalletUpgradeable` is initiated by the `TokenWalletPlatform` contract.
-
-First lets take a look at the Platform base implementation:
+In the following section, we will provide an explanation of how the  `TokenWalletUpgradeable`  contract is initiated by the  `TokenWalletPlatform`  contract.
+Let's begin by examining the base implementation of the Platform:
 
 <details>
 <summary> show code</summary>
@@ -58,8 +55,8 @@ contract TokenWalletPlatform {
 
     /**
      * @dev Contstructor for TokenWalletPlatform.
-     * @param walletCode Code of the upgradable token wallet.
-     * @param walletVersion Version of the upgradable token wallet.
+     * @param walletCode Code of the upgradeable token wallet.
+     * @param walletVersion Version of the upgradeable token wallet.
      * @param sender Address of the sender.
      * @param remainingGasTo Address to send remaining gas to.
      *
@@ -67,7 +64,7 @@ contract TokenWalletPlatform {
      *   - Caller must be root or sender must be a wallet.
      *
      * Postcondition:
-     *  - Deployed upgradable token wallet or remaining gas is sent
+     *  - Deployed upgradeable token wallet or remaining gas is sent
      *    to remainingGasTo.
      */
     constructor(TvmCell walletCode, uint32 walletVersion, address sender, address remainingGasTo)
@@ -116,7 +113,7 @@ contract TokenWalletPlatform {
     }
 
     /**
-     * @dev Initialize the upgradable token wallet.
+     * @dev Initialize the upgradeable token wallet.
      *
      * The initialize function uses the `TvmBuilder` object to building `TvmCell`
      * to store the `root`, `owner`, and `remainingGasTo` addresses, as well
@@ -128,8 +125,8 @@ contract TokenWalletPlatform {
      * code for the wallet contract. It also triggers the {onCodeUpgrade} function,
      * which can be overridden by derived contracts to handle code upgrades.
      *
-     * @param walletCode Code of the upgradable token wallet.
-     * @param walletVersion Version of the upgradable token wallet.
+     * @param walletCode Code of the upgradeable token wallet.
+     * @param walletVersion Version of the upgradeable token wallet.
      * @param remainingGasTo Address to send remaining gas to.
      *
      */
@@ -157,14 +154,18 @@ contract TokenWalletPlatform {
 ````
 </details>
 
-As you saw the platform contract will get the `code`, `walletVersion`, static variables values (`params`) and the remainingGasTo in its constructor and then calls   the initialize function which changes the code of the deployed platform contract into the `TokenWalletUpgradeable` contract code.
+As you have observed, the platform contract accepts the  `code` ,  `walletVersion` , static variable values ( `params` ) and the remainingGasTo as inputs in its constructor. It then calls the initialize function, which changes the code of the deployed platform contract to the  `TokenWalletUpgradeable`  contract code.
 
-After the `TokenWalletUpgradeable` contract has been initiated, its available to be interacted as a common token wallet contract but with few
-more features related to the upgradeability as explained below.
+Once the  `TokenWalletUpgradeable`  contract has been initialized, it becomes available for interaction as a standard token wallet contract. However, it also offers additional features related to upgradeability, which are explained below.
+
+::: tip
+Pleas Note that the `TokenWalletPlatform` contract is only deployable via the the `TokenRootUpgradable` or `TokenWalletUpgradeable` contract.
+Contrary, the normal token wallet can be deployed by contracts except than the `TokenRoot` or `TokenWallet` contracts.
+:::
 
 ## Token Wallet Upgradable
 
-before any explanations lets take a look at the `TokenWalletUpgradeable` code:
+before any further explanations lets take a look at the `TokenWalletUpgradeable` code:
 
 <details>
 <summary> show code</summary>
@@ -392,44 +393,49 @@ contract TokenWalletUpgradeable is
 
 </details>
 
-Now lets discuss its additional functions and vars which are as follows:
+Now, let's delve into the additional functions and variables of the  `TokenWalletUpgradeable`  contract, which are as follows:
 
-- upgrade
-- acceptUpgrade
-- onCodeUpgrade
-- platformCode
-- version
+-  `upgrade`
+-  `acceptUpgrade`
+-  `onCodeUpgrade`
+-  `platformCode`
+-  `version`
 
-#### upgrade and acceptUpgrade
+---
 
-This function will send a request on upgrading to the token root contract and then when the root contract confirmed it and updated its state relevant to that data the `acceptUpgrade` will be called.
+####  upgrade  and  acceptUpgrade
+The  `upgrade`  function calls the `requestUpgradeWallet` on the token root contract. Once the root contract confirms that the `msg.sender` is the valid sender, the  `acceptUpgrade`  function is called on `TokenWalletUpgradable` contract accordingly.
 
-`acceptUpgrade` contract then sets the new code of the contract using the same approach used in the `TokenWalletUPlatform` and calls the `onCodeUpgrade` function.
+The  `acceptUpgrade`  function then sets the new code of the contract using the same approach as the  `TokenWalletPlatform`  and invokes the  `onCodeUpgrade`  function.
 
-#### onCodeUpgrade
+---
 
-At this stage the contract code has been updated and its time to update the variable which this function will take care of that.
+####  onCodeUpgrade
+At this stage, the contract code has been updated and it is time to update the state of the contract. The  `onCodeUpgrade`  function takes care of this task.
 
-Inside of the onCodeUpgrade function the old storage and state of the contract will be terminated using `tvm.resetStorage` to set the value of the old variables into their default value.
-after that the passed input which is a converted encoded builder cell will be converted to a `TVMSlice` type variable using `TVMCell.toSlice` method and its stored encoded data will be decoded using the `TVMSlice.decode` method and the decoded data will be stored in in the variables with their related data types.
+Within the  `onCodeUpgrade`  function, the old storage and state of the contract are terminated using  `tvm.resetStorage`  to set the value of the old variables to their default values.
 
-the reason to do that is in case is a new state variable is added to the contract code, it must be initialized with an arbitrary value.
-Notice that this arbitrary value is decoded in the passed as the input to the onCodeUpgrade function But in our case the `tokenWalletUpgradable` and `TokenWalletPlatform` are immutable contracts so we don't ever encounter that case.
+Next, the passed input, which is a converted encoded builder to a cell, is converted to a  `TVMSlice`  type variable using the  `TVMCell.toSlice`  method. The stored encoded data in the  `TVMSlice`  is then decoded using the  `TVMSlice.decode`  method, and the decoded data is stored in the variables with their respective data types.
+
+This process ensures that if a new state variable is added to the contract code, it will be initialized with an desired value. It is important to note that this desired value is decoded and passed as input to the  `onCodeUpgrade`  function. However, in the case of the  `tokenWalletUpgradable`  and  `TokenWalletPlatform`  contracts, which are immutable, this scenario is not encountered.
+
+---
+
+####  platformCode
+This variable stores the cell type that holds the code of the old  `TokenRootPlatform`  contract. The platform contract stores a cell, which is the contract code obtained using  `tvm.code`  right before setting the new code of the contract. Therefore, the stored code represents the platform contract code, not the token wallet upgradeable code.
+
+---
+
+####  version
+This variable represents the version of the current token wallet code.
+
+---
 
 
-#### platformCode
-
-A variable with the cell type that stores the code of the old `TokenRootPlatform` contract code.
-The platform contract stores a cell which is the contract contract code derived using `tvm.code` right before setting the new code of the contract, so the stored code will be the platform contract code and not the token wallet upgradable.
-
-#### version
-
-Version of the current token wallet code.
 
 ## Token Root Upgradable
 
-The `TokenRootUpgradable` has the same functionality in terms of the fungibility as the normal token root contract.
-It also implements the new features related to the upgradeability of the TokenWallet and itself(TokenRootUpgradable), we will talk about these these features but before that lets take a look at its contract code.
+The  `TokenRootUpgradable`  contract provides the same functionality as the standard token root contract in terms of fungibility. However, it also incorporates additional features related to the upgradeability of both the TokenWallet and itself ( `TokenRootUpgradable` ). We will delve into these features shortly, but first, let's examine its contract code.
 
 <details>
 <summary> show code</summary>
@@ -457,7 +463,7 @@ import "./TokenWalletPlatform.tsol";
 /**
  * @title Fungible token root upgradeable contract.
  *
- * @dev This is an implementation of upgradable token root that implements
+ * @dev This is an implementation of upgradeable token root that implements
  * all the required methods of the TIP-3 standard.
  */
 contract TokenRootUpgradeable is
@@ -730,41 +736,25 @@ contract TokenRootUpgradeable is
 
 </details>
 
+
 ::: tip
-
-Notice that separate than the additional features, a critical implementation has been changed as explained below
-
+Please note that in addition to the additional features, a critical implementation has been modified as described below:
 #### Deployable Token Wallet
-
-Unlike the normal TokenRoot, the upgradable one deploys the `TokenWalletPlatform` contract which we explained its workflow earlier.
+In contrast to the standard TokenRoot, the upgradeable version deploys the  `TokenWalletPlatform`  contract, which we previously explained its workflow.
 :::
 
-The most important features in terms of function and vars which are added to the `TokenRootUPgradeable` contract are:
+The  `TokenRootUpgradeable`  contract introduces several important features in terms of functions and variables, including:
 
-- requestUpgradeWallet
-- setWalletCode
-- upgrade
-- walletVersion
-- platformCode
-
-#### requestUpgradeWallet
-
-Will be called by the initiated TokenWalletUpgradable contract and request to change its code.
-
-#### setWalletCode
-Will update the state of the TokenRootUpgradable contract to latest TokenWalletUpgradable code.
-
-#### upgrade
-Will update the TokenRootUpgradable contract code and the flow is same as before.
-
-#### walletVersion
-Version of the current token wallet code.
-
-#### platformCode
-The `TokenWalletPlatform` contract code.
+-  `requestUpgradeWallet` : This function is called by the initiated TokenWalletUpgradeable contract to request a code change.
+-  `setWalletCode` : This function updates the state of the TokenRootUpgradeable contract to the latest TokenWalletUpgradeable code.
+-  `upgrade` : This function updates the code of the TokenRootUpgradeable contract, following the same flow as before.
+-  `walletVersion` : Represents the version of the current token wallet code.
+-  `platformCode` : Refers to the contract code of the  `TokenWalletPlatform` .
 
 
-## Deploy
+::: tip
+Please refer to the [Deploy Upgradable Contracts](../../Deployments/upgradeableContracts.md) section for detailed instructions on the deployment process of the previously mentioned contracts and how to interact with them.
+:::
 
 <style>
 
