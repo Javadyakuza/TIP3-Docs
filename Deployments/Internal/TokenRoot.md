@@ -62,7 +62,6 @@ The parameter `initialSupply` must be set to zero if the `initialSupplyTo` is **
  * locklift is a globally declared object
  */
 
-import { EverWalletAccount } from "everscale-standalone-client";
 import { Address, zeroAddress, Signer, Contract } from "locklift";
 import { FactorySource } from "../build/factorySource";
 
@@ -70,9 +69,19 @@ async function main() {
   // Setting up the signer and wallet
   const signer: Signer = (await locklift.keystore.getSigner("0"))!;
 
-  const everWallet: EverWalletAccount = await EverWalletAccount.fromPubkey({
-    publicKey: signer.publicKey!,
-    workchain: 0,
+  // uncomment if deploying a new account
+  // const { contract: Account } = await locklift.factory.deployContract({
+  //   contract: "Account",
+  //   publicKey: signer.publicKey,
+  //   constructorParams: {},
+  //   initParams: { _randomNonce: locklift.utils.getRandomNonce() },
+  //   value: locklift.utils.toNano(20),
+  // });
+
+  // Adding an existing account from the key pair defined in  the locklift.config.ts
+  const account = await locklift.factory.accounts.addExistingAccount({
+    type: WalletTypes.WalletV3,
+    publicKey: signer.publicKey,
   });
 
   const rootDeployerAddress: Address = new Address("<YOUR_ROOT_DEPLOYER_ADDRESS>");
@@ -106,11 +115,11 @@ async function main() {
     deployWalletValue: 0,
     symbol: "TOT",
     mintDisabled: false,
-    rootOwner: everWallet.address,
+    rootOwner: account.address,
     randomNonce: locklift.utils.getRandomNonce(),
     burnByRootDisabled: false,
     burnPaused: false,
-    remainingGasTo: everWallet.address,
+    remainingGasTo: account.address,
   };
 
   await rootDeployerContract.methods.deployTokenRoot(deployRootFromDeployerParams).sendExternal({

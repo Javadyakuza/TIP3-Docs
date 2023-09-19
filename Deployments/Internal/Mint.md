@@ -55,7 +55,6 @@ Minting TIP-3 tokens using everscale-inpage-provider is pretty easy as well:
  * locklift is a globally declared object
  */
 
-import { Account, EverWalletAccount } from "everscale-standalone-client";
 import { FactorySource } from "../build/factorySource";
 import { Address, Contract, zeroAddress, Signer, WalletTypes } from "locklift";
 
@@ -82,11 +81,20 @@ async function main() {
   // Setting up the signer and the wallet
   const signer: Signer = (await locklift.keystore.getSigner("0"))!;
 
-  const everWallet: EverWalletAccount = await EverWalletAccount.fromPubkey({
+  // uncomment if deploying a new account
+  // const { contract: Account } = await locklift.factory.deployContract({
+  //   contract: "Account",
+  //   publicKey: signer.publicKey,
+  //   constructorParams: {},
+  //   initParams: { _randomNonce: locklift.utils.getRandomNonce() },
+  //   value: locklift.utils.toNano(20),
+  // });
+
+  // Adding an existing account from the key pair defined in  the locklift.config.ts
+  const account = await locklift.factory.accounts.addExistingAccount({
+    type: WalletTypes.WalletV3,
     publicKey: signer.publicKey,
-    nonce: 123,
-    workchain: 0,
-  }); // deploy or use the Root Deployer, Multi Wallet and the Token Root contracts from previous sections
+  });
 
   const tokenRootAddress: Address = new Address("0:fbc4a3db3df3d3b03f1752ab05d6ba3155865f906af4b5653b324d1a2519b03d");
   const multiWalletAddress: Address = new Address("0:154a511d61b2a0ac92841e4e8c319ab5390d665db650533c512f0661277df045");
@@ -128,10 +136,10 @@ async function main() {
       deployWalletValue: deployWalletValue,
       notify: true, // To update the Multi Wallet contract
       payload: "",
-      remainingGasTo: everWallet.address,
+      remainingGasTo: account.address,
     })
     .send({
-      from: everWallet.address,
+      from: account.address,
       amount: locklift.utils.toNano(5),
     })
 

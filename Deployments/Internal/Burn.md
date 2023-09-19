@@ -42,7 +42,6 @@ The code sample below follows the same approach but makes the transactions using
  * locklift is a globally declared object
  */
 
-import { EverWalletAccount } from "everscale-standalone-client";
 import { Contract, Signer, zeroAddress, Address } from "locklift";
 import { FactorySource } from "../build/factorySource";
 
@@ -82,9 +81,19 @@ async function main() {
   // Setting up the signer and the wallet
   const signer: Signer = (await locklift.keystore.getSigner("0"))!;
 
-  const everWallet: EverWalletAccount = await EverWalletAccount.fromPubkey({
-    publicKey: signer.publicKey!,
-    workchain: 0,
+  // uncomment if deploying a new account
+  // const { contract: Account } = await locklift.factory.deployContract({
+  //   contract: "Account",
+  //   publicKey: signer.publicKey,
+  //   constructorParams: {},
+  //   initParams: { _randomNonce: locklift.utils.getRandomNonce() },
+  //   value: locklift.utils.toNano(20),
+  // });
+
+  // Adding an existing account from the key pair defined in  the locklift.config.ts
+  const account = await locklift.factory.accounts.addExistingAccount({
+    type: WalletTypes.WalletV3,
+    publicKey: signer.publicKey,
   });
 
   const [decimals, symbol] = await Promise.all([
@@ -122,12 +131,12 @@ async function main() {
   await tokenRootContract.methods
     .burnTokens({
       amount: burnByRootAmount,
-      remainingGasTo: everWallet.address,
+      remainingGasTo: account.address,
       walletOwner: multiWalletContract.address,
       callbackTo: multiWalletContract.address, // important to update the MW state
       payload: "",
     })
-    .send({ from: everWallet.address, amount: locklift.utils.toNano("2") });
+    .send({ from: account.address, amount: locklift.utils.toNano("2") });
 
   newBal = (await getWalletData(multiWalletContract, tokenRootContract.address)).balance;
 
