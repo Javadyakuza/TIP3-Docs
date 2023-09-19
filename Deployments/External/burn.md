@@ -64,7 +64,6 @@ Before we start to write our scripts we need to make sure that there is a file n
  * locklift is a globally declared object
  */
 
-import { EverWalletAccount } from "everscale-standalone-client";
 import { Address, WalletTypes, zeroAddress, Signer, Contract } from "locklift";
 import { FactorySource, factorySource } from "../build/factorySource";
 
@@ -72,24 +71,21 @@ async function main() {
   // Creating two signers and wallets
   const signer: Signer = (await locklift.keystore.getSigner("0"))!;
 
-  /**
-   * @dev creating and instance of the wallet using "fromPubkey" is only for already deployed wallet.
-   */
-  const everWallet: EverWalletAccount = await EverWalletAccount.fromPubkey({
-    publicKey: signer.publicKey!,
-    workchain: 0,
+  // uncomment if deploying a new account
+  // const { contract: Account } = await locklift.factory.deployContract({
+  //   contract: "Account",
+  //   publicKey: signer.publicKey,
+  //   constructorParams: {},
+  //   initParams: { _randomNonce: locklift.utils.getRandomNonce() },
+  //   value: locklift.utils.toNano(20),
+  // });
+
+  // Adding an existing account from the key pair defined in  the locklift.config.ts
+  const account = await locklift.factory.accounts.addExistingAccount({
+    type: WalletTypes.WalletV3,
+    publicKey: signer.publicKey,
   });
 
-  /**
-   * @dev uncomment the following lines and comment the upper lines if you don't have an already deployed wallet
-   */
-  // const everWallet = (
-  //   await locklift.factory.accounts.addNewAccount({
-  //     type: WalletTypes.EverWallet,
-  //     value: locklift.utils.toNano(100),
-  //     publicKey: signer.publicKey,
-  //   })
-  // ).account;
   // Preparing the params
   const tokenRootAddress: Address = new Address("<YOUR_TOKEN_ROOT_ADDRESS>");
   // Fetching the token root contract
@@ -114,7 +110,7 @@ async function main() {
       await tokenRootContract.methods
         .walletOf({
           answerId: 0,
-          walletOwner: everWallet.address,
+          walletOwner: account.address,
         })
         .call()
     ).value0,
@@ -138,12 +134,12 @@ async function main() {
   await tokenWalletContract.methods
     .burn({
       amount: burnAmount,
-      remainingGasTo: everWallet.address,
+      remainingGasTo: account.address,
       callbackTo: zeroAddress,
       payload: "",
     })
     .send({
-      from: everWallet.address,
+      from: account.address,
       amount: locklift.utils.toNano(3),
     });
 
@@ -166,13 +162,13 @@ async function main() {
   await tokenRootContract.methods
     .burnTokens({
       amount: burnByRootAmount,
-      walletOwner: everWallet.address,
-      remainingGasTo: everWallet.address,
+      walletOwner: account.address,
+      remainingGasTo: account.address,
       callbackTo: zeroAddress,
       payload: "",
     })
     .send({
-      from: everWallet.address,
+      from: account.address,
       amount: locklift.utils.toNano(3),
     });
   console.log(

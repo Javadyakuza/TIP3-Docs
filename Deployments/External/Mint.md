@@ -49,7 +49,6 @@ Please be aware that if the `notify` parameter is set to true for the transactio
  * locklift is a globally declared object
  */
 
-import { EverWalletAccount } from "everscale-standalone-client";
 import { Address, Contract, Signer } from "locklift";
 import { FactorySource } from "../build/factorySource";
 
@@ -58,14 +57,34 @@ async function main() {
   const aliceSigner: Signer = (await locklift.keystore.getSigner("0"))!;
   const bobSigner: Signer = (await locklift.keystore.getSigner("1"))!;
 
-  const aliceEverWallet: EverWalletAccount = await EverWalletAccount.fromPubkey({
-    publicKey: aliceSigner.publicKey!,
-    workchain: 0,
+  // uncomment if deploying a new account
+  // const { contract: aliceAccount } = await locklift.factory.deployContract({
+  //   contract: "Account",
+  //   publicKey: aliceSigner.publicKey,
+  //   constructorParams: {},
+  //   initParams: { _randomNonce: locklift.utils.getRandomNonce() },
+  //   value: locklift.utils.toNano(20),
+  // });
+
+  // Adding an existing account from the key pair defined in  the locklift.config.ts
+  const aliceAccount = await locklift.factory.accounts.addExistingAccount({
+    type: WalletTypes.WalletV3,
+    publicKey: aliceSigner.publicKey,
   });
 
-  const bobEverWallet: EverWalletAccount = await EverWalletAccount.fromPubkey({
-    publicKey: bobSigner.publicKey!,
-    workchain: 0,
+  // uncomment if deploying a new account
+  // const { contract: bobAccount } = await locklift.factory.deployContract({
+  //   contract: "Account",
+  //   publicKey: bobSigner.publicKey,
+  //   constructorParams: {},
+  //   initParams: { _randomNonce: locklift.utils.getRandomNonce() },
+  //   value: locklift.utils.toNano(20),
+  // });
+
+  // Adding an existing account from the key pair defined in  the locklift.config.ts
+  const bobAccount = await locklift.factory.accounts.addExistingAccount({
+    type: WalletTypes.WalletV3,
+    publicKey: bobSigner.publicKey,
   });
 
   // preparing the parameters
@@ -83,7 +102,7 @@ async function main() {
   if (
     !(
       await locklift.provider.getFullContractState({
-        address: (await tokenRootContract.methods.walletOf({ answerId: 0, walletOwner: bobEverWallet.address }).call())
+        address: (await tokenRootContract.methods.walletOf({ answerId: 0, walletOwner: bobAccount.address }).call())
           .value0,
       })
     ).state?.isDeployed
@@ -104,19 +123,19 @@ async function main() {
       amount: mintAmount * 10 ** decimals,
       deployWalletValue: deployWalletValue,
       notify: false,
-      recipient: bobEverWallet.address,
-      remainingGasTo: aliceEverWallet.address,
+      recipient: bobAccount.address,
+      remainingGasTo: aliceAccount.address,
       payload: "",
     })
     .send({
-      from: aliceEverWallet.address,
+      from: aliceAccount.address,
       amount: txFee,
     });
 
   // Fetching the bobs balance
   const bobTWCon: Contract<FactorySource["TokenWallet"]> = await locklift.factory.getDeployedContract(
     "TokenWallet",
-    (await tokenRootContract.methods.walletOf({ answerId: 0, walletOwner: bobEverWallet.address }).call()).value0,
+    (await tokenRootContract.methods.walletOf({ answerId: 0, walletOwner: bobAccount.address }).call()).value0,
   );
   const bobBal: number = Number((await bobTWCon.methods.balance({ answerId: 0 }).call()).value0);
   console.log(`bob's ${symbol} balance: ${bobBal / 10 ** decimals}`); // >> 10

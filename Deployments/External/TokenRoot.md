@@ -48,17 +48,25 @@ The parameter `initialSupply` must be set to **zero** if the `initialSupplyTo` i
 import { Address, zeroAddress, Signer } from "locklift";
 import { ContractData } from "locklift/internal/factory";
 import { FactorySource, factorySource } from "../build/factorySource";
-import { EverWalletAccount } from "everscale-standalone-client";
+
 
 async function main() {
   // Fetching the signer key pair from locklift.config.ts
   const signer: Signer = (await locklift.keystore.getSigner("0"))!;
-  /**
-   * Making an instance of the wallet account using the signer public key and everscale-standalone-client tool
-   */
-  const everWallet: EverWalletAccount = await EverWalletAccount.fromPubkey({
-    publicKey: signer.publicKey!,
-    workchain: 0,
+
+  // uncomment if deploying a new account
+  // const { contract: Account } = await locklift.factory.deployContract({
+  //   contract: "Account",
+  //   publicKey: signer.publicKey,
+  //   constructorParams: {},
+  //   initParams: { _randomNonce: locklift.utils.getRandomNonce() },
+  //   value: locklift.utils.toNano(20),
+  // });
+
+  // Adding an existing account from the key pair defined in  the locklift.config.ts
+  const account = await locklift.factory.accounts.addExistingAccount({
+    type: WalletTypes.WalletV3,
+    publicKey: signer.publicKey,
   });
 
   // Preparing test params
@@ -109,7 +117,7 @@ async function main() {
       mintDisabled: disableMint,
       burnByRootDisabled: disableBurnByRoot,
       burnPaused: pauseBurn,
-      remainingGasTo: everWallet.address,
+      remainingGasTo: account.address,
     },
     value: locklift.utils.toNano(5),
   });

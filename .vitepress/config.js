@@ -109,14 +109,14 @@ module.exports = {
         collapsable: false,
         items: [
           {
-            text: 'Deploy Upgradable Contracts',
-            collapsable: false,
-            link: '/Deployments/upgradeableContracts.md',
-          },
-          {
             text: 'Prerequisites',
             collapsable: false,
             link: '/Deployments/EIP.md',
+          },
+          {
+            text: 'Deploy Upgradable Contracts',
+            collapsable: false,
+            link: '/Deployments/upgradeableContracts.md',
           },
           {
             text: 'Using Account',

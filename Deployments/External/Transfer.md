@@ -62,7 +62,6 @@ Transferring TIP-3 tokens is considered one of the easier steps depended to prev
  */
 
 import { Address, Contract, Signer, WalletTypes } from "locklift";
-import { EverWalletAccount } from "everscale-standalone-client";
 import { FactorySource } from "../build/factorySource";
 
 async function main() {
@@ -71,38 +70,35 @@ async function main() {
   const signerAlice: Signer = (await locklift.keystore.getSigner("0"))!;
   const signerBob: Signer = (await locklift.keystore.getSigner("1"))!;
 
-  /**
-   * @dev creating and instance of the wallet using "fromPubkey" is only for already deployed wallet.
-   */
-  const aliceEverWallet: EverWalletAccount = await EverWalletAccount.fromPubkey({
-    publicKey: signerAlice.publicKey!,
-    workchain: 0,
+  // uncomment if deploying a new account
+  // const { contract: aliceAccount } = await locklift.factory.deployContract({
+  //   contract: "Account",
+  //   publicKey: aliceSigner.publicKey,
+  //   constructorParams: {},
+  //   initParams: { _randomNonce: locklift.utils.getRandomNonce() },
+  //   value: locklift.utils.toNano(20),
+  // });
+
+  // Adding an existing account from the key pair defined in  the locklift.config.ts
+  const aliceAccount = await locklift.factory.accounts.addExistingAccount({
+    type: WalletTypes.WalletV3,
+    publicKey: aliceSigner.publicKey,
   });
 
-  const bobEverWallet: EverWalletAccount = await EverWalletAccount.fromPubkey({
-    publicKey: signerBob.publicKey!,
-    workchain: 0,
+  // uncomment if deploying a new account
+  // const { contract: bobAccount } = await locklift.factory.deployContract({
+  //   contract: "Account",
+  //   publicKey: bobSigner.publicKey,
+  //   constructorParams: {},
+  //   initParams: { _randomNonce: locklift.utils.getRandomNonce() },
+  //   value: locklift.utils.toNano(20),
+  // });
+
+  // Adding an existing account from the key pair defined in  the locklift.config.ts
+  const bobAccount = await locklift.factory.accounts.addExistingAccount({
+    type: WalletTypes.WalletV3,
+    publicKey: bobSigner.publicKey,
   });
-
-  /**
-   * @dev uncomment the following lines and comment the upper lines if you don't have an already deployed wallet
-   */
-
-  // const aliceEverWallet = (
-  //   await locklift.factory.accounts.addNewAccount({
-  //     type: WalletTypes.EverWallet,
-  //     value: locklift.utils.toNano(100),
-  //     publicKey: aliceSigner.publicKey,
-  //   })
-  // ).account;
-
-  // const bobEverWallet = (
-  //   await locklift.factory.accounts.addNewAccount({
-  //     type: WalletTypes.EverWallet,
-  //     value: locklift.utils.toNano(100),
-  //     publicKey: bobSigner.publicKey,
-  //   })
-  // ).account;
 
   // Creating the target contracts instances
   const tokenRootContract: Contract<FactorySource["TokenRoot"]> = locklift.factory.getDeployedContract(
@@ -115,7 +111,7 @@ async function main() {
 
   const bobTokenWallet: Contract<FactorySource["TokenWallet"]> = locklift.factory.getDeployedContract(
     "TokenWallet",
-    (await tokenRootContract.methods.walletOf({ answerId: 0, walletOwner: bobEverWallet.address }).call({})).value0,
+    (await tokenRootContract.methods.walletOf({ answerId: 0, walletOwner: bobAccount.address }).call({})).value0,
   );
 
   console.log(
@@ -144,14 +140,14 @@ async function main() {
   await bobTokenWallet.methods
     .transfer({
       amount: transferAmount,
-      recipient: aliceEverWallet.address,
+      recipient: aliceAccount.address,
       deployWalletValue: locklift.utils.toNano(2), // assume alice doesn't have any token wallet
-      remainingGasTo: bobEverWallet.address,
+      remainingGasTo: bobAccount.address,
       notify: false,
       payload: "",
     })
     .send({
-      from: bobEverWallet.address,
+      from: bobAccount.address,
       amount: locklift.utils.toNano("5"),
     });
 
@@ -164,7 +160,7 @@ async function main() {
       await tokenRootContract.methods
         .walletOf({
           answerId: 0,
-          walletOwner: aliceEverWallet.address,
+          walletOwner: aliceAccount.address,
         })
         .call()
     ).value0,
@@ -205,12 +201,12 @@ async function main() {
     .transferToWallet({
       amount: transferAmount,
       recipientTokenWallet: aliceTokenWallet.address,
-      remainingGasTo: bobEverWallet.address,
+      remainingGasTo: bobAccount.address,
       notify: false,
       payload: "",
     })
     .send({
-      from: bobEverWallet.address,
+      from: bobAccount.address,
       amount: locklift.utils.toNano("3"),
     });
 

@@ -10,6 +10,19 @@ Each account, being a smart contract, has the capability to hold a balance, exec
 
 This flexibility of the smart contract code provides a broad range of authentication options, surpassing the traditional private key ownership.
 
+## Usage
+
+This documentation covers the usage of two tools for deploying and interacting with the contract on the TVm based network:
+
+-  `locklift`
+-  `everscale-inpage-provider`
+
+When using  `nodejs`  to interact with the blockchain,  `locklift`  is employed. On the other hand, when making transactions from a  `Dapp` ,  `everscale-inpage-provider`  is utilized.
+
+If you are using  `locklift` , the  `WalletV3`  is used to either add the Account contract to the Accounts storage or create an instance of it. However, if you are using  `everscale-inpage-provider` , the  `EverWallet`  is utilized.
+
+Please note that the  `EverWallet`  used contract, written in `func` language, is different from the Account contract which is written in `t-sol`.
+
 ---
 
 ::: tip

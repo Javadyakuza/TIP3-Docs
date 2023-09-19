@@ -46,19 +46,25 @@ Using the  `everscale-inpage-provider`  to deploy a token wallet is as easy as a
  */
 
 import { Address, Contract, Signer } from "locklift";
-import { EverWalletAccount } from "everscale-standalone-client";
 import { FactorySource } from "../build/factorySource";
 
 async function main() {
   // Fetching the account and signer
   const signer: Signer = (await locklift.keystore.getSigner("0"))!;
 
-  /**
-   * Making an instance of the wallet account using the signer public key and everscale-standalone-client tool
-   */
-  const everWallet: EverWalletAccount = await EverWalletAccount.fromPubkey({
-    publicKey: signer.publicKey!,
-    workchain: 0,
+  // uncomment if deploying a new account
+  // const { contract: Account } = await locklift.factory.deployContract({
+  //   contract: "Account",
+  //   publicKey: signer.publicKey,
+  //   constructorParams: {},
+  //   initParams: { _randomNonce: locklift.utils.getRandomNonce() },
+  //   value: locklift.utils.toNano(20),
+  // });
+
+  // Adding an existing account from the key pair defined in  the locklift.config.ts
+  const account = await locklift.factory.accounts.addExistingAccount({
+    type: WalletTypes.WalletV3,
+    publicKey: signer.publicKey,
   });
 
   /*
@@ -78,11 +84,11 @@ async function main() {
   await tokenRoot.methods
     .deployWallet({
       answerId: 0,
-      walletOwner: everWallet.address,
+      walletOwner: account.address,
       deployWalletValue: locklift.utils.toNano("2"),
     })
     .send({
-      from: everWallet.address,
+      from: account.address,
       amount: locklift.utils.toNano("4"),
     });
 
@@ -93,7 +99,7 @@ async function main() {
     await tokenRoot.methods
       .walletOf({
         answerId: 0,
-        walletOwner: everWallet.address,
+        walletOwner: account.address,
       })
       .call({})
   ).value0;

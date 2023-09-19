@@ -40,23 +40,28 @@ First create a file named `00-deploy-upgradeable-contracts.ts` in your `scripts`
 
 ````typescript
 import { Address, Contract, Signer, WalletTypes, zeroAddress } from "locklift";
-import { EverWalletAccount } from "everscale-standalone-client";
 import { FactorySource } from "../build/factorySource";
 async function main() {
   try {
     // Fetching the signer and creating a wallet
     const signer: Signer = (await locklift.keystore.getSigner("0"))!;
 
-    // Uncomment if running locally
-    // const everWallet = (
-    //   await locklift.factory.accounts.addNewAccount({
-    //     type: WalletTypes.EverWallet,
-    //     value: locklift.utils.toNano(100),
-    //     publicKey: signer.publicKey,
-    //   })
-    // ).account;
+    // uncomment if deploying a new account
+    // const { contract: Account } = await locklift.factory.deployContract({
+    //   contract: "Account",
+    //   publicKey: signer.publicKey,
+    //   constructorParams: {},
+    //   initParams: { _randomNonce: locklift.utils.getRandomNonce() },
+    //   value: locklift.utils.toNano(20),
+    // });
 
-    const everWallet: EverWalletAccount = await EverWalletAccount.fromPubkey({ publicKey: signer.publicKey });
+    // Adding an existing account from the key pair defined in  the locklift.config.ts
+    const account = await locklift.factory.accounts.addExistingAccount({
+      type: WalletTypes.WalletV3,
+      publicKey: signer.publicKey,
+    });
+
+    console.log(`Account address: ${account.address.toString()}`);
 
     // Deploying the required contracts
     const { contract: tokenRootUpgradeable } = await locklift.factory.deployContract({
@@ -69,12 +74,12 @@ async function main() {
         mintDisabled: false,
         burnByRootDisabled: false,
         burnPaused: false,
-        remainingGasTo: everWallet.address,
+        remainingGasTo: account.address,
       },
       initParams: {
         deployer_: zeroAddress, // must be zero address, not zeroAddress if deploying fromm a contract
         randomNonce_: locklift.utils.getRandomNonce(),
-        rootOwner_: everWallet.address,
+        rootOwner_: account.address,
         name_: "Tip3OnboardingToken",
         symbol_: "TOT",
         decimals_: 6,
@@ -93,9 +98,9 @@ async function main() {
       .deployWallet({
         answerId: 0,
         deployWalletValue: locklift.utils.toNano(5),
-        walletOwner: everWallet.address,
+        walletOwner: account.address,
       })
-      .send({ from: everWallet.address, amount: locklift.utils.toNano(10) });
+      .send({ from: account.address, amount: locklift.utils.toNano(10) });
 
     /**
      * @dev Notice that now that the constructor of the Token Wallet Platform is triggered, its code should have been changed to the Token Wallet upgradeable,
@@ -105,7 +110,7 @@ async function main() {
       await tokenRootUpgradeable.methods
         .walletOf({
           answerId: 0,
-          walletOwner: everWallet.address,
+          walletOwner: account.address,
         })
         .call({})
     ).value0;
@@ -121,14 +126,14 @@ async function main() {
 
     await tokenRootUpgradeable.methods
       .mint({
-        recipient: everWallet.address,
+        recipient: account.address,
         amount: 10 * 10 ** 6,
-        remainingGasTo: everWallet.address,
+        remainingGasTo: account.address,
         notify: false,
         payload: "",
         deployWalletValue: 0, // already minted
       })
-      .send({ from: everWallet.address, amount: locklift.utils.toNano(3) });
+      .send({ from: account.address, amount: locklift.utils.toNano(3) });
 
     balance = (await tokenWalletUpgradeable.methods.balance({ answerId: 0 }).call({})).value0;
 
