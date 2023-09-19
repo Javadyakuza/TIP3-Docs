@@ -32,7 +32,7 @@ TIP-3 standard describes basic principles of building smart token contracts.
 ## Useful Links
 
 - [Tokens and Assets (Venom Foundation)](https://docs.venom.foundation/learn/tokens-and-assets)
-s
+
 - [What is TIP? (Everscale)](https://docs.everscale.network/standard/workflow)
 
 - [TIP-3 Implementation (Broxus)](https://github.com/broxus/tip3)

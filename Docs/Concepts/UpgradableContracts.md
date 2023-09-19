@@ -753,7 +753,7 @@ The  `TokenRootUpgradeable`  contract introduces several important features in t
 
 
 ::: tip
-Please refer to the [Deploy Upgradable Contracts](../../Deployments/upgradeableContracts.md) section for detailed instructions on the deployment process of the previously mentioned contracts and how to interact with them.
+Please navigate to the [Deploy Upgradable Contracts](../../Deployments/upgradeableContracts.md) section for detailed instructions on the deployment process of the previously mentioned contracts and how to interact with them.
 :::
 
 <style>

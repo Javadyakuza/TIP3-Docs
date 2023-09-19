@@ -1,6 +1,6 @@
 # Deploy Account
 
-In this section we will learn how to deploy an Account smart contract.
+In this section we will learn how to deploy an Account smart contract and use it in our scripts to send transactions.
 
 
 ## Step 1: Write a Deployment Script
@@ -16,6 +16,8 @@ Before we start to write our scripts we need to make sure that there is a file n
 /*
   locklift is a globally declared variable
 */
+
+import { Signer, WalletTypes } from "locklift";
 
 async function main() {
 
@@ -34,14 +36,21 @@ async function main() {
     }
   */
 
-  const signer = (await locklift.keystore.getSigner(keyNumber))!;
+  const signer: Signer = (await locklift.keystore.getSigner(keyNumber))!;
 
-  const {contract: Account} = await locklift.factory.deployContract({
+  // Deploying the account contract
+  const {contract: account} = await locklift.factory.deployContract({
     contract: "Account",
     publicKey: signer.publicKey,
     constructorParams: {},
     initParams: { _randomNonce: locklift.utils.getRandomNonce() },
     value: locklift.utils.toNano(balance),
+  });
+
+  // Adding it to the AccountStorage to be recognized as a sender to be able to send transaction from it
+  const loadedAccount = await locklift.factory.accounts.addExistingAccount({
+    type: WalletTypes.WalletV3,
+    publicKey: signer.publicKey,
   });
 
   console.log(`Account deployed at: ${Account.address.toString()}`);
@@ -57,12 +66,13 @@ main()
 ```
 
 :::tip
-Giver - is a contract that has a `sendTransaction` method.\
+- Giver - is a contract that has a `sendTransaction` method.\
 The local-node already
 has a pre-installed contract with the initial amount of EVERs. For other networks, you can configure your giver in `locklift.config.ts`
-:::
-:::tip
-If you need a permanent address for testing, then set the `_randomNonce` constant. By changing  `_randomNonce` you change the byte code of the contract, and the final address.
+
+- If you need a permanent address for testing, then set the `_randomNonce` constant. By changing  `_randomNonce` you change the byte code of the contract, and the final address.
+
+- Kindly Navigate to the Deployment section to see the example of using the Account contract to send transaction from.
 :::
 
 ## Step 2: Deploy the Account

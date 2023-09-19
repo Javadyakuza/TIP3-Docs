@@ -30,9 +30,7 @@ After completing the process there should be a folder named **_build_** with thi
 <ImgContainer src= '/llStructure.png' width="100%" altText="buildStructure" />
 
 ::: tip
-For further information kindly refer to locklift documentation.
-
-https://docs.locklift.io/
+Please refer to the Locklift documentation at https://docs.locklift.io/ for more detailed information.
 :::
 
 <script lang="ts" >

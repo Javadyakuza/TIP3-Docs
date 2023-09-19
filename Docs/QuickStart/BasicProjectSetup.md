@@ -1,6 +1,6 @@
 # Setup of TIP-3 Contracts in a Project
 
-This guide will walk you through the process of setting up a project with TIP3 contracts and integrating it with a multiwallet example.
+This guide will walk you through the process of setting up a project with TIP-3 contracts.
 
 ## Prerequisites
 First, make sure you have the nodeJs and npm installed on your machine.
@@ -29,9 +29,9 @@ We should get such a project structure:
 
 <ImgContainer src= '/image(7).png' width="100%" altText="locklift structure after initialization" />
 
-## Step 3: Install Packages
+## Step 3: Install Contract Packages
 
-Next, we'll install the `TIP-3` contracts and the `@broxus/contracts` package. `TIP-3` contracts represent token contracts for the TON network, and `@broxus/contracts`provides smart contract interfaces.
+Next, we'll install the `TIP-3` contracts and the `@broxus/contracts` packages. `TIP-3` contracts represent fungible tokens standard contracts for the TVM based networks, and `@broxus/contracts`provides smart contract interfaces.
 
 ```` shell
 npm i @broxus/contracts tip3
