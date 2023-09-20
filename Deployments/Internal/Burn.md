@@ -469,14 +469,14 @@ export default defineComponent({
           this.$refs.burnTokenOutput.innerHTML = burnTokenRes;
   }
 
-   async function burnTokensToWallet(){
-          this.$refs.burnTokensByRoot.innerHTML = "Processing ..."
+   async function burnTokensByRoot(){
+          this.$refs.BurnTokenByRootOutput.innerHTML = "Processing ..."
         if (
             this.$refs.actionRootTokenRootAddress.value == ""
 
         ){
             toast("Token root address field is required !",0)
-            this.$refs.actionWalletAmount.innerHTML = "Failed"
+            this.$refs.BurnTokenByRootOutput.innerHTML = "Failed"
             return
         }        // checking of all the values are fully filled
         if (
@@ -484,7 +484,7 @@ export default defineComponent({
 
         ){
             toast("Multi wallet address field is required !",0)
-            this.$refs.burnTokensByRoot.innerHTML = "Failed"
+            this.$refs.BurnTokenByRootOutput.innerHTML = "Failed"
             return
         }
         if (
@@ -492,24 +492,24 @@ export default defineComponent({
 
         ){
             toast("Amount field is required !",0)
-            this.$refs.burnTokensByRoot.innerHTML = "Failed"
+            this.$refs.BurnTokenByRootOutput.innerHTML = "Failed"
             return
         }
         let burnTokenRes = await burnTip3ByRootCon(
           this.$refs.actionRootTokenRootAddress.value,
           this.$refs.actionRootCandleAddress.value,
-          this.$refs.actionRootAmount.checked
+          this.$refs.actionRootAmount.value
           )
           // Rendering the output
           burnTokenRes = !burnTokenRes ? "Failed" :  burnTokenRes;
-          this.$refs.burnTokensByRoot.innerHTML = burnTokenRes;
+          this.$refs.BurnTokenByRootOutput.innerHTML = burnTokenRes;
   }
 
 return {
         eipHandler,
         llHandler,
         burnTokens,
-        burnTokensToWallet
+        burnTokensByRoot
     };
   },
 });

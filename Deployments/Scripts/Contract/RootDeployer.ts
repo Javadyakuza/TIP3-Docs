@@ -24,7 +24,7 @@ export async function deployRootDeployerCon(): Promise<
   }
 
   try {
-    /* 
+    /*
     Returns compilation artifacts based on the .sol file name
       or name from value config.externalContracts[pathToLib].
   */
@@ -47,6 +47,7 @@ export async function deployRootDeployerCon(): Promise<
 
     // Preparing the deployment params
     const randomNonce_ = (Math.random() * 6400) | 0;
+    // const randomNonce_ = 78342;
     const deployParams: DeployParams<tip3Artifacts.FactorySource['RootDeployer']> = {
       tvc: RDArt.tvc,
       workchain: 0,
@@ -70,7 +71,7 @@ export async function deployRootDeployerCon(): Promise<
     await provider.sendMessage({
       sender: senderAddress,
       recipient: expectedAddress,
-      amount: ethers.parseUnits('4', 9).toString(),
+      amount: ethers.parseUnits('3', 9).toString(),
       bounce: false, // It is important to set 'bounce' to false
       // to ensure funds remain in the contract.
       stateInit: stateInit.stateInit,
@@ -81,7 +82,6 @@ export async function deployRootDeployerCon(): Promise<
     const userRootDeployer: Contract<tip3Artifacts.FactorySource['RootDeployer']> =
       new provider.Contract(rootDeployer, expectedAddress);
 
-    toast('Sending stateInit to the Calculated address ...', 2);
     // Call the contract constructor
     const { transaction: deployRes } = await userRootDeployer.methods
       .constructor({

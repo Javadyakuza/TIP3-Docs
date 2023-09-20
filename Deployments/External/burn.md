@@ -23,7 +23,7 @@ Furthermore, it is important to note that only the owner of the root contract ha
 
 :::
 
-## Step 2: Write Burning Script
+## Step 1: Write Burning Script
 <span  :class="LLdis"  >
 
 Utilize the code sample below to burn TIP- tokens using locklift:

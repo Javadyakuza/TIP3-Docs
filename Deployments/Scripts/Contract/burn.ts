@@ -51,15 +51,7 @@ export async function burnTip3Con(
     ]);
 
     const oldBal = (await getWalletData(multiWalletContract, tokenRootContract.address)).balance;
-
-    const senderPubkey: string = await extractPubkey(provider, senderAddress);
-    if (senderPubkey != (await multiWalletContract.methods.owner({}).call()).owner) {
-      toast('You are not the owner of the sender multi wallet contract !', 0);
-
-      return 'Failed';
-    }
-
-    if (oldBal == 0) {
+    if (oldBal == 0 || Number(ethers.formatUnits(String(oldBal), decimals)) < Number(amount)) {
       toast('Low balance !', 0);
 
       return 'Failed';

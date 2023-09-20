@@ -3,7 +3,6 @@ import { ProviderRpcClient as PRC, Address, Transaction } from 'everscale-inpage
 import * as tip3Artifacts from 'tip3-docs-artifacts';
 
 import { toast } from '../../../src/helpers/toast';
-import { extractPubkey } from '../helpers/extractPubkey';
 import { getWalletData } from '../helpers/getTWDataFromMW';
 import isValidEverAddress from '../helpers/isValideverAddress';
 import { useProviderInfo } from '../helpers/useWalletsData';
@@ -52,20 +51,13 @@ export async function burnTip3ByRootCon(
 
     const oldBal = (await getWalletData(multiWalletContract, tokenRootContract.address)).balance;
 
-    const senderPubkey: string = await extractPubkey(provider, senderAddress);
-    if (senderPubkey != (await multiWalletContract.methods.owner({}).call()).owner) {
-      toast('You are not the owner of the sender multi wallet contract !', 0);
-
-      return 'Failed';
-    }
-
-    if (oldBal == 0) {
+    if (oldBal == 0 || Number(ethers.formatUnits(String(oldBal), decimals)) < Number(amount)) {
       toast('Low balance !', 0);
 
       return 'Failed';
     }
     // burning tokens from a token wallet by calling the burn method
-    const { transaction: burnRes } = await tokenRootContract.methods
+    const burnRes: Transaction = await tokenRootContract.methods
       .burnTokens({
         amount: ethers.parseUnits(amount, decimals).toString(),
         walletOwner: multiWalletContract.address,
@@ -73,8 +65,9 @@ export async function burnTip3ByRootCon(
         callbackTo: multiWalletContract.address,
         payload: '',
       })
-      .sendExternal({
-        publicKey: await extractPubkey(provider, senderAddress),
+      .send({
+        from: senderAddress,
+        amount: ethers.parseUnits('1', 9).toString(),
       });
 
     if (burnRes.aborted) {
@@ -91,13 +84,13 @@ export async function burnTip3ByRootCon(
       toast(`${amount} ${symbol}'s successfully burnt !`, 1);
 
       return `Hash: ${burnRes.id.hash} \n old Balance  ${ethers.formatUnits(
-        oldBal,
+        String(oldBal),
         decimals
-      )} \n New balance: ${ethers.formatUnits(newBal, decimals)}`;
+      )} \n New balance: ${ethers.formatUnits(String(newBal), decimals)}`;
     } else {
       toast('Burning tokens failed !', 0);
 
-      return `Failed \n 
+      return `Failed \n
       ${(burnRes.exitCode, burnRes.resultCode)}`;
     }
   } catch (e: any) {

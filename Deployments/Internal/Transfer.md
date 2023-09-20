@@ -508,7 +508,7 @@ export default defineComponent({
             return
         }
         let transferTokenRes = await transferTokenCon(
-          this.$refs.actionTokenAddress.value,
+          this.$refs.actionTokenRootAddress.value,
           this.$refs.actionRecipientAddress.value,
           this.$refs.actionSenderAddress.value,
           this.$refs.actionAmount.value,
@@ -526,7 +526,7 @@ export default defineComponent({
 
         ){
             toast("Token root address field is required !",0)
-            this.$refs.actionWalletAmount.innerHTML = "Failed"
+            this.$refs.WalletTransferTokenOutput.innerHTML = "Failed"
             return
         }
         if (
@@ -534,7 +534,7 @@ export default defineComponent({
 
         ){
             toast("Recipient multi wallet address field is required !",0)
-            this.$refs.actionWalletAmount.innerHTML = "Failed"
+            this.$refs.WalletTransferTokenOutput.innerHTML = "Failed"
             return
         }
         if (
@@ -542,11 +542,11 @@ export default defineComponent({
 
         ){
             toast("Sender multi wallet address field is required !",0)
-            this.$refs.actionWalletAmount.innerHTML = "Failed"
+            this.$refs.WalletTransferTokenOutput.innerHTML = "Failed"
             return
         }
         if (
-            this.$refs.actionWalletNotify.value == ""
+            this.$refs.actionWalletAmount.value == ""
 
         ){
             toast("Amount field is required !",0)
@@ -554,7 +554,7 @@ export default defineComponent({
             return
         }
         let transferTokenRes = await transferTokenToWalletCon(
-          this.$refs.actionWalletTokenAddress.value,
+          this.$refs.actionWalletTokenRootAddress.value,
           this.$refs.actionWalletRecipientAddress.value,
           this.$refs.actionWalletSenderAddress.value,
           this.$refs.actionWalletAmount.value,

@@ -3,6 +3,8 @@ import { ProviderRpcClient as PRC, Address, Transaction } from 'everscale-inpage
 import * as tip3Artifacts from 'tip3-docs-artifacts';
 
 import { toast } from '../../../src/helpers/toast';
+import { extractPubkey } from '../helpers/extractPubkey';
+import { getWalletData } from '../helpers/getTWDataFromMW';
 import isValidEverAddress from '../helpers/isValideverAddress';
 import { useProviderInfo } from '../helpers/useWalletsData';
 
@@ -44,29 +46,27 @@ export async function deployTokenWalletCon(
     const symbol: string = (await tokenRootContract.methods.symbol({ answerId: 0 }).call()).value0;
 
     // Checking if the user already doesn't have the any wallet of that token root
-    let tokenWalletData = (await MultiWalletContract.methods.wallets().call()).wallets.map(item => {
-      if (item[0].toString() == tokenRootContract.address.toString()) {
-        return item[1];
-      }
-    });
+
     const zeroAddress = '0:0000000000000000000000000000000000000000000000000000000000000000';
 
-    if (tokenWalletData[0]!.tokenWallet.toString() != zeroAddress) {
+    if (
+      (
+        await getWalletData(MultiWalletContract, tokenRootContract.address)
+      ).tokenWallet.toString() != zeroAddress
+    ) {
       toast('You already have a Wallet of this token !', 0);
 
       return 'Failed';
     }
 
     // Deploying a new contract if didn't exist before
-    const deployWalletRes: Transaction = await MultiWalletContract.methods
+    const { transaction: deployWalletRes } = await MultiWalletContract.methods
       .deployWallet({
         _deployWalletBalance: ethers.parseUnits('2', 9).toString(),
         _tokenRoot: tokenRootContract.address,
       })
-      .send({
-        from: senderAddress,
-        amount: ethers.parseUnits('4', 9).toString(),
-        bounce: false, // Important to be set to false in order to keep the sent amount in the token wallet contract
+      .sendExternal({
+        publicKey: await extractPubkey(provider, senderAddress),
       });
     if (deployWalletRes.aborted) {
       toast(`Transaction aborted ! ${deployWalletRes.exitCode}`, 0);
@@ -75,15 +75,16 @@ export async function deployTokenWalletCon(
     }
     // Checking if the user already doesn't have the any wallet of that token root
 
-    tokenWalletData = (await MultiWalletContract.methods.wallets().call()).wallets.map(item => {
-      if (item[0].toString() == tokenRootContract.address.toString()) {
-        return item[1];
-      }
-    });
-    if (tokenWalletData[0]!.tokenWallet.toString() != zeroAddress) {
+    if (
+      (
+        await getWalletData(MultiWalletContract, tokenRootContract.address)
+      ).tokenWallet.toString() != zeroAddress
+    ) {
       toast('Token Wallet successfully deployed !', 1);
 
-      return `${symbol}'s token wallet deployed to: ${tokenWalletData[0]!.tokenWallet.toString()}`;
+      return `${symbol}'s token wallet deployed to: ${(
+        await getWalletData(MultiWalletContract, tokenRootContract.address)
+      ).tokenWallet.toString()}`;
     } else {
       toast('The token wallet deployment failed !', 0);
 

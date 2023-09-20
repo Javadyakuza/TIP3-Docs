@@ -1,4 +1,3 @@
-import { ethers } from 'ethers';
 import {
   ProviderRpcClient as PRC,
   Address,
@@ -8,6 +7,7 @@ import {
 import * as tip3Artifacts from 'tip3-docs-artifacts';
 
 import { toast } from '../../../src/helpers/toast';
+import { extractPubkey } from '../helpers/extractPubkey';
 import isValidEverAddress from '../helpers/isValideverAddress';
 import { useProviderInfo } from '../helpers/useWalletsData';
 import { deployRootParams, deployFromRootDeployerParams } from '../types';
@@ -89,12 +89,10 @@ export async function deployTokenRootFromContract(
       remainingGasTo: senderAddress,
     };
     // Deploying the tokenRoot
-    const tokenRootDeploymentRes: Transaction = await userRootDeployer.methods
+    const { transaction: tokenRootDeploymentRes } = await userRootDeployer.methods
       .deployTokenRoot(tokenRootDeploymentsParams)
-      .send({
-        from: senderAddress,
-        amount: ethers.parseUnits(deployWalletValue == '0' ? '2' : '4', 9).toString(),
-        bounce: true,
+      .sendExternal({
+        publicKey: await extractPubkey(provider, senderAddress),
       });
     // checking if the token root is deployed successfully by calling one of its methods
     if (tokenRootDeploymentRes.aborted) {

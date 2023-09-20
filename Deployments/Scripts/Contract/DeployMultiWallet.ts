@@ -24,7 +24,7 @@ export async function deployMultiWalletTip3Con(): Promise<
   }
 
   try {
-    /* 
+    /*
     Returns compilation artifacts based on the .sol file name
       or name from value config.externalContracts[pathToLib].
   */
@@ -67,7 +67,7 @@ export async function deployMultiWalletTip3Con(): Promise<
     await provider.sendMessage({
       sender: senderAddress,
       recipient: expectedAddress,
-      amount: ethers.parseUnits('20', 9).toString(),
+      amount: ethers.parseUnits('2', 9).toString(),
       bounce: false, // It is important to set 'bounce' to false
       // to ensure funds remain in the contract.
       stateInit: stateInit.stateInit,
@@ -80,7 +80,6 @@ export async function deployMultiWalletTip3Con(): Promise<
       expectedAddress
     );
 
-    toast('Sending stateInit to the Calculated address ...', 2);
     // Call the contract constructor
     const { transaction: deployRes } = await MWcon.methods
       .constructor({

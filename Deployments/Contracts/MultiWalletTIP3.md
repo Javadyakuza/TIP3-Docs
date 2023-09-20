@@ -758,7 +758,7 @@ contract MultiWalletTIP3 is CheckPubKey, ExternalOwner, RandomNonce {
 
 </details>
 
-## Deploy Multi Wallet TIP-3
+## Step 1: Write Deployment Script
 
 <div class="DeployMultiWalletTip3">
 
@@ -960,7 +960,7 @@ Congratulations, you have deployed a Multi Wallet TIP3 contract 🎉
 
 <div :class="eipAction" >
 
-### Deploy Multi Wallet Tip3
+## Step 2: Deploy Multi Wallet Tip3
 
 
 <button @click="deployMultiWallet" class="DeployMultiWalletTip3But" >Deploy Multi Wallet Tip3</button>
@@ -1038,9 +1038,7 @@ return {
 </script>
 
 <style>
-.DeployMultiWalletTip3{
-  font-size: 1.1rem;
-}
+
 .action{
     display:inline-block;
 }
@@ -1049,7 +1047,7 @@ return {
     font-size: .9rem;
 }
 
-.DeployRootDeployerBut, .switcherContainer, .codeBlockContainer, .Ain, details
+.DeployMultiWalletTip3But, .switcherContainer, .codeBlockContainer, .Ain, details
 {
   background-color: var(--vp-c-bg-mute);
   transition: background-color 0.1s;
@@ -1069,6 +1067,7 @@ details {
     cursor:pointer;
     padding: 5px 12px;
     display: flex;
+
     transition: all ease .3s;
 }
 

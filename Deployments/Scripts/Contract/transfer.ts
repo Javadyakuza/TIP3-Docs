@@ -74,11 +74,7 @@ export async function transferTokenCon(
       return 'Failed';
     }
     const senderPubkey: string = await extractPubkey(provider, senderAddress);
-    if (senderPubkey != (await senderMWContract.methods.owner({}).call()).owner) {
-      toast('You are not the owner of the sender multi wallet contract !', 0);
 
-      return 'Failed';
-    }
     // Checking recipient has a deploy wallet of that token root
     const recipientOldWalletData = await getWalletData(
       receiverMWContract,
@@ -185,11 +181,7 @@ export async function transferTokenToWalletCon(
       return 'Failed';
     }
     const senderPubkey: string = await extractPubkey(provider, senderAddress);
-    if (senderPubkey != (await senderMWContract.methods.owner({}).call()).owner) {
-      toast('You are not the owner of the sender multi wallet contract !', 0);
 
-      return 'Failed';
-    }
     // Checking recipient has a deploy wallet of that token root
     const recipientOldWalletData = await getWalletData(
       receiverMWContract,

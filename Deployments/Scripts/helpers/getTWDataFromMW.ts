@@ -19,6 +19,6 @@ export async function getWalletData(
     balance = Number(walletData[0]!.balance);
     tokenWallet = walletData[0]!.tokenWallet;
   }
-  
-return { tokenWallet: tokenWallet, balance: balance };
+
+  return { tokenWallet: tokenWallet, balance: balance };
 }

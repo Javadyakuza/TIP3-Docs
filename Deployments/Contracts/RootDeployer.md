@@ -133,7 +133,7 @@ For this reason, we pass callbacks so that the contract returns something.
 
 :::
 
-## Deploy Root Deployer
+## Step 1: Write Deployment Script
 
 
 Now we write scripts to deploy the Root Deployer contract :
@@ -330,7 +330,7 @@ Congratulations, you have deployed a Root Deployer contract 🎉
 
 <div :class="eipAction" >
 
-### Deploy Root Deployer
+## Step 2: Deploy Root Deployer
 
 <button @click="deployRootDeployer" class="DeployRootDeployerBut" >Deploy root deployer</button>
 

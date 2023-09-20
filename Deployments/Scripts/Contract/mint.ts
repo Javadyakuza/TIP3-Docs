@@ -93,7 +93,7 @@ export async function mintTokenCon(
     if (newBal >= oldBal) {
       toast(`${mintAmount} ${symbol}'s minted successfully `, 1);
 
-      return `Old balance: ${oldBal} \n New balance: ${newBal}`;
+      return `tx hash: ${deployWalletRes.id.hash} Old balance: ${oldBal} \n New balance: ${newBal}`;
     } else {
       toast('Minting tokens failed !', 0);
 

@@ -7,7 +7,6 @@ export async function extractPubkey(
   const accountFullState: FullContractState = (
     await provider.getFullContractState({ address: senderAddress })
   ).state!;
-
   const senderPublicKey: string = await provider.extractPublicKey(accountFullState.boc);
 
   return senderPublicKey;
