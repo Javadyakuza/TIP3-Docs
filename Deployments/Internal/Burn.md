@@ -42,7 +42,7 @@ The code sample below follows the same approach but makes the transactions using
  * locklift is a globally declared object
  */
 
-import { Contract, Signer, zeroAddress, Address } from "locklift";
+import { Contract, Signer, zeroAddress, Address, WalletTypes } from "locklift";
 import { FactorySource } from "../build/factorySource";
 
 // We use the getWalletData function to extract the token wallet data from the multi wallet contract
@@ -92,8 +92,9 @@ async function main() {
 
   // Adding an existing account from the key pair defined in  the locklift.config.ts
   const account = await locklift.factory.accounts.addExistingAccount({
-    type: WalletTypes.WalletV3,
-    publicKey: signer.publicKey,
+    type: WalletTypes.MsigAccount,
+    address: new Address("<YOUR_ACCOUNT_ADDRESS>"),
+    mSigType: "SafeMultisig",
   });
 
   const [decimals, symbol] = await Promise.all([

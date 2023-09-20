@@ -78,8 +78,6 @@ async function getWalletData(
 }
 
 async function main() {
-  // Setting up the signer and the wallet
-  const signer: Signer = (await locklift.keystore.getSigner("0"))!;
 
   // uncomment if deploying a new account
   // const { contract: Account } = await locklift.factory.deployContract({
@@ -92,8 +90,9 @@ async function main() {
 
   // Adding an existing account from the key pair defined in  the locklift.config.ts
   const account = await locklift.factory.accounts.addExistingAccount({
-    type: WalletTypes.WalletV3,
-    publicKey: signer.publicKey,
+    type: WalletTypes.MsigAccount,
+    address: new Address("<YOUR_ACCOUNT_ADDRESS>"),
+    mSigType: "SafeMultisig",
   });
 
   const tokenRootAddress: Address = new Address("0:fbc4a3db3df3d3b03f1752ab05d6ba3155865f906af4b5653b324d1a2519b03d");

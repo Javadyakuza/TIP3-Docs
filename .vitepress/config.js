@@ -34,10 +34,7 @@ module.exports = {
     search: {
       provider: 'local',
     },
-    nav: [
-      { text: 'Feedback', link: FEEDBACK_URL },
-      { text: 'Community', link: HELP_URL },
-    ],
+    nav: NAV,
     sidebar: [
       {
         text: 'Overview',

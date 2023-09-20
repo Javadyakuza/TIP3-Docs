@@ -45,12 +45,10 @@ Using the  `everscale-inpage-provider`  to deploy a token wallet is as easy as a
  * locklift is a globally declared object
  */
 
-import { Address, Contract, Signer } from "locklift";
+import { Address, Contract, Signer, WalletTypes } from "locklift";
 import { FactorySource } from "../build/factorySource";
 
 async function main() {
-  // Fetching the account and signer
-  const signer: Signer = (await locklift.keystore.getSigner("0"))!;
 
   // uncomment if deploying a new account
   // const { contract: Account } = await locklift.factory.deployContract({
@@ -63,8 +61,9 @@ async function main() {
 
   // Adding an existing account from the key pair defined in  the locklift.config.ts
   const account = await locklift.factory.accounts.addExistingAccount({
-    type: WalletTypes.WalletV3,
-    publicKey: signer.publicKey,
+    type: WalletTypes.MsigAccount,
+    address: new Address("<YOUR_ACCOUNT_ADDRESS>"),
+    mSigType: "SafeMultisig",
   });
 
   /*

@@ -68,8 +68,6 @@ import { Address, WalletTypes, zeroAddress, Signer, Contract } from "locklift";
 import { FactorySource, factorySource } from "../build/factorySource";
 
 async function main() {
-  // Creating two signers and wallets
-  const signer: Signer = (await locklift.keystore.getSigner("0"))!;
 
   // uncomment if deploying a new account
   // const { contract: Account } = await locklift.factory.deployContract({
@@ -82,8 +80,9 @@ async function main() {
 
   // Adding an existing account from the key pair defined in  the locklift.config.ts
   const account = await locklift.factory.accounts.addExistingAccount({
-    type: WalletTypes.WalletV3,
-    publicKey: signer.publicKey,
+    type: WalletTypes.MsigAccount,
+    address: new Address("<YOUR_ACCOUNT_ADDRESS>"),
+    mSigType: "SafeMultisig",
   });
 
   // Preparing the params

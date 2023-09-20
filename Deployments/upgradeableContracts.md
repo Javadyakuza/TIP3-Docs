@@ -57,8 +57,9 @@ async function main() {
 
     // Adding an existing account from the key pair defined in  the locklift.config.ts
     const account = await locklift.factory.accounts.addExistingAccount({
-      type: WalletTypes.WalletV3,
-      publicKey: signer.publicKey,
+      type: WalletTypes.MsigAccount,
+      address: new Address("<YOUR_ACCOUNT_ADDRESS>"),
+      mSigType: "SafeMultisig",
     });
 
     console.log(`Account address: ${account.address.toString()}`);

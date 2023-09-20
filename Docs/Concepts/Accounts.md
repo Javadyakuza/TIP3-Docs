@@ -19,7 +19,7 @@ This documentation covers the usage of two tools for deploying and interacting w
 
 When using  `nodejs`  to interact with the blockchain,  `locklift`  is employed. On the other hand, when making transactions from a  `Dapp` ,  `everscale-inpage-provider`  is utilized.
 
-If you are using  `locklift` , the  `WalletV3`  is used to either add the Account contract to the Accounts storage or create an instance of it. However, if you are using  `everscale-inpage-provider` , the  `EverWallet`  is utilized.
+If you are using  `locklift` , then the  `SafeMultiSig`   is used as the account contract to either add the Account contract to the Accounts storage or create an instance of it. However, if you are using  `everscale-inpage-provider` , the  `WalletV3` contract is utilized.
 
 Please note that the  `EverWallet`  used contract, written in `func` language, is different from the Account contract which is written in `t-sol`.
 

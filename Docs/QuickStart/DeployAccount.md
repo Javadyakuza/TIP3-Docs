@@ -17,7 +17,7 @@ Before we start to write our scripts we need to make sure that there is a file n
   locklift is a globally declared variable
 */
 
-import { Signer, WalletTypes } from "locklift";
+import { Signer, WalletTypes, Address } from "locklift";
 
 async function main() {
 
@@ -49,11 +49,12 @@ async function main() {
 
   // Adding it to the AccountStorage to be recognized as a sender to be able to send transaction from it
   const loadedAccount = await locklift.factory.accounts.addExistingAccount({
-    type: WalletTypes.WalletV3,
-    publicKey: signer.publicKey,
+    type: WalletTypes.MsigAccount,
+    address: account.address,
+    mSigType: "SafeMultisig",
   });
 
-  console.log(`Account deployed at: ${Account.address.toString()}`);
+  console.log(`Account deployed at: ${loadedAccount.address.toString()}`);
 }
 
 main()

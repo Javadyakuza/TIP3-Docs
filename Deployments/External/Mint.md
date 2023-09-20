@@ -49,13 +49,10 @@ Please be aware that if the `notify` parameter is set to true for the transactio
  * locklift is a globally declared object
  */
 
-import { Address, Contract, Signer } from "locklift";
+import { Address, Contract, Signer, WalletTypes } from "locklift";
 import { FactorySource } from "../build/factorySource";
 
 async function main() {
-  // Creating two signers and wallets
-  const aliceSigner: Signer = (await locklift.keystore.getSigner("0"))!;
-  const bobSigner: Signer = (await locklift.keystore.getSigner("1"))!;
 
   // uncomment if deploying a new account
   // const { contract: aliceAccount } = await locklift.factory.deployContract({
@@ -68,8 +65,9 @@ async function main() {
 
   // Adding an existing account from the key pair defined in  the locklift.config.ts
   const aliceAccount = await locklift.factory.accounts.addExistingAccount({
-    type: WalletTypes.WalletV3,
-    publicKey: aliceSigner.publicKey,
+    type: WalletTypes.MsigAccount,
+    address:  new Address("<ALICE_ACCOUNT_ADDRESS>"),
+    mSigType: "SafeMultisig",
   });
 
   // uncomment if deploying a new account
@@ -83,8 +81,9 @@ async function main() {
 
   // Adding an existing account from the key pair defined in  the locklift.config.ts
   const bobAccount = await locklift.factory.accounts.addExistingAccount({
-    type: WalletTypes.WalletV3,
-    publicKey: bobSigner.publicKey,
+    type: WalletTypes.MsigAccount,
+    address:  new Address("<BOB_ACCOUNT_ADDRESS>"),
+    mSigType: "SafeMultisig",
   });
 
   // preparing the parameters

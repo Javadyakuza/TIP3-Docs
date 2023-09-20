@@ -62,7 +62,7 @@ The parameter `initialSupply` must be set to zero if the `initialSupplyTo` is **
  * locklift is a globally declared object
  */
 
-import { Address, zeroAddress, Signer, Contract } from "locklift";
+import { Address, zeroAddress, Signer, Contract, WalletTypes } from "locklift";
 import { FactorySource } from "../build/factorySource";
 
 async function main() {
@@ -80,8 +80,9 @@ async function main() {
 
   // Adding an existing account from the key pair defined in  the locklift.config.ts
   const account = await locklift.factory.accounts.addExistingAccount({
-    type: WalletTypes.WalletV3,
-    publicKey: signer.publicKey,
+    type: WalletTypes.MsigAccount,
+    address: new Address("<YOUR_ACCOUNT_ADDRESS>"),
+    mSigType: "SafeMultisig",
   });
 
   const rootDeployerAddress: Address = new Address("<YOUR_ROOT_DEPLOYER_ADDRESS>");

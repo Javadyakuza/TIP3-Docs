@@ -67,9 +67,6 @@ import { FactorySource } from "../build/factorySource";
 async function main() {
   const tokenRootAddress: Address = new Address("<YOUR_TOKEN_ROOT_ADDRESS>");
 
-  const signerAlice: Signer = (await locklift.keystore.getSigner("0"))!;
-  const signerBob: Signer = (await locklift.keystore.getSigner("1"))!;
-
   // uncomment if deploying a new account
   // const { contract: aliceAccount } = await locklift.factory.deployContract({
   //   contract: "Account",
@@ -81,8 +78,9 @@ async function main() {
 
   // Adding an existing account from the key pair defined in  the locklift.config.ts
   const aliceAccount = await locklift.factory.accounts.addExistingAccount({
-    type: WalletTypes.WalletV3,
-    publicKey: aliceSigner.publicKey,
+    type: WalletTypes.MsigAccount,
+    address: new Address("<ALICE_ACCOUNT_ADDRESS>"),
+    mSigType: "SafeMultisig",
   });
 
   // uncomment if deploying a new account
@@ -96,8 +94,9 @@ async function main() {
 
   // Adding an existing account from the key pair defined in  the locklift.config.ts
   const bobAccount = await locklift.factory.accounts.addExistingAccount({
-    type: WalletTypes.WalletV3,
-    publicKey: bobSigner.publicKey,
+    type: WalletTypes.MsigAccount,
+    address: new Address("<BOB_ACCOUNT_ADDRESS>"),
+    mSigType: "SafeMultisig",
   });
 
   // Creating the target contracts instances
