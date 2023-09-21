@@ -800,6 +800,7 @@ The code samples below demonstrate how to deploy a Multi Wallet TIP3 contract us
 import { Signer } from "locklift";
 
 async function main() {
+
   // Setting up the signers and the wallets
   const signer: Signer = (await locklift.keystore.getSigner("0"))!;
 
@@ -842,11 +843,9 @@ import {
 import * as tip3Artifacts from 'tip3-docs-artifacts';
 import { provider, providerAddress } from './useProvider';
 
-export async function main() {
-  // Initiate the TVM provider
-
+async function main() {
   try {
-    // Multi wallet contract Abi
+    // Required contracts Abi's
     const multiWalletTip3Abi: tip3Artifacts.FactorySource['MultiWalletTIP3'] =
       tip3Artifacts.factorySource['MultiWalletTIP3'];
     const multiWalletTip3Artifacts: typeof tip3Artifacts.artifacts.MultiWalletTIP3 =
@@ -866,6 +865,7 @@ export async function main() {
 
     const senderPublicKey: string = await provider.extractPublicKey(accountFullState.boc);
 
+    // Preparing the deployment parameters
     const deployParams: DeployParams<tip3Artifacts.FactorySource['MultiWalletTIP3']> = {
       tvc: multiWalletTip3Artifacts.tvc,
       workchain: 0,
@@ -874,7 +874,8 @@ export async function main() {
         _randomNonce: (Math.random() * 6400) | 0,
       },
     };
-    // Get the expected contract address
+
+    // Get the expected address of the multi wallet tip-3 contract
     const expectedAddress = await provider.getExpectedAddress(multiWalletTip3Abi, deployParams);
 
     // Get the state init
@@ -887,18 +888,19 @@ export async function main() {
       amount: String(20 * 10 ** 9),
       bounce: false, // It is important to set 'bounce' to false
       // to ensure funds remain in the contract.
+      // if true "no data" exception will be raised
       stateInit: stateInit.stateInit,
     });
 
     console.log('Fund sent to the Calculated address !');
 
-    // Create a contract instance
+    // Create a instance from the multi wallet contract
     const multiWalletTip3Contract: Contract<tip3Artifacts.FactorySource['MultiWalletTIP3']> =
       new provider.Contract(multiWalletTip3Abi, expectedAddress);
 
     console.log('Sending stateInit to the Calculated address ...');
 
-    // Call the contract constructor
+    // activating the contract by calling its constructor
     const { transaction: deployRes } = await multiWalletTip3Contract.methods
       .constructor({
         _walletCode: tokenWalletArtifacts.code,
@@ -908,7 +910,7 @@ export async function main() {
         publicKey: deployParams.publicKey!,
       });
 
-    // returning the tx response as a string if aborted
+    // returning the tx response if aborted
     if (deployRes.aborted) {
       console.log(`Transaction aborted ! ${(deployRes.exitCode, deployRes.resultCode)}`);
 
@@ -916,7 +918,6 @@ export async function main() {
     }
 
     // checking if the token root is deployed successfully by calling one of its methods
-
     if (
       (
         await provider.getFullContractState({

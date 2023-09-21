@@ -51,6 +51,7 @@ import { FactorySource, factorySource } from "../build/factorySource";
 
 
 async function main() {
+
   // Fetching the signer key pair from locklift.config.ts
   const signer: Signer = (await locklift.keystore.getSigner("0"))!;
 
@@ -153,6 +154,7 @@ import { provider, providerAddress } from './useProvider';
 
 async function main() {
 
+  // Defining an interface for token root deployment parameters
   interface deployRootParams {
     initialSupplyTo: Address;
     rootOwner: Address;
@@ -175,7 +177,7 @@ async function main() {
   const tokenWalletArtifacts: typeof tip3Artifacts.artifacts.TokenWallet =
     tip3Artifacts.artifacts.TokenWallet;
 
-  // Preparing test params
+  // Preparing deployments params
   const params: deployRootParams = {
     initialSupplyTo: tip3Artifacts.zeroAddress,
     rootOwner: tip3Artifacts.zeroAddress,
@@ -186,8 +188,9 @@ async function main() {
     disableBurnByRoot: false,
     pauseBurn: false,
     initialSupply: 0,
-  }; // Or get them from user
+  };
 
+  // Setting the deployWalletValue based on the initialSupply
   const deployWalletValue: number =
     params.initialSupplyTo == tip3Artifacts.zeroAddress ? 2 * 10 ** params.decimals : 0;
 

@@ -88,11 +88,13 @@ async function main() {
 
   // preparing the parameters
   const tokenRootAddress: Address = new Address("<YOUR_TOKEN_ROOT_ADDRESS>");
+
   // Fetching the token root contract
   const tokenRootContract: Contract<FactorySource["TokenRoot"]> = locklift.factory.getDeployedContract(
     "TokenRoot",
     tokenRootAddress,
   );
+
   const mintAmount: number = 10;
   let deployWalletValue: string = "0";
   let txFee: string = "2";
@@ -165,13 +167,16 @@ import { provider, providerAddress } from './useProvider';
 
 async function main() {
   try {
+
+    // Required contracts Abi's
     const tokenRootAddress: Address = new Address('<YOUR_TOKEN_ROOT_ADDRESS>');
     const recipientAddress: Address = new Address('<RECIPIENT_ADDRESS>');
 
-    // creating an instance of the token root contract
+    // Creating an instance of the token root contract
     const tokenRootContract: Contract<tip3Artifacts.FactorySource['TokenRoot']> =
       new provider.Contract(tip3Artifacts.factorySource.TokenRoot, tokenRootAddress);
 
+    // Fetching the token wallet address
     const recipientTokenWalletAddress: Address = (
       await tokenRootContract.methods
         .walletOf({ answerId: 0, walletOwner: recipientAddress })
@@ -184,6 +189,7 @@ async function main() {
       (await tokenRootContract.methods.symbol({ answerId: 0 }).call()).value0,
     ]);
 
+    // Defining the mint amount
     const amount: number = 10 * 10 ** decimals;
 
     // Checking if receiver has a wallet of this token root to specify the deployWalletValue parameter
@@ -221,17 +227,18 @@ async function main() {
       return mintRes;
     }
 
-    // Checking if the user already doesn't have the any wallet of that token root
     // Getting the recipient balance
     const recipientTokenWalletContract: Contract<tip3Artifacts.FactorySource['TokenWallet']> =
       new provider.Contract(tip3Artifacts.factorySource.TokenWallet, recipientTokenWalletAddress);
 
+    // Fetching the new balance of the receiver
     const recipientBal: number =
       Number(
         (await recipientTokenWalletContract.methods.balance({ answerId: 0 }).call({})).value0
       ) /
       10 ** decimals;
 
+    // Checking if the desired amount is minted for the receiver 
     if (recipientBal >= amount) {
       console.log(`${amount} ${symbol}'s successfully minted for recipient`);
 

@@ -86,7 +86,7 @@ export async function burnTip3Con(
     } else {
       toast('Burning tokens failed !', 0);
 
-      return `Failed \n 
+      return `Failed \n
       ${(burnRes.exitCode, burnRes.resultCode)}`;
     }
   } catch (e: any) {

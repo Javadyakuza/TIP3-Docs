@@ -87,6 +87,7 @@ async function main() {
 
   // Preparing the params
   const tokenRootAddress: Address = new Address("<YOUR_TOKEN_ROOT_ADDRESS>");
+
   // Fetching the token root contract
   const tokenRootContract: Contract<FactorySource["TokenRoot"]> = locklift.factory.getDeployedContract(
     "TokenRoot",
@@ -99,7 +100,7 @@ async function main() {
     (await tokenRootContract.methods.symbol({ answerId: 0 }).call()).value0,
   ]);
 
-  // Preparing the params
+  // Preparing the burn amounts
   const burnAmount: number = 100 * 10 ** decimals;
   const burnByRootAmount: number = 50 * 10 ** decimals;
 
@@ -114,6 +115,7 @@ async function main() {
         .call()
     ).value0,
   );
+
   // We assume that alice has 200 tokens
   console.log(
     "balance before burn: ",

@@ -78,9 +78,9 @@ export async function deployTokenWalletEip(
     ) {
       toast('Token Wallet successfully deployed !', 1);
 
-      return (
+      return `TOken wallet deployed to: ${(
         await tokenRootContract.methods.walletOf({ answerId: 0, walletOwner: senderAddress }).call()
-      ).value0;
+      ).value0.toString()}`;
     } else {
       toast('The token wallet deployment failed !', 0);
 

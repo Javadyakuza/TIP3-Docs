@@ -1,4 +1,5 @@
 import { ProviderRpcClient, Address } from 'everscale-inpage-provider';
+
 import { useProvider } from '../../../src/providers/useProvider';
 /**
  * Fetches the data about the EVER Wallet

@@ -69,8 +69,6 @@ async function main() {
   /*
     Get instance of already deployed TOken Root contract
   */
-  // Preparing the target contracts to interact with
-
   const tokenRootAddress: Address = new Address("<YOUR_TOKEN_ROOT_ADDRESS>");
   const tokenRoot: Contract<FactorySource["TokenRoot"]> = locklift.factory.getDeployedContract(
     "TokenRoot",
@@ -78,7 +76,7 @@ async function main() {
   );
 
   /*
-    Call the deployWallet in the TokenRoot contract
+    Call the deployWallet method on the TokenRoot contract
   */
   await tokenRoot.methods
     .deployWallet({
@@ -129,7 +127,8 @@ import * as tip3Artifacts from 'tip3-docs-artifacts';
 import { provider, providerAddress } from './useProvider';
 
 async function main() {
-  // Preparing the params
+
+  // Preparing token root address
   const tokenRootAddress: Address = new Address('<YOUR_TOKEN_ROOT_ADDRESS>');
 
   // creating an instance of the token root contract
@@ -179,6 +178,7 @@ async function main() {
           .call()
       ).value0.toString()}`
     );
+
     return true;
   } else {
     throw new Error(

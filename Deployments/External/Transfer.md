@@ -65,6 +65,8 @@ import { Address, Contract, Signer, WalletTypes } from "locklift";
 import { FactorySource } from "../build/factorySource";
 
 async function main() {
+
+  // Preparing the token root address
   const tokenRootAddress: Address = new Address("<YOUR_TOKEN_ROOT_ADDRESS>");
 
   // uncomment if deploying a new account
@@ -99,7 +101,7 @@ async function main() {
     mSigType: "SafeMultisig",
   });
 
-  // Creating the target contracts instances
+  // Creating the target contract instance
   const tokenRootContract: Contract<FactorySource["TokenRoot"]> = locklift.factory.getDeployedContract(
     "TokenRoot",
     tokenRootAddress,
@@ -264,18 +266,17 @@ import * as tip3Artifacts from 'tip3-docs-artifacts';
 import { provider, providerAddress } from './useProvider';
 
 async function main() {
-  // Initiate the TVM provider
 
-  // Preparing the params
+  // Preparing the required addresses
   const tokenRootAddress: Address = new Address('<YOUR_TOKEN_ROOT_ADDRESS>');
   const recipientAddress: Address = new Address('<RECIPIENT_ACCOUNT_ADDRESS>');
 
-  // creating an instance of the target token root contracts
+  // creating an instance of the target token root contract
   const tokenRootContract: Contract<tip3Artifacts.FactorySource['TokenRoot']> =
     new provider.Contract(tip3Artifacts.factorySource['TokenRoot'], tokenRootAddress);
 
   // getting the decimals of the token
-  const decimals: number = Number(
+  const decimals = Number(
     (await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0
   );
 
@@ -298,10 +299,12 @@ async function main() {
     await tokenRootContract.methods.walletOf({ answerId: 0, walletOwner: recipientAddress }).call()
   ).value0;
 
+  // Defining the transfer parameters
   let txFee: number = 3 * 10 ** 9;
   let oldBal: number = 0;
   let deployWalletValue: number = 0;
 
+  // Setting the deployWalletValue and transaction fee based on the recipient token wallet deployment status
   if (
     !(
       await provider.getFullContractState({
@@ -321,6 +324,7 @@ async function main() {
     oldBal = Number((await recipientTokenWallet.methods.balance({ answerId: 0 }).call({})).value0);
   }
 
+  // Defining the transfer amount
   let transferAmount: number = 10 ** (10 ** decimals);
 
   // Transferring token
@@ -335,22 +339,22 @@ async function main() {
     })
     .send({ from: providerAddress, amount: String(txFee), bounce: true });
 
-  /**
-   * We first verify if the transfer transaction was aborted. If it was not aborted, we proceed to check the balance of the recipient's token wallet. We compare this balance to the sum of the previous balance (oldBalance) and the amount transferred only If the user had already deployed a token wallet prior to the transfer transaction, and it was not deployed before the transaction it must have been deployed during the transaction, so we create an instance of the recipient's token wallet contract and confirm that its balance is greater than zero.
-   */
+  // Checking of the transaction is aborted or not
   if (transferRes.aborted) {
     throw new Error(`Transaction aborted !: ${(transferRes.exitCode, transferRes.resultCode)}`);
   }
+
   // In this case the recipient didn't have any token wallet and one is deployed during the transfer, so we fetch it since we haven't before
   recipientTokenWallet = new provider.Contract(
     // Transferring the token
     tip3Artifacts.factorySource['TokenWallet'],
     receiverTokenWalletAddress
   );
-
+  // recipient balance after transfer
   const newBal: number = Number(
     (await recipientTokenWallet.methods.balance({ answerId: 0 }).call({})).value0
   );
+
   // Checking if the tokens are received successfully
   if (newBal >= Number(transferAmount) * 10 ** decimals + oldBal) {
     console.log('tokens transferred successfully');
@@ -371,9 +375,7 @@ async function main() {
     })
     .send({ from: providerAddress, amount: String(3 * 10 ** 9), bounce: true });
 
-  /**
-   * Checking the tokens are transferred and the receiver balance is more than before
-   */
+  // Throwing an error if the transaction was aborted
   if (transferToWalletRes.aborted) {
     throw new Error(`Transaction aborted !: ${transferRes.exitCode}`);
   }

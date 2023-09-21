@@ -175,6 +175,7 @@ We have already learned how to deploy a contract using  `everscale-inpage-provid
 import { Signer } from "locklift";
 
 async function main() {
+
   // Fetching the signer key pair from locklift.config.ts
   const signer: Signer = (await locklift.keystore.getSigner("0"))!;
 
@@ -255,7 +256,7 @@ async function main() {
     },
   };
 
-  // Get the expected contract address
+  // Get the expected address of the root deployer contract
   const expectedAddress = await provider.getExpectedAddress(rootDeployerAbi, deployParams);
 
   // Get the state init
@@ -272,8 +273,8 @@ async function main() {
   });
 
   console.log('Fund sent to the Calculated address !');
-  // Create a contract instance
 
+  // Create a instance of the root deployer contract
   const userRootDeployer: Contract<tip3Artifacts.FactorySource['RootDeployer']> =
     new provider.Contract(rootDeployerAbi, expectedAddress);
 
