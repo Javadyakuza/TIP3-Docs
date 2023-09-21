@@ -47,7 +47,7 @@ async function main() {
     const signer: Signer = (await locklift.keystore.getSigner("0"))!;
 
     // uncomment if deploying a new account
-    // const { contract: Account } = await locklift.factory.deployContract({
+    // const { contract: account } = await locklift.factory.deployContract({
     //   contract: "Account",
     //   publicKey: signer.publicKey,
     //   constructorParams: {},

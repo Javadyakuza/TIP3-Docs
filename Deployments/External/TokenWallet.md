@@ -51,7 +51,7 @@ import { FactorySource } from "../build/factorySource";
 async function main() {
 
   // uncomment if deploying a new account
-  // const { contract: Account } = await locklift.factory.deployContract({
+  // const { contract: account } = await locklift.factory.deployContract({
   //   contract: "Account",
   //   publicKey: signer.publicKey,
   //   constructorParams: {},
