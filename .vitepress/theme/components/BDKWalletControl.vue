@@ -82,6 +82,7 @@ export default defineComponent({
 .disconnectBtn {
   padding: 5px 8px !important;
 }
+
 .walletControl button:hover,
 .walletControl button:focus {
   outline: none;

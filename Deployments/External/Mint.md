@@ -259,7 +259,7 @@ async function main() {
 
 <div class="action">
 
-## step 2: Mint TIP-3 tokens
+## Step 2: Mint TIP-3 tokens
 <div :class="llAction">
 
 
@@ -299,7 +299,7 @@ In order to be able to mint token for a token wallet you must be the token root 
 
 <button @click="mintTokens" class="mintTokenBut" >mint Tokens</button>
 </div>
-<p id="output-p" :class="EIPdis" ref="mintTokenOutput"></p>
+<p id="output-p" :class="EIPdis" ref="mintTokenOutput"><loading :text="loadingText"/></p>
 
 </div>
 
@@ -312,10 +312,13 @@ import { defineComponent, ref, onMounted } from "vue";
 import {toast} from "/src/helpers/toast";
 import {mintTip3Eip} from "../Scripts/Account/mint"
 import ImgContainer from "../../.vitepress/theme/components/shared/BKDImgContainer.vue"
+import loading from "../../.vitepress/theme/components/shared/BKDLoading.vue"
+
 export default defineComponent({
   name: "mintToken",
-      components :{
-    ImgContainer
+  components :{
+    ImgContainer,
+    loading
   },
   data(){
     return{
@@ -324,7 +327,8 @@ export default defineComponent({
         llSwitcher:"llSwitcher on",
         eipSwitcher: "eipSwitcher off",
         llAction: "llAction cbShow",
-        eipAction: "eipAction cbHide"
+        eipAction: "eipAction cbHide",
+        loadingText: " ",
     }
   },
   setup() {
@@ -352,14 +356,14 @@ export default defineComponent({
         this.eipAction = "eipAction cbShow"
     }
   async function mintTokens(){
-          this.$refs.mintTokenOutput.innerHTML = "Processing ..."
+          this.loadingText = "";
         // checking of all the values are fully filled
         if (
             this.$refs.actionTokenRootAddress.value == ""
 
         ){
             toast("Token root address field is required !",0)
-            this.$refs.mintTokenOutput.innerHTML = "Failed"
+            this.loadingText = "Failed"
             return
         }
                 // checking of all the values are fully filled
@@ -368,7 +372,7 @@ export default defineComponent({
 
         ){
             toast("Recipient address field is required !",0)
-            this.$refs.mintTokenOutput.innerHTML = "Failed"
+            this.loadingText = "Failed"
             return
         }        // checking of all the values are fully filled
         if (
@@ -376,7 +380,7 @@ export default defineComponent({
 
         ){
             toast("Amount field is required !",0)
-            this.$refs.mintTokenOutput.innerHTML = "Failed"
+            this.loadingText = "Failed"
             return
         }
         let mintTokenRes = await mintTip3Eip(
@@ -386,7 +390,7 @@ export default defineComponent({
           )
           // Rendering the output
           mintTokenRes = !mintTokenRes ? "Failed" :  mintTokenRes;
-          this.$refs.mintTokenOutput.innerHTML = mintTokenRes;
+          this.loadingText = mintTokenRes;
   }
 
 return {

@@ -339,10 +339,10 @@ Congratulations, you have successfully burned TIP-3 tokens from a token wallet ð
 <p class=actionInName style="margin-bottom: 0;">Amount</p>
 <input ref="actionAmount" class="action Ain" type="text"/>
 
-<button @click="burnTokens" class="burnTokenBut" >burn Tokens</button>`
+<button @click="burnTokens" class="burnTokenBut" >burn Tokens</button>
 
 </div>
-<p id="output-p" :class="EIPdis" ref="burnTokenOutput"></p>
+<p id="output-p" :class="EIPdis" ref="burnTokenOutput"><loading :text="loadingText"/></p>
 
 ### Burn TIP-3 Tokens By root
 
@@ -362,7 +362,7 @@ In order to utilize the `burnByRoot` you must be the root owner !
 
 <button @click="burnTokensByRoot" class="burnTokenBut" >burn TIP-3 Tokens By Root </button>
 </div>
-<p id="output-p" :class="EIPdis" ref="burnTokenOutputByRoot"></p>
+<p id="output-p" :class="EIPdis" ref="burnTokenOutputByRoot"><loading :text="loadingText2"/></p>
 
 </div>
 
@@ -376,11 +376,13 @@ import {toast} from "/src/helpers/toast";
 import {burnTip3Eip} from "../Scripts/Account/burn"
 import {burnByRootTip3Eip} from "../Scripts/Account/burnByRoot"
 import ImgContainer from "../../.vitepress/theme/components/shared/BKDImgContainer.vue"
+import loading from "../../.vitepress/theme/components/shared/BKDLoading.vue"
 
 export default defineComponent({
   name: "burnToken",
       components :{
-    ImgContainer
+    ImgContainer,
+    loading
   },
   data(){
     return{
@@ -389,8 +391,10 @@ export default defineComponent({
         llSwitcher:"llSwitcher on",
         eipSwitcher: "eipSwitcher off",
         llAction: "llAction cbShow",
-        eipAction: "eipAction cbHide"
-    }
+        eipAction: "eipAction cbHide",
+        loadingText: " ",
+        loadingText2: " "
+        }
   },
   setup() {
 
@@ -417,14 +421,14 @@ export default defineComponent({
         this.eipAction = "eipAction cbShow"
     }
   async function burnTokens(){
-          this.$refs.burnTokenOutput.innerHTML = "Processing ..."
+          this.loadingText = ""
         // checking of all the values are fully filled
         if (
             this.$refs.actionTokenRootAddress.value == ""
 
         ){
             toast("Token root address field is required !",0)
-            this.$refs.burnTokenOutput.innerHTML = "Failed"
+            this.loadingText = "Failed"
             return
         }
         // checking of all the values are fully filled
@@ -433,7 +437,7 @@ export default defineComponent({
 
         ){
             toast("Amount field is required !", 0)
-            this.$refs.burnTokenOutput.innerHTML = "Failed"
+            this.loadingText = "Failed"
             return
         }
 
@@ -444,17 +448,17 @@ export default defineComponent({
           )
           // Rendering the output
           burnTokenRes = !burnTokenRes ? "Failed" :  burnTokenRes;
-          this.$refs.burnTokenOutput.innerHTML = burnTokenRes;
+          this.loadingText = burnTokenRes;
   }
 
    async function burnTokensByRoot(){
-          this.$refs.burnTokenOutputByRoot.innerHTML = "Processing ..."
+          this.loadingText2 = ""
         if (
             this.$refs.actionTokenRootAddressByRoot.value == ""
 
         ){
             toast("token Root field field is required !",0)
-            this.$refs.burnTokenOutputByRoot.innerHTML = "Failed"
+            this.loadingText2 = "Failed"
             return
         }
         if (
@@ -462,7 +466,7 @@ export default defineComponent({
 
         ){
             toast("target field is required !", 0)
-            this.$refs.burnTokenOutputByRoot.innerHTML = "Failed"
+            this.loadingText2 = "Failed"
             return
         }
         // checking of all the values are fully filled
@@ -471,7 +475,7 @@ export default defineComponent({
 
         ){
             toast("Amount field is required !",0)
-            this.$refs.burnTokenOutputByRoot.innerHTML = "Failed"
+            this.loadingText2 = "Failed"
             return
         }
         let burnTokenRes = await burnByRootTip3Eip(
@@ -481,7 +485,7 @@ export default defineComponent({
           )
           // Rendering the output
           burnTokenRes = !burnTokenRes ? "Failed" :  burnTokenRes;
-          this.$refs.burnTokenOutputByRoot.innerHTML = burnTokenRes;
+          this.loadingText2 = burnTokenRes;
   }
 
 return {

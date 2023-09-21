@@ -286,13 +286,13 @@ async function main() {
 
 <div class="action">
 
-## step 2: Deploy Token Root
+## Step 2: Deploy Token Root
 <div :class="llAction">
 
 Let's run our script using locklift:
 
 ```` shell
-npx locklift run -s ./scripts/01-deploy-token.ts -n local
+npx locklift run -s ./scripts/01-deploy-token.ts -n `
 ````
 <ImgContainer src= '/image(15).png' width="100%" altText="deployTokenRootOutput" />
 
@@ -343,8 +343,8 @@ Congratulations, you have deployed your first TIP3 Token Root 🎉
 </div>
 
 </div>
-
-<p id="output-p" :class="EIPdis" ref="deployTokenRootOutput"></p>
+<p id="output-p" :class="EIPdis" ref="deployTokenRootOutput"><loading :text="loadingText"/>
+</p>
 
 </div>
 
@@ -354,11 +354,13 @@ import {deployRootParams} from "../Scripts/types";
 import {toast} from "/src/helpers/toast";
 import {deployTokenRootEip} from  "../Scripts/Account/TokenRoot";
 import ImgContainer from "../../.vitepress/theme/components/shared/BKDImgContainer.vue"
+import loading from "../../.vitepress/theme/components/shared/BKDLoading.vue"
 
 export default defineComponent({
   name: "DeployTokenRoot",
     components :{
-    ImgContainer
+    ImgContainer,
+    loading
   },
   data(){
     return{
@@ -368,10 +370,11 @@ export default defineComponent({
         eipSwitcher: "eipSwitcher off",
         llAction: "llAction cbShow",
         eipAction: "eipAction cbHide",
-
+        loadingText: " ",
     }
   },
   setup() {
+
     function llHandler(e){
         if(this.LLdis == "cbHide")
         {
@@ -397,21 +400,21 @@ export default defineComponent({
     }
 
     async function deployTokenRoot(){
-      this.$refs.deployTokenRootOutput.innerHTML = "Processing ..."
+      this.loadingText = "";
         // checking of all the values are fully filled
         if (
             this.$refs.actionName.value == ""
 
         ){
             toast("Name field is required !",0)
-            this.$refs.deployTokenRootOutput.innerHTML = "Failed"
+            this.loadingText = "Failed"
             return
         }
         if (
             this.$refs.actionSymbol.value == ""
         ){
             toast("Symbol field is required !",0)
-            this.$refs.deployTokenRootOutput.innerHTML = "Failed"
+            this.loadingText = "Failed"
             return
         }
         if (
@@ -419,7 +422,7 @@ export default defineComponent({
             isNaN(Number(this.$refs.actionDecimals.value))
         ){
             toast("Decimals field must be number and non empty !",0)
-            this.$refs.deployTokenRootOutput.innerHTML = "Failed"
+            this.loadingText = "Failed"
             return
         }
         if (
@@ -427,7 +430,7 @@ export default defineComponent({
             this.$refs.actionInitialSupply.value != 0
         ){
             toast("initialSupply must be empty for zeroAddress supply receiver !",0)
-            this.$refs.deployTokenRootOutput.innerHTML = "Failed"
+            this.loadingText = "Failed"
             return
         }
 
@@ -447,7 +450,7 @@ export default defineComponent({
         await deployTokenRootEip(deployTokenRootParams);
         // Rendering the output
         deployedTokenAddr = !deployedTokenAddr ? "Failed" :  deployedTokenAddr;
-        this.$refs.deployTokenRootOutput.innerHTML = deployedTokenAddr;
+        this.loadingText = deployedTokenAddr
 
     }
     return {
