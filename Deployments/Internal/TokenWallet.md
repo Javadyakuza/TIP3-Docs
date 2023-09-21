@@ -44,13 +44,15 @@ import { FactorySource } from "../build/factorySource";
 import { Address, Signer, Contract } from "locklift";
 
 async function main() {
-  // Setting up the signers and the wallets
 
+  // Setting up the signers and the accounts
   const signer: Signer = (await locklift.keystore.getSigner("0"))!;
 
+  // Required contracts addresses
   const tokenRootAddress: Address = new Address("<YOUR_TOKEN_ROOT_ADDReSS>");
   const multiWalletAddress: Address = new Address("<YOUR_MULTI_WALLET_ADDRESS>");
 
+  // Creating an instance of the multi wallet tip-3 contract
   const multiWalletContract: Contract<FactorySource["MultiWalletTIP3"]> = await locklift.factory.getDeployedContract(
     "MultiWalletTIP3",
     multiWalletAddress,
@@ -102,6 +104,8 @@ import { provider, providerAddress } from './useProvider';
 /**
  * We develop two more methods in order to reduce the mass of the script
  */
+
+// This function will extract the public key of the sender
 async function extractPubkey(provider: ProviderRpcClient, senderAddress: Address): Promise<string> {
   // Fetching the user public key
   const accountFullState: FullContractState = (
@@ -114,22 +118,25 @@ async function extractPubkey(provider: ProviderRpcClient, senderAddress: Address
 }
 
 async function main() {
-  // Initiate the TVM provider
-  const tokenRootAddress: Address = new Address('<YOUR_TOKEN_ROOT_ADDRESS>');
-  const multiWalletAddress: Address = new Address('<YOUR_MULTI_WALLET_TIP3_ADDRESS>');
 
   try {
-    // creating an instance of the token root contract
+
+    // Required contracts addresses
+    const tokenRootAddress: Address = new Address('<YOUR_TOKEN_ROOT_ADDRESS>');
+    const multiWalletAddress: Address = new Address('<YOUR_MULTI_WALLET_TIP3_ADDRESS>');
+
+    // Creating instances of the required contracts
     const tokenRootContract = new provider.Contract(
       tip3Artifacts.factorySource['TokenRoot'],
       tokenRootAddress
     );
-    // creating an instance of the token root contract
+
     const MultiWalletContract = new provider.Contract(
       tip3Artifacts.factorySource['MultiWalletTIP3'],
       multiWalletAddress
     );
-    // Fetching the decimals
+
+    // Fetching the symbol
     const symbol: string = (await tokenRootContract.methods.symbol({ answerId: 0 }).call()).value0;
 
     // Checking if the user already doesn't have any wallet of that token root
@@ -140,12 +147,10 @@ async function main() {
     });
 
     if (tokenWalletData[0]!.tokenWallet.toString() != tip3Artifacts.zeroAddress.toString()) {
-      console.log('You already have a wallet of this token !');
-
-      return 'Failed';
+      throw new Error('Failed, You already have a wallet of this token !');
     }
 
-    // Deploying a new contract if didn't exist before
+    // Deploying a new token wallet if it doesn't exists before
     const { transaction: deployWalletRes } = await MultiWalletContract.methods
       .deployWallet({
         _deployWalletBalance: 2 * 10 ** 9,
@@ -155,13 +160,14 @@ async function main() {
         publicKey: await extractPubkey(provider, providerAddress),
       });
 
+    // Throwing an error if the transaction was aborted
     if (deployWalletRes.aborted) {
       throw new Error(
         `Transaction aborted ! ${(deployWalletRes.exitCode, deployWalletRes.resultCode)}`
       );
     }
-    // Checking if the user already doesn't have the any wallet of that token root
 
+    // Fetching the new wallet data from the multi wallet contract and check if its deployed successfully or not
     tokenWalletData = (await MultiWalletContract.methods.wallets().call()).wallets.map(item => {
       if (item[0].toString() == tokenRootContract.address.toString()) {
         return item[1];

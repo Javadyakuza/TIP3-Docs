@@ -66,7 +66,8 @@ import { Address, zeroAddress, Signer, Contract, WalletTypes } from "locklift";
 import { FactorySource } from "../build/factorySource";
 
 async function main() {
-  // Setting up the signer and wallet
+
+  // Setting up the signer and account
   const signer: Signer = (await locklift.keystore.getSigner("0"))!;
 
   // uncomment if deploying a new account
@@ -85,6 +86,7 @@ async function main() {
     mSigType: "SafeMultisig",
   });
 
+  // Creating an instance of the target token root
   const rootDeployerAddress: Address = new Address("<YOUR_ROOT_DEPLOYER_ADDRESS>");
 
   const rootDeployerContract: Contract<FactorySource["RootDeployer"]> = locklift.factory.getDeployedContract(
@@ -92,7 +94,7 @@ async function main() {
     rootDeployerAddress,
   );
 
-  // Preparing the params
+  // Defining an interface for tokens root deployment using the root deployer contract
   interface deployRootParams {
     initialSupplyTo: Address;
     rootOwner: Address;
@@ -108,6 +110,7 @@ async function main() {
     remainingGasTo: Address;
   }
 
+  // Preparing the deployment params
   const deployRootFromDeployerParams: deployRootParams = {
     name: "Tip3OnboardingToken",
     decimals: 6,
@@ -123,12 +126,12 @@ async function main() {
     remainingGasTo: account.address,
   };
 
+  // Deploying the token root utilizing an external message to the root deployer contract
   await rootDeployerContract.methods.deployTokenRoot(deployRootFromDeployerParams).sendExternal({
     publicKey: signer.publicKey,
   });
 
-  // Confirming tha that the token root is deployed by calling the name method on it
-  // making an instance of the contract , the deployment confirmation will be recognized here as well but we prefer getting the name of the contract
+  // Confirming tha that the token root is deployed by calling its name method
   const tokenRoot: Contract<FactorySource["TokenRoot"]> = locklift.factory.getDeployedContract(
     "TokenRoot",
     (
@@ -179,6 +182,8 @@ import { provider, providerAddress } from './useProvider';
 /**
  * We develop two more methods in order to reduce the mass of the script
  */
+
+// THis function will extract the public key of the sender
 async function extractPubkey(provider: ProviderRpcClient, senderAddress: Address): Promise<string> {
   // Fetching the user public key
   const accountFullState: FullContractState = (
@@ -193,11 +198,11 @@ async function extractPubkey(provider: ProviderRpcClient, senderAddress: Address
 async function main() {
   // Initiate the TVM provider
 
-  // Token Root contracts abis
+  // Token Root contracts abi
   const tokenRootAbi: tip3Artifacts.FactorySource['TokenRoot'] =
     tip3Artifacts.factorySource['TokenRoot'];
 
-  // Fetching the root deployer
+  // Creating an instance of the  root deployer contract
   const rootDeployerAddress: Address = new Address('<YOUR_ROOT_DEPLOYER_ADDRESS>');
 
   const rootDeployerAbi: tip3Artifacts.FactorySource['RootDeployer'] =
@@ -206,7 +211,7 @@ async function main() {
   const rootDeployerContract: Contract<tip3Artifacts.FactorySource['RootDeployer']> =
     new provider.Contract(rootDeployerAbi, rootDeployerAddress);
 
-  // Preparing the params
+  // Defining an interface for tokens root deployment using the root deployer contract
   interface deployRootParams {
     initialSupplyTo: Address;
     rootOwner: Address;
@@ -222,6 +227,7 @@ async function main() {
     remainingGasTo: Address;
   }
 
+  // Preparing the parameters
   const params: deployRootParams = {
     initialSupplyTo: tip3Artifacts.zeroAddress,
     rootOwner: providerAddress,
@@ -244,7 +250,7 @@ async function main() {
       publicKey: await extractPubkey(provider, providerAddress),
     });
 
-  // checking if the token root is deployed successfully by calling one of its methods
+  // Throwing an error if the transaction was aborted
   if (deployRes.aborted) {
     throw new Error(`transaction aborted ${(deployRes.exitCode, deployRes.resultCode)}`);
   }
@@ -266,6 +272,7 @@ async function main() {
   const tokenRootContract: Contract<tip3Artifacts.FactorySource['TokenRoot']> =
     new provider.Contract(tokenRootAbi, tokenRootAddr);
 
+  // checking if the token root is deployed successfully by calling one of its methods
   const tokenName: string = (await tokenRootContract.methods.name({ answerId: 0 }).call({})).value0;
 
   if (tokenName == params.name) {

@@ -63,6 +63,8 @@ async function getWalletData(
   MWContract: Contract<FactorySource["MultiWalletTIP3"]>,
   tokenRootAddress: Address,
 ): Promise<{ tokenWallet: Address; balance: number }> {
+
+  // Returned value of the wallets mapping on the multi wallet tip-3 contract
   const walletData = (await MWContract.methods.wallets().call()).wallets.map(item => {
     if (item[0].toString() == tokenRootAddress.toString()) {
       return item[1];
@@ -95,28 +97,30 @@ async function main() {
     mSigType: "SafeMultisig",
   });
 
+  // Preparing the required contracts addresses
   const tokenRootAddress: Address = new Address("0:fbc4a3db3df3d3b03f1752ab05d6ba3155865f906af4b5653b324d1a2519b03d");
   const multiWalletAddress: Address = new Address("0:154a511d61b2a0ac92841e4e8c319ab5390d665db650533c512f0661277df045");
 
+  // Creating an instance of the required contracts
   const [tokenRootContract, multiWalletContract] = await Promise.all([
     await locklift.factory.getDeployedContract("TokenRoot", tokenRootAddress),
     await locklift.factory.getDeployedContract("MultiWalletTIP3", multiWalletAddress),
   ]);
 
+  // Fetching the decimals and symbol from the token root contract
   const [decimals, symbol] = await Promise.all([
     Number((await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0),
     (await tokenRootContract.methods.symbol({ answerId: 0 }).call()).value0,
   ]);
 
+  // Creating an instance of the token wallet contract
   let tokenWalletContract: Contract<FactorySource["TokenWallet"]>;
 
   // fetching the balance of the token wallet associated with the token root and determining of its deployed or no
-
   let deployWalletValue: string = "0";
   const tokenWalletData = await getWalletData(multiWalletContract, tokenRootAddress);
 
   if (tokenWalletData.tokenWallet.toString() != zeroAddress.toString()) {
-    // means that the token wallet is deployed for the user
     tokenWalletContract = locklift.factory.getDeployedContract("TokenWallet", tokenWalletData.tokenWallet);
     console.log("Token Wallet is deployed, balance before mint: ", Number(tokenWalletData.balance) / 10 ** decimals);
   } else {
@@ -124,10 +128,10 @@ async function main() {
     deployWalletValue = locklift.utils.toNano(2);
   }
 
+  // Defining he mint amount
   const mintAmount: number = 50 * 10 ** decimals;
 
-  // Minting tokens for Alice
-
+  // Minting tokens for receiver
   await tokenRootContract.methods
     .mint({
       amount: mintAmount,
@@ -177,6 +181,8 @@ async function getWalletData(
   MWContract: Contract<tip3Artifacts.FactorySource['MultiWalletTIP3']>,
   tokenRootAddress: Address
 ): Promise<{ tokenWallet: Address; balance: number }> {
+
+  // Returned value of the wallets mapping on the multi wallet tip-3 contract
   const walletData = (await MWContract.methods.wallets().call()).wallets.map(item => {
     if (item[0].toString() == tokenRootAddress.toString()) {
       return item[1];
@@ -192,37 +198,46 @@ async function getWalletData(
 }
 
 async function main() {
-  // Initiate the TVM provider
+
+  // Required contracts addresses
   const tokenRootAddress: Address = new Address('<YOUR_TOKEN_ROOT_ADDRESS>');
   const multiWalletAddress: Address = new Address('<YOUR_MULTI_WALLET_ADDRESS>');
 
   try {
-    // creating an instance of the token root contract
+
+    // creating an instance of the required contracts
     const tokenRootContract: Contract<tip3Artifacts.FactorySource['TokenRoot']> =
       new provider.Contract(tip3Artifacts.factorySource['TokenRoot'], tokenRootAddress);
-    // creating an instance of the token root contract
     const MultiWalletContract: Contract<tip3Artifacts.FactorySource['MultiWalletTIP3']> =
       new provider.Contract(tip3Artifacts.factorySource['MultiWalletTIP3'], multiWalletAddress);
+
     // Fetching the decimals and symbol
     const [decimals, symbol] = await Promise.all([
       Number((await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0),
       (await tokenRootContract.methods.symbol({ answerId: 0 }).call()).value0,
     ]);
 
+    // Defining the mint amount
     const mintAmount: number = 50 * 10 ** decimals;
 
-    // Checking if the user already doesn't have the any wallet of that token root
+    // Checking if the user already has a token wallet associated with the token root
     let tokenWalletData = await getWalletData(MultiWalletContract, tokenRootContract.address);
 
+    // Defining the deployWalletValue
     let deployWalletValue: number = 0;
 
+    // Fetching the balance before minting tokens
     const oldBal: number = Number(tokenWalletData.balance) / 10 ** decimals;
 
+    // Checking the if the user already has an token wallet of the target token root and accordingly setting the deployWalletValue to deploy onw for the user if doesn't have any
     if (tokenWalletData.tokenWallet.toString() == tip3Artifacts.zeroAddress.toString()) {
       deployWalletValue = 2 * 10 ** 9;
     }
+
+    // Defining the transaction fee
     const txFee: string = String(2 * 10 ** 9 + deployWalletValue);
-    // Deploying a new contract if didn't exist before
+
+    // Minting tokens fo the receiver
     const mintRes: Transaction = await tokenRootContract.methods
       .mint({
         amount: mintAmount,
@@ -238,13 +253,16 @@ async function main() {
         bounce: true,
       });
 
+    // Throwing an error if the transaction was aborted
     if (mintRes.aborted) {
       throw new Error(`Transaction aborted ! ${(mintRes.exitCode, mintRes.resultCode)}`);
     }
 
+    // Fetching the wallet data and balance after the mint is done
     tokenWalletData = await getWalletData(MultiWalletContract, tokenRootContract.address);
     const newBal: number = Number(tokenWalletData.balance) / 10 ** decimals;
 
+    // Checking if the tokens are minted successfully for th receiver
     if (newBal >= oldBal) {
       console.log(`${mintAmount} ${symbol}'s minted successfully `);
 

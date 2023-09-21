@@ -112,7 +112,7 @@ async function main() {
     txFee = locklift.utils.toNano("5");
   }
 
-  // getting decimals and symbols
+  // getting decimals and symbol
   const [decimals, symbol] = await Promise.all([
     Number((await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0),
     (await tokenRootContract.methods.symbol({ answerId: 0 }).call()).value0,

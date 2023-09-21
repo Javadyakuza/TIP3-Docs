@@ -55,6 +55,8 @@ import { FactorySource } from "../build/factorySource";
 /**
  * We develope a method that retrieves the data of the token wallet from the relevant multi wallet contract
  */
+
+// This function will extract the wallet data recorded in the multi wallet tip-3 contract
 async function getWalletData(
   MWContract: Contract<FactorySource["MultiWalletTIP3"]>,
   tokenRootAddress: Address,
@@ -74,10 +76,13 @@ async function getWalletData(
 }
 
 async function main() {
+
+  // Required contracts Abi's
   const tokenRootAddress: Address = new Address("<YOUR_TOKEN_ROOT_ADDRESS>");
   const aliceMultiWalletAddress: Address = new Address("<SENDER_MULTI_WALLET_ADDRESS>");
   const bobMultiWalletAddress: Address = new Address("<RECEIVER_MULTI_WALLET_ADDRESS>");
 
+  // Fetching the first signer as alice
   const signerAlice: Signer = (await locklift.keystore.getSigner("0"))!;
 
   // Creating the target contracts instances
@@ -202,10 +207,13 @@ import { provider, providerAddress } from './useProvider';
 /**
  * We develop two more methods in order to reduce the mass of the script
  */
+
+// This function will extract the public key of the sender
 async function extractPubkey(
   provider: ProviderRpcClient,
   providerAddress: Address
 ): Promise<string> {
+
   // Fetching the user public key
   const accountFullState: FullContractState = (
     await provider.getFullContractState({ address: providerAddress })
@@ -215,11 +223,14 @@ async function extractPubkey(
 
   return senderPublicKey;
 }
+
+// Defining the interface of what does the extractPubkey function returns
 interface walletData {
   tokenWallet: Address;
   balance: number;
 }
-export async function getWalletData(
+// This function will extract the wallets data from the wallets mapping from the multi wallet tip-3 contract
+async function getWalletData(
   MWContract: Contract<tip3Artifacts.FactorySource['MultiWalletTIP3']>,
   tokenRootAddress: Address
 ): Promise<walletData> {
@@ -239,6 +250,8 @@ export async function getWalletData(
 
 async function main() {
   try {
+
+    // Required contracts addresses
     const tokenRootAddress: Address = new Address('<YOUR_TOKEN_ROOT_ADDRESS>');
     const receiverMWAddress: Address = new Address('<RECEIVER_MULTI_WALLET_ADDRESS>');
     const senderMWAddress: Address = new Address('<SENDER_MULTI_WALLET_ADDRESS>');
@@ -274,12 +287,14 @@ async function main() {
 
       return 'Failed';
     }
+
     // Checking recipient has a deploy wallet of that token root
     let recipientOldWalletData: walletData = await getWalletData(
       receiverMWContract,
       tokenRootContract.address
     );
 
+    // Fetching the old balance of the receiver before transfer and determining if the receiver has a token wallet and deploy one by setting the deployWalletValue if not
     let oldBal: number = recipientOldWalletData.balance;
 
     let deployWalletValue: number = 0;
@@ -298,6 +313,7 @@ async function main() {
       })
       .sendExternal({ publicKey: senderPubkey });
 
+    // Throwing an error if transaction aborted and checking the confirmation of the transfer if not aborted
     if (transferRes.aborted) {
       console.log(`Transaction aborted !: ${(transferRes.exitCode, transferRes.resultCode)}`);
     } else {
@@ -319,6 +335,7 @@ async function main() {
       Using transferToWallet function
     */
 
+    // Fetching the receiver balance before utilizing th transfer to wallet function
     oldBal = recipientOldWalletData.balance;
 
     // Transferring token using the receiver token wallet address
@@ -330,6 +347,7 @@ async function main() {
       })
       .sendExternal({ publicKey: senderPubkey });
 
+    // Throwing an error if transaction aborted and checking the confirmation of the transfer if not aborted
     if (transferToWalletRes.aborted) {
       throw new Error(
         `Transaction aborted !: ${(transferToWalletRes.exitCode, transferToWalletRes.resultCode)}`

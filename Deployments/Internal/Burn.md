@@ -45,11 +45,13 @@ The code sample below follows the same approach but makes the transactions using
 import { Contract, Signer, zeroAddress, Address, WalletTypes } from "locklift";
 import { FactorySource } from "../build/factorySource";
 
-// We use the getWalletData function to extract the token wallet data from the multi wallet contract
+// We use the getWalletData function to extract the token wallet's data from the multi wallet contract
 async function getWalletData(
   MWContract: Contract<FactorySource["MultiWalletTIP3"]>,
   tokenRootAddress: Address,
 ): Promise<{ tokenWallet: Address; balance: number }> {
+
+  // Fetching the wallet data from wallets mapping from the multi wallet tip-3 contract
   const walletData = (await MWContract.methods.wallets().call()).wallets.map(item => {
     if (item[0].toString() == tokenRootAddress.toString()) {
       return item[1];
@@ -65,9 +67,12 @@ async function getWalletData(
 }
 
 async function main() {
+
+  // Preparing the required contracts addresses
   const tokenRootAddress: Address = new Address("<YOUR_TOKEN_ROOT_ADDRESS>");
   const multiWalletAddress: Address = new Address("<YOUR_MULTI_WALLET_ADDRESS>");
 
+  // Creating an instance of the required contracts
   const tokenRootContract: Contract<FactorySource["TokenRoot"]> = locklift.factory.getDeployedContract(
     "TokenRoot",
     tokenRootAddress,
@@ -78,7 +83,7 @@ async function main() {
     multiWalletAddress,
   );
 
-  // Setting up the signer and the wallet
+  // Setting up the signer and the account
   const signer: Signer = (await locklift.keystore.getSigner("0"))!;
 
   // uncomment if deploying a new account
@@ -97,14 +102,19 @@ async function main() {
     mSigType: "SafeMultisig",
   });
 
+  // Fetching the decimals and the symbol
   const [decimals, symbol] = await Promise.all([
     Number((await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0),
     (await tokenRootContract.methods.symbol({ answerId: 0 }).call()).value0,
   ]);
 
+  // Preparing the burning amount
   const burnAmount: number = 10 * 10 ** decimals;
+
+  // Fetching the old balance of the token wallet using multi wallet tpi-3 contract
   let oldBal: number = (await getWalletData(multiWalletContract, tokenRootContract.address)).balance;
-  // Burning some tokens from Bob's wallet(bob's Multi Wallet contract)
+
+  // Burning tip-3 tokens from Bob's wallet(bob's Multi Wallet contract)
   const { transaction: burnRes } = await multiWalletContract.methods
     .burn({
       _amount: burnAmount,
@@ -112,7 +122,7 @@ async function main() {
     })
     .sendExternal({ publicKey: signer.publicKey });
 
-  // Confirming token are burnt
+  // Confirming tokens are burnt
   let newBal: number = (await getWalletData(multiWalletContract, tokenRootContract.address)).balance;
   if (newBal < oldBal) {
     console.log(
@@ -124,11 +134,17 @@ async function main() {
     console.log(`Burning token failed ${(burnRes.exitCode, burnRes.resultCode)}`);
   }
 
+   /*
+    Using burnByRoot function
+  */
+
+  // Defining the burn amount to be used in the burnBYRoot function
   const burnByRootAmount: number = 5 * 10 ** decimals;
 
+  // Defining the balance of the token wallet before burning
   oldBal = (await getWalletData(multiWalletContract, tokenRootContract.address)).balance;
 
-  // Burning some tokens from the token root by calling (burnByRoot)
+  // Burning tip-3 tokens from the token root by calling (burnByRoot) on the token root contract
   await tokenRootContract.methods
     .burnTokens({
       amount: burnByRootAmount,
@@ -139,8 +155,10 @@ async function main() {
     })
     .send({ from: account.address, amount: locklift.utils.toNano("2") });
 
+  // Fetching the new balance after the burn is done
   newBal = (await getWalletData(multiWalletContract, tokenRootContract.address)).balance;
 
+  // Checking if the token are burnt successfully
   if (newBal < oldBal) {
     console.log(
       `${burnByRootAmount / 10 ** decimals} ${symbol}'s burnt by root successfully \n
@@ -179,10 +197,13 @@ import { provider, providerAddress } from './useProvider';
 /**
  * We develop two more methods in order to reduce the mass of the script
  */
+
+// This function is utilized to extract the public key of the sender wallet
 async function extractPubkey(
   provider: ProviderRpcClient,
   providerAddress: Address
 ): Promise<string> {
+
   // Fetching the user public key
   const accountFullState: FullContractState = (
     await provider.getFullContractState({ address: providerAddress })
@@ -197,10 +218,13 @@ interface walletData {
   balance: number;
 }
 
+// THis function is utilized to fetch token wallet data from the multi wallet tip-3 contract
 async function getWalletData(
   MWContract: Contract<tip3Artifacts.FactorySource['MultiWalletTIP3']>,
   tokenRootAddress: Address
 ): Promise<walletData> {
+
+  // returned value of the "wallets" mapping from multi wallet tip-3
   const walletData = (await MWContract.methods.wallets().call()).wallets.map(item => {
     if (item[0].toString() == tokenRootAddress.toString()) {
       return item[1];
@@ -217,6 +241,8 @@ async function getWalletData(
 
 async function main() {
   try {
+
+    // Preparing the required contracts addresses
     const tokenRootAddress: Address = new Address('<YOUR_TOKEN_ROOT_ADDRESS>');
     const multiWalletAddress: Address = new Address('<YOUR_MULTI_WALLET_ADDRESS>');
 
@@ -227,25 +253,30 @@ async function main() {
     const multiWalletContract: Contract<tip3Artifacts.FactorySource['MultiWalletTIP3']> =
       new provider.Contract(tip3Artifacts.factorySource['MultiWalletTIP3'], multiWalletAddress);
 
-    // Fetching the decimals
+    // Fetching the decimals and symbol
     const [decimals, symbol] = await Promise.all([
       Number((await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0),
       (await tokenRootContract.methods.symbol({ answerId: 0 }).call()).value0,
     ]);
 
+    // Defining the burn amount
     const burnAmount: number = 10 * 10 ** decimals;
 
+    // Fetching the balance before burning tokens
     let oldBal: number = (await getWalletData(multiWalletContract, tokenRootContract.address))
       .balance;
 
+    // Get the senders public key
     const senderPubkey: string = await extractPubkey(provider, providerAddress);
     if (senderPubkey != (await multiWalletContract.methods.owner({}).call()).owner) {
       throw new Error('You are not the owner of the sender multi wallet contract !');
     }
 
+    // checking if the user has enough tokens to burn
     if (oldBal < burnAmount) {
       throw new Error('Low balance !');
     }
+
     // burning tokens from a token wallet by calling the burn method
     const { transaction: burnRes } = await multiWalletContract.methods
       .burn({
@@ -256,14 +287,15 @@ async function main() {
         publicKey: await extractPubkey(provider, providerAddress),
       });
 
+    // Throwing an Error if the transaction was aborted
     if (burnRes.aborted) {
       throw new Error(`Transaction aborted ! ${burnRes.exitCode}`);
     }
-    // Checking if the user already doesn't have the any wallet of that token root
-    // Getting the recipient balance
 
+    // Getting the balance after burning the tokens
     let newBal = (await getWalletData(multiWalletContract, tokenRootContract.address)).balance;
 
+    // Checking if the tokens are successfully burnt
     if (newBal < oldBal) {
       console.log(`${burnAmount / 10 ** decimals} ${symbol}'s successfully burnt !`);
 
@@ -278,13 +310,17 @@ async function main() {
       Using burnByRoot function
     */
 
+    // Fetching the balance before utilizing the burnByRoot function
     oldBal = (await getWalletData(multiWalletContract, tokenRootContract.address)).balance;
 
+    // Defining the burn amount to be used when calling the burnByRoot function
     const burnByRootAmount: number = 5 * 10 ** decimals;
 
+    // Checking iof the user has enough tokens to burn
     if (oldBal < burnByRootAmount) {
       throw new Error('Low balance !');
     }
+
     // burning tokens from a token wallet by calling the burn method
     const { transaction: burnByRootRes } = await tokenRootContract.methods
       .burnTokens({
@@ -298,14 +334,15 @@ async function main() {
         publicKey: await extractPubkey(provider, providerAddress),
       });
 
+    // Throwing an error if the transaction was aborted
     if (burnByRootRes.aborted) {
       throw new Error(`Transaction aborted ! ${burnByRootRes.exitCode}`);
     }
-    // Checking if the user already doesn't have the any wallet of that token root
-    // Getting the recipient balance
 
+    // Getting the balance after burning tokens using token root function
     newBal = (await getWalletData(multiWalletContract, tokenRootContract.address)).balance;
 
+    // Checking if the tokens are burnt successfully
     if (newBal < oldBal) {
       console.log(`${burnByRootAmount / 10 ** decimals} ${symbol}'s successfully burnt By Root!`);
 
