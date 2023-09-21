@@ -300,7 +300,7 @@ Congratulations, you have successfully minted TIP-3 tokens for a token wallet de
 
 </div>
 
-<p id="output-p" :class="EIPdis" ref="mintTokenOutput"></p>
+<p id="output-p" :class="EIPdis" ref="mintTokenOutput"><loading :text="loadingText"/></p>
 
 </div>
 </div>
@@ -313,11 +313,14 @@ import { defineComponent, ref, onMounted } from "vue";
 import {toast} from "/src/helpers/toast";
 import {mintTokenCon} from "../Scripts/Contract/mint"
 import ImgContainer from "../../.vitepress/theme/components/shared/BKDImgContainer.vue"
+import loading from "../../.vitepress/theme/components/shared/BKDLoading.vue"
 
 export default defineComponent({
   name: "mintToken",
     components :{
-    ImgContainer
+    ImgContainer,
+    loading
+
   },
   data(){
     return{
@@ -326,7 +329,9 @@ export default defineComponent({
         llSwitcher:"llSwitcher on",
         eipSwitcher: "eipSwitcher off",
         llAction: "llAction cbShow",
-        eipAction: "eipAction cbHide"
+        eipAction: "eipAction cbHide",
+        loadingText: " ",
+
     }
   },
   setup() {
@@ -354,14 +359,14 @@ export default defineComponent({
         this.eipAction = "eipAction cbShow"
     }
   async function mintTokens(){
-          this.$refs.mintTokenOutput.innerHTML = "Processing ..."
+          this.loadingText = ""
         // checking of all the values are fully filled
         if (
             this.$refs.actionTokenRootAddress.value == ""
 
         ){
             toast("Token root address field is required !",0)
-            this.$refs.mintTokenOutput.innerHTML = "Failed"
+            this.loadingText = "Failed"
             return
         }
                 // checking of all the values are fully filled
@@ -370,7 +375,7 @@ export default defineComponent({
 
         ){
             toast("Multi Wallet  address field is required !",0)
-            this.$refs.mintTokenOutput.innerHTML = "Failed"
+            this.loadingText = "Failed"
             return
         }        // checking of all the values are fully filled
         if (
@@ -378,7 +383,7 @@ export default defineComponent({
 
         ){
             toast("Amount field is required !",0)
-            this.$refs.mintTokenOutput.innerHTML = "Failed"
+            this.loadingText = "Failed"
             return
         }
         let mintTokenRes = await mintTokenCon(
@@ -388,7 +393,7 @@ export default defineComponent({
           )
           // Rendering the output
           mintTokenRes = !mintTokenRes ? "Failed" :  mintTokenRes;
-          this.$refs.mintTokenOutput.innerHTML = mintTokenRes;
+          this.loadingText = mintTokenRes;
   }
 
 

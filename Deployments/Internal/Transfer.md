@@ -399,7 +399,7 @@ Congratulations, you have successfully transferred TIP-3 tokens from one to anot
 
 <button @click="transferTokens" class="transferTokenBut" >Transfer Tokens</button>
 </div>
-<p id="output-p" :class="EIPdis" ref="transferTokenOutput"></p>
+<p id="output-p" :class="EIPdis" ref="transferTokenOutput"><loading :text="loadingText"/></p>
 
 <div :class="transferToWallet">
 
@@ -424,7 +424,7 @@ Congratulations, you have successfully transferred TIP-3 tokens from one to anot
 
 </div>
 
-<p id="output-p" :class="EIPdis" ref="WalletTransferTokenOutput"></p>
+<p id="output-p" :class="EIPdis" ref="WalletTransferTokenOutput"><loading :text="loadingText2"/></p>
 
 </div>
 
@@ -433,10 +433,14 @@ import { defineComponent, ref, onMounted } from "vue";
 import {toast} from "/src/helpers/toast";
 import {transferTokenCon, transferTokenToWalletCon} from "../Scripts/Contract/transfer"
 import ImgContainer from "../../.vitepress/theme/components/shared/BKDImgContainer.vue"
+import loading from "../../.vitepress/theme/components/shared/BKDLoading.vue"
+
 export default defineComponent({
   name: "transferToken",
     components :{
-    ImgContainer
+    ImgContainer,
+    loading
+
   },
   data(){
     return{
@@ -445,7 +449,10 @@ export default defineComponent({
         llSwitcher:"llSwitcher on",
         eipSwitcher: "eipSwitcher off",
         llAction: "llAction cbShow",
-        eipAction: "eipAction cbHide"
+        eipAction: "eipAction cbHide",
+        loadingText: " ",
+        loadingText2: " ",
+
     }
   },
   setup() {
@@ -473,14 +480,14 @@ export default defineComponent({
         this.eipAction = "eipAction cbShow"
     }
   async function transferTokens(){
-          this.$refs.transferTokenOutput.innerHTML = "Processing ..."
+          this.loadingText = ""
         // checking of all the values are fully filled
         if (
             this.$refs.actionTokenRootAddress.value == ""
 
         ){
             toast("Token root address field is required !",0)
-            this.$refs.transferTokenOutput.innerHTML = "Failed"
+            this.loadingText = "Failed"
             return
         }
         if (
@@ -488,7 +495,7 @@ export default defineComponent({
 
         ){
             toast("Recipient multi wallet address field is required !",0)
-            this.$refs.transferTokenOutput.innerHTML = "Failed"
+            this.loadingText = "Failed"
             return
         }
         if (
@@ -496,7 +503,7 @@ export default defineComponent({
 
         ){
             toast("Sender multi wallet address field is required !",0)
-            this.$refs.transferTokenOutput.innerHTML = "Failed"
+            this.loadingText = "Failed"
             return
         }
         if (
@@ -504,7 +511,7 @@ export default defineComponent({
 
         ){
             toast("Amount field is required !",0)
-            this.$refs.transferTokenOutput.innerHTML = "Failed"
+            this.loadingText = "Failed"
             return
         }
         let transferTokenRes = await transferTokenCon(
@@ -516,17 +523,17 @@ export default defineComponent({
 
         // Rendering the output
         transferTokenRes = !transferTokenRes ? "Failed" :  transferTokenRes;
-        this.$refs.transferTokenOutput.innerHTML = transferTokenRes;
+        this.loadingText = transferTokenRes;
   }
 
    async function transferTokensToWallet(){
-          this.$refs.WalletTransferTokenOutput.innerHTML = "Processing ..."
+          this.loadingText2 = ""
         if (
             this.$refs.actionWalletTokenRootAddress.value == ""
 
         ){
             toast("Token root address field is required !",0)
-            this.$refs.WalletTransferTokenOutput.innerHTML = "Failed"
+            this.loadingText2 = "Failed"
             return
         }
         if (
@@ -534,7 +541,7 @@ export default defineComponent({
 
         ){
             toast("Recipient multi wallet address field is required !",0)
-            this.$refs.WalletTransferTokenOutput.innerHTML = "Failed"
+            this.loadingText2 = "Failed"
             return
         }
         if (
@@ -542,7 +549,7 @@ export default defineComponent({
 
         ){
             toast("Sender multi wallet address field is required !",0)
-            this.$refs.WalletTransferTokenOutput.innerHTML = "Failed"
+            this.loadingText2 = "Failed"
             return
         }
         if (
@@ -550,7 +557,7 @@ export default defineComponent({
 
         ){
             toast("Amount field is required !",0)
-            this.$refs.WalletTransferTokenOutput.innerHTML = "Failed"
+            this.loadingText2 = "Failed"
             return
         }
         let transferTokenRes = await transferTokenToWalletCon(
@@ -561,7 +568,7 @@ export default defineComponent({
           )
           // Rendering the output
           transferTokenRes = !transferTokenRes ? "Failed" :  transferTokenRes;
-          this.$refs.WalletTransferTokenOutput.innerHTML = transferTokenRes;
+          this.loadingText2 = transferTokenRes;
   }
 
 return {

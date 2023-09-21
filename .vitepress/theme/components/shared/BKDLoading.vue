@@ -5,9 +5,7 @@
     <p class="textContainer" style="margin : 5px 0 5px 0;">{{ text }}</p>
 </template>
 <script lang="ts">
-/* eslint-disable */
-import { TransferWithinAStationTwoTone } from '@mui/icons-material';
-import { defineComponent, ref, onMounted, watch } from 'vue';
+import { defineComponent, ref, watch } from 'vue';
 
 export default defineComponent({
     name: 'loading',

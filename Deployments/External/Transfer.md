@@ -481,7 +481,7 @@ export default defineComponent({
         llSwitcher:"llSwitcher on",
         eipSwitcher: "eipSwitcher off",
         llAction: "llAction cbShow",
-        eipAction: "eipAction cbHide",  
+        eipAction: "eipAction cbHide",
         loadingText: " ",
         loadingText2: " ",
     }

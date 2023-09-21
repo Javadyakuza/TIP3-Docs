@@ -37,7 +37,7 @@ Before we start to write our scripts we need to make sure that there is a file n
 Deploying a token root using everscale-inpage-provider is now made easier with the Multi Wallet contract, as demonstrated in the code samples below:
 
 
-::: danger
+::: warning
 
 The parameter `initialSupply` must be set to zero if the `initialSupplyTo` is **zero address**.
 
@@ -344,7 +344,7 @@ Congratulations, you have deployed a TIP3 Token Root through the Root Deployer c
 
 </div>
 
-<p id="output-p" :class="EIPdis" ref="deployTokenRootOutput"></p>
+<p id="output-p" :class="EIPdis" ref="deployTokenRootOutput"><loading :text="loadingText"/></p>
 
 </div>
 
@@ -354,10 +354,14 @@ import {deployRootParams} from "../Scripts/types";
 import {toast} from "/src/helpers/toast";
 import {deployTokenRootFromContract} from  "../Scripts/Contract/DeployTokenRoot";
 import ImgContainer from "../../.vitepress/theme/components/shared/BKDImgContainer.vue"
+import loading from "../../.vitepress/theme/components/shared/BKDLoading.vue"
+
 export default defineComponent({
   name: "DeployTokenRoot",
     components :{
-    ImgContainer
+    ImgContainer,
+    loading
+
   },
   data(){
     return{
@@ -366,7 +370,9 @@ export default defineComponent({
         llSwitcher:"llSwitcher on",
         eipSwitcher: "eipSwitcher off",
         llAction: "llAction cbShow",
-        eipAction: "eipAction cbHide"
+        eipAction: "eipAction cbHide",
+        loadingText: " ",
+
     }
   },
   setup() {
@@ -395,14 +401,14 @@ export default defineComponent({
     }
 
     async function deployTokenRoot(){
-      this.$refs.deployTokenRootOutput.innerHTML = "Processing ..."
+      this.loadingText = ""
         // checking of all the values are fully filled
         if (
             this.$refs.actionRootDeployer.value == ""
 
         ){
             toast("Root Deployer field is required !",0)
-            this.$refs.deployTokenRootOutput.innerHTML = "Failed"
+            this.loadingText = "Failed"
             return
         }
         if (
@@ -410,14 +416,14 @@ export default defineComponent({
 
         ){
             toast("Name field is required !",0)
-            this.$refs.deployTokenRootOutput.innerHTML = "Failed"
+            this.loadingText = "Failed"
             return
         }
         if (
             this.$refs.actionSymbol.value == ""
         ){
             toast("Symbol field is required !",0)
-            this.$refs.deployTokenRootOutput.innerHTML = "Failed"
+            this.loadingText = "Failed"
             return
         }
         if (
@@ -425,7 +431,7 @@ export default defineComponent({
             isNaN(Number(this.$refs.actionDecimals.value))
         ){
             toast("Decimals field must be number and non empty !",0)
-            this.$refs.deployTokenRootOutput.innerHTML = "Failed"
+            this.loadingText = "Failed"
             return
         }
         if (
@@ -434,7 +440,7 @@ export default defineComponent({
 
         ){
             toast("initialSupply must be empty for zeroAddress supply receiver !",0)
-            this.$refs.deployTokenRootOutput.innerHTML = "Failed"
+            this.loadingText = "Failed"
             return
         }
 
@@ -454,7 +460,7 @@ export default defineComponent({
         await deployTokenRootFromContract(deployTokenRootParams, this.$refs.actionRootDeployer.value);
         // Rendering the output
         deployedTokenAddr = !deployedTokenAddr ? "Failed" :  deployedTokenAddr;
-        this.$refs.deployTokenRootOutput.innerHTML = deployedTokenAddr;
+        this.loadingText = deployedTokenAddr;
 
     }
 

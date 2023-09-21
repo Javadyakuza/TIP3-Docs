@@ -218,7 +218,7 @@ Congratulations, you have deployed a TIP3 Token Wallet from the Multi Wallet TIP
 
 </div>
 
-<p id="output-p" :class="EIPdis" ref="deployTokenWalletOutput"></p>
+<p id="output-p" :class="EIPdis" ref="deployTokenWalletOutput"><loading :text="loadingText"/></p>
 
 </div>
 
@@ -228,11 +228,14 @@ import {deployRootParams} from "../Scripts/types";
 import {toast} from "/src/helpers/toast";
 import {deployTokenWalletCon} from "../Scripts/Contract/tokenWallet"
 import ImgContainer from "../../.vitepress/theme/components/shared/BKDImgContainer.vue"
+import loading from "../../.vitepress/theme/components/shared/BKDLoading.vue"
 
 export default defineComponent({
   name: "DeployTokenWallet",
     components :{
-    ImgContainer
+    ImgContainer,
+    loading
+
   },
   data(){
     return{
@@ -241,7 +244,9 @@ export default defineComponent({
         llSwitcher:"llSwitcher on",
         eipSwitcher: "eipSwitcher off",
         llAction: "llAction cbShow",
-        eipAction: "eipAction cbHide"
+        eipAction: "eipAction cbHide",
+        loadingText: " ",
+
     }
   },
   setup() {
@@ -269,14 +274,14 @@ export default defineComponent({
         this.eipAction = "eipAction cbShow"
     }
   async function deployTokenWallet(){
-          this.$refs.deployTokenWalletOutput.innerHTML = "Processing ..."
+          this.loadingText = ""
         // checking of all the values are fully filled
         if (
             this.$refs.actionTokenRootAddress.value == ""
 
         ){
             toast("Token root address field is required !",0)
-            this.$refs.deployTokenWalletOutput.innerHTML = "Failed"
+            this.loadingText = "Failed"
             return
         }
         if (
@@ -284,14 +289,14 @@ export default defineComponent({
 
         ){
             toast("Multi wallet tip-3 address field is required !",0)
-            this.$refs.deployTokenWalletOutput.innerHTML = "Failed"
+            this.loadingText = "Failed"
             return
         }
 
         let deployTokenWalletAddr = await deployTokenWalletCon(this.$refs.actionTokenRootAddress.value, this.$refs.actionMultiWalletTip3Address.value)
         // Rendering the output
         deployTokenWalletAddr = !deployTokenWalletAddr ? "Failed" :  deployTokenWalletAddr;
-        this.$refs.deployTokenWalletOutput.innerHTML = deployTokenWalletAddr;
+        this.loadingText = deployTokenWalletAddr;
   }
 return {
         eipHandler,

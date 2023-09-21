@@ -969,7 +969,7 @@ Congratulations, you have deployed a Multi Wallet TIP3 contract 🎉
 
 </div>
 
-<p id="output-p" :class="EIPdis" ref="DeployMultiWalletTip3Output"></p>
+<p id="output-p" :class="EIPdis" ref="DeployMultiWalletTip3Output"><loading :text="loadingText"/></p>
 
 </div>
 
@@ -979,11 +979,14 @@ import {deployRootParams} from "../Scripts/types";
 import {toast} from "/src/helpers/toast";
 import {deployMultiWalletTip3Con} from "../Scripts/Contract/DeployMultiWallet"
 import ImgContainer from "../../.vitepress/theme/components/shared/BKDImgContainer.vue"
+import loading from "../../.vitepress/theme/components/shared/BKDLoading.vue"
 
 export default defineComponent({
   name: "DeployMultiWalletTip3",
   components :{
-    ImgContainer
+    ImgContainer,
+    loading
+
   },
   data(){
     return{
@@ -992,7 +995,9 @@ export default defineComponent({
         llSwitcher:"llSwitcher on",
         eipSwitcher: "eipSwitcher off",
         llAction: "llAction cbShow",
-        eipAction: "eipAction cbHide"
+        eipAction: "eipAction cbHide",
+        loadingText: " ",
+
     }
   },
   setup() {
@@ -1020,12 +1025,12 @@ export default defineComponent({
         this.eipAction = "eipAction cbShow"
     }
   async function deployMultiWallet(){
-          this.$refs.DeployMultiWalletTip3Output.innerHTML = "Processing ..."
+          this.loadingText = ""
         // checking of all the values are fully filled
         let DeployMultiWalletTip3Addr = await deployMultiWalletTip3Con()
         // Rendering the output
         DeployMultiWalletTip3Addr = !DeployMultiWalletTip3Addr ? "Failed" :  DeployMultiWalletTip3Addr;
-        this.$refs.DeployMultiWalletTip3Output.innerHTML = DeployMultiWalletTip3Addr;
+        this.loadingText = DeployMultiWalletTip3Addr;
   }
 return {
         eipHandler,

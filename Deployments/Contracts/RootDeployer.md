@@ -338,7 +338,7 @@ Congratulations, you have deployed a Root Deployer contract 🎉
 
 </div>
 
-<p id="output-p" :class="EIPdis" ref="DeployRootDeployerOutput"></p>
+<p id="output-p" :class="EIPdis" ref="DeployRootDeployerOutput"><loading :text="loadingText"/></p>
 
 </div>
 
@@ -349,10 +349,13 @@ import {deployRootParams} from "../Scripts/types";
 import {toast} from "/src/helpers/toast";
 import {deployRootDeployerCon} from  "../Scripts/Contract/RootDeployer";
 import ImgContainer from "../../.vitepress/theme/components/shared/BKDImgContainer.vue"
+import loading from "../../.vitepress/theme/components/shared/BKDLoading.vue"
+
 export default defineComponent({
   name: "DeployRootDeployer",
       components :{
-    ImgContainer
+    ImgContainer,
+    loading
   },
   data(){
     return{
@@ -361,7 +364,8 @@ export default defineComponent({
         llSwitcher:"llSwitcher on",
         eipSwitcher: "eipSwitcher off",
         llAction: "llAction cbShow",
-        eipAction: "eipAction cbHide"
+        eipAction: "eipAction cbHide",
+        loadingText: " ",
     }
   },
   setup() {
@@ -390,10 +394,10 @@ export default defineComponent({
     }
 
     async function deployRootDeployer(){
-        this.$refs.DeployRootDeployerOutput.innerHTML = "Processing ...";
+        this.loadingText = "";
         let deployRootDeployerRes = await deployRootDeployerCon();
         deployRootDeployerRes = !deployRootDeployerRes ? "Failed" :  deployRootDeployerRes;
-        this.$refs.DeployRootDeployerOutput.innerHTML = deployRootDeployerRes;
+        this.loadingText = deployRootDeployerRes;
     }
 
     return {
