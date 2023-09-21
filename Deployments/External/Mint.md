@@ -63,7 +63,7 @@ async function main() {
   //   value: locklift.utils.toNano(20),
   // });
 
-  // Adding an existing account from the key pair defined in  the locklift.config.ts
+// Adding an existing SafeMultiSig Account using its address
   const aliceAccount = await locklift.factory.accounts.addExistingAccount({
     type: WalletTypes.MsigAccount,
     address:  new Address("<ALICE_ACCOUNT_ADDRESS>"),
@@ -79,7 +79,7 @@ async function main() {
   //   value: locklift.utils.toNano(20),
   // });
 
-  // Adding an existing account from the key pair defined in  the locklift.config.ts
+// Adding an existing SafeMultiSig Account using its address
   const bobAccount = await locklift.factory.accounts.addExistingAccount({
     type: WalletTypes.MsigAccount,
     address:  new Address("<BOB_ACCOUNT_ADDRESS>"),
