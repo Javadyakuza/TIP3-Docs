@@ -34,6 +34,9 @@ module.exports = {
     search: {
       provider: 'local',
     },
+    editLink: {
+      pattern: 'https://github.com/Javadyakuza/TIP3-Docs/edit/main/:path',
+    },
     nav: NAV,
     sidebar: [
       {

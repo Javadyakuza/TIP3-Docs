@@ -4,7 +4,7 @@
 
 In the EVM (Ethereum Virtual Machine), to enable upgradeability for a specific A1, you must deploy at least one additional A2 for that A1. Each upgrade will necessitate the deployment of a new account. This widely accepted approach is known as the _Upgradeable Proxy Pattern_.
 
-In the TVM (TON Virtual Machine), there is an instruction called  `SETCODE`  that allows an account to upgrade itself using a code obtained from an inbound message or its own storage. The account's address remains unchanged, and the upgrade does not require any additional deployments.
+In the TVM (Threaded Virtual Machine), there is an instruction called  `SETCODE`  that allows an account to upgrade itself using a code obtained from an inbound message or its own storage. The account's address remains unchanged, and the upgrade does not require any additional deployments.
 
 ::: tip
 For a better understanding of this instruction, you can also refer to the TVM API documentation at the following link:
@@ -25,6 +25,12 @@ We will now explain how these smart contracts function and their purpose. Howeve
 
 In simpler terms, the base implementation of the Platform (represented by the  `TokenWalletPlatform`  contract in the TIP-3 standard) initializes the  `TokenWalletUpgradeable` contract.
 
+## Why Do We Need the Platform Contract?
+
+Why do we need a platform contract when we can simply deploy a token wallet directly?
+
+The platform contract features immutable and unmodifiable code, providing a stable foundation for deploying token wallets. This ensures that wallets can always recognize each other. Conversely, when token wallets are upgraded, the expected address is derived from the same code. This provides stability to the token wallet addresses, allowing them to consistently recognize each other.
+
 #### workflow
 
 In the following section, we will provide an explanation of how the  `TokenWalletUpgradeable`  contract is initiated by the  `TokenWalletPlatform`  contract.
@@ -34,7 +40,7 @@ Let's begin by examining the base implementation of the Platform:
 <summary> show code</summary>
 
 ```` solidity
-pragma ton-solidity >= 0.57.0;
+pragma ever-solidity >= 0.57.0;
 
 import "./libraries/TokenMsgFlag.tsol";
 
@@ -171,7 +177,7 @@ before any further explanations lets take a look at the `TokenWalletUpgradeable`
 <summary> show code</summary>
 
 ```` solidity
-pragma ton-solidity >= 0.57.0;
+pragma ever-solidity >= 0.57.0;
 
 pragma AbiHeader expire;
 pragma AbiHeader pubkey;
@@ -441,7 +447,7 @@ The  `TokenRootUpgradable`  contract provides the same functionality as the stan
 <summary> show code</summary>
 
 ```` solidity
-pragma ton-solidity >= 0.57.0;
+pragma ever-solidity >= 0.57.0;
 
 pragma AbiHeader expire;
 pragma AbiHeader pubkey;
@@ -737,20 +743,10 @@ contract TokenRootUpgradeable is
 </details>
 
 
-::: tip
 Please note that in addition to the additional features, a critical implementation has been modified as described below:
+
 #### Deployable Token Wallet
 In contrast to the standard TokenRoot, the upgradeable version deploys the  `TokenWalletPlatform`  contract, which we previously explained its workflow.
-:::
-
-The  `TokenRootUpgradeable`  contract introduces several important features in terms of functions and variables, including:
-
--  `requestUpgradeWallet` : This function is called by the initiated TokenWalletUpgradeable contract to request a code change.
--  `setWalletCode` : This function updates the state of the TokenRootUpgradeable contract to the latest TokenWalletUpgradeable code.
--  `upgrade` : This function updates the code of the TokenRootUpgradeable contract, following the same flow as before.
--  `walletVersion` : Represents the version of the current token wallet code.
--  `platformCode` : Refers to the contract code of the  `TokenWalletPlatform` .
-
 
 ::: tip
 Please navigate to the [Deploy Upgradable Contracts](../../Deployments/upgradeableContracts.md) section for detailed instructions on the deployment process of the previously mentioned contracts and how to interact with them.

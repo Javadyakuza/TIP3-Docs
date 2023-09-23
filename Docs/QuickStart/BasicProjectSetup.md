@@ -23,11 +23,11 @@ Locklift is a tool that simplifies the development and management of smart contr
 ``` shell
 npx locklift init
 ```
-<ImgContainer src= '/image(12).png' width="100%" altText="locklift initialization output" />
+<ImgContainer src= '/image(12).png' width="70%" altText="locklift initialization output" />
 
 We should get such a project structure:
 
-<ImgContainer src= '/image(7).png' width="100%" altText="locklift structure after initialization" />
+<ImgContainer src= '/image(7).png' width="50%" altText="locklift structure after initialization" />
 
 ## Step 3: Install Contract Packages
 

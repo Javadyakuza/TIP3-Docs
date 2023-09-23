@@ -19,7 +19,7 @@ In Everscale, a contract can have an external (msg.pubkey) and/or internal (msg.
 <summary> show code </summary>
 
 ```solidity
-pragma ton-solidity >= 0.61.2;
+pragma ever-solidity >= 0.61.2;
 pragma AbiHeader expire;
 pragma AbiHeader pubkey;
 

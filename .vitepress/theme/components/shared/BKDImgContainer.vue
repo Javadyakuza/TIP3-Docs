@@ -1,6 +1,6 @@
 <template>
     <div class="image-container">
-        <img :src="src" :alt="altText" :style="{ maxWidth: maxWidth, padding: padding }" />
+        <img :src="src" :alt="altText" :style="{ width: width, maxWidth: maxWidth, padding: padding }" />
     </div>
 </template>
 

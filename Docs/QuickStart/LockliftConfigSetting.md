@@ -27,11 +27,9 @@ npx locklift build
 After completing the process there should be a folder named **_build_** with this structure:
 
 
-<ImgContainer src= '/llStructure.png' width="100%" altText="buildStructure" />
+<ImgContainer src= '/llStructure.png' width="50%" altText="buildStructure" />
 
-::: tip
-Please refer to the Locklift documentation at https://docs.locklift.io/ for more detailed information.
-:::
+Please refer to the [Locklift documentation]( https://docs.locklift.io/) for more detailed information.
 
 <script lang="ts" >
 import { defineComponent, ref, onMounted } from "vue";
