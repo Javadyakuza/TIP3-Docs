@@ -169,6 +169,13 @@ Pleas Note that the `TokenWalletPlatform` contract is only deployable via the th
 Contrary, the normal token wallet can be deployed by contracts except than the `TokenRoot` or `TokenWallet` contracts.
 :::
 
+## How Does Contract Upgrading Work?
+### Upgrading the TokenRootUpgradeable Contract
+The  `upgrade`  function within the token root contract allows for the upgrading of the contract itself by utilizing the `SETCODE` TVM instruction.
+### TokenWalletUpgradeable
+The upgrade process for the  `TokenWalletUpgradeable`  contract occurs when there are changes made to the wallet code within the token root contract, utilizing the  `setWalletCode`  method.
+Once this update has taken place, it becomes possible to request an upgrade for the token wallet code to the most recent version available in the token root contract, utilizing the  `upgrade`  method on the `TokenWalletUpgradeable`.
+
 ## Token Wallet Upgradable
 
 before any further explanations lets take a look at the `TokenWalletUpgradeable` code:
@@ -410,7 +417,7 @@ Now, let's delve into the additional functions and variables of the  `TokenWalle
 ---
 
 ####  upgrade  and  acceptUpgrade
-The  `upgrade`  function calls the `requestUpgradeWallet` on the token root contract. Once the root contract confirms that the `msg.sender` is the valid sender, the  `acceptUpgrade`  function is called on `TokenWalletUpgradable` contract accordingly.
+The  `upgrade`  function calls the `requestUpgradeWallet` on the token root contract. Once the root contract confirms that the `msg.sender` is the valid sender, the  `acceptUpgrade`  function is called on `TokenWalletUpgradable` contract accordingly and the latest wallet code will be passed to it as the input.
 
 The  `acceptUpgrade`  function then sets the new code of the contract using the same approach as the  `TokenWalletPlatform`  and invokes the  `onCodeUpgrade`  function.
 
@@ -742,11 +749,8 @@ contract TokenRootUpgradeable is
 
 </details>
 
-
-Please note that in addition to the additional features, a critical implementation has been modified as described below:
-
-#### Deployable Token Wallet
 In contrast to the standard TokenRoot, the upgradeable version deploys the  `TokenWalletPlatform`  contract, which we previously explained its workflow.
+
 
 ::: tip
 Please navigate to the [Deploy Upgradable Contracts](../../Deployments/upgradeableContracts.md) section for detailed instructions on the deployment process of the previously mentioned contracts and how to interact with them.

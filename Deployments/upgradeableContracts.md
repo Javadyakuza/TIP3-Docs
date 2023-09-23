@@ -34,13 +34,17 @@ After changing the config file run this command to rebuild the artifacts of the 
 npx locklift build
 ````
 
-## Step 2: Deploy The Contracts
+## Step 2: Use the Upgradeable Contracts
 
 First create a file named `00-deploy-upgradeable-contracts.ts` in your `scripts` folder and then copy the code sample below to it.
 
+Let's take a look at the code sample,  after that we explore what is happening inside of it.
+
 ````typescript
+
 import { Address, Contract, Signer, WalletTypes, zeroAddress } from "locklift";
 import { FactorySource } from "../build/factorySource";
+
 async function main() {
   try {
     // Fetching the signer and creating a wallet
@@ -55,7 +59,7 @@ async function main() {
     //   value: locklift.utils.toNano(20),
     // });
 
-  // Adding an existing SafeMultiSig Account using its address
+    // Adding an existing SafeMultiSig Account using its address
     const account = await locklift.factory.accounts.addExistingAccount({
       type: WalletTypes.MsigAccount,
       address: new Address("<YOUR_ACCOUNT_ADDRESS>"),
@@ -92,7 +96,7 @@ async function main() {
     console.log(`Token Root Upgradeable deployed to: ${tokenRootUpgradeable.address.toString()}`);
 
     // ensure its deployed
-    console.log(`Token Root Upgradeable deployed to: ${tokenRootUpgradeable.address.toString()}`);
+    console.log(`Token Root name: ${(await tokenRootUpgradeable.methods.name({ answerId: 0 }).call()).value0}`); // >> Tip3OnboardingToken
 
     // Deploying the TokenWalletPlatform via the TokenRootContract which results deploying the TokenWalletUpgradable contract
     await tokenRootUpgradeable.methods
@@ -124,7 +128,6 @@ async function main() {
     console.log(`The token wallet upgradable balance: ${balance}`); // >> 0
 
     // Minting some token for that token wallet
-
     await tokenRootUpgradeable.methods
       .mint({
         recipient: account.address,
@@ -136,20 +139,76 @@ async function main() {
       })
       .send({ from: account.address, amount: locklift.utils.toNano(3) });
 
+    // Fetching the balance and the version of the wallet
     balance = (await tokenWalletUpgradeable.methods.balance({ answerId: 0 }).call({})).value0;
 
-    console.log(`The token wallet upgradable balance: ${Number(balance) / 10 ** 6}`); // >> 10
+    let version = (await tokenWalletUpgradeable.methods.version({ answerId: 0 }).call({})).value0;
+
+    console.log(
+      `The token wallet upgradable balance: ${Number(balance) / 10 ** 6}
+       token Wallet version: ${version}`,
+    ); // >> 10 , 1
+
+    // Upgrading the token wallet code in the rot contract
+    await tokenRootUpgradeable.methods
+      .setWalletCode({
+        code: locklift.factory.getContractArtifacts("newTokenWalletUpgradeable").code,
+      })
+      .send({ from: account.address, amount: locklift.utils.toNano(3) });
+
+    // Time to update the th token wallet upgradeable code by requesting a code upgrade on the root contract
+    await tokenWalletUpgradeable.methods
+      .upgrade({ remainingGasTo: account.address })
+      .send({ from: account.address, amount: locklift.utils.toNano(3) });
+
+    // Calling the newly added function (getName)
+    //fetching the token wallet contract with the new abi and the same old address
+    const newTokenWalletUpgradeable: Contract<FactorySource["newTokenWalletUpgradeable"]> =
+      locklift.factory.getDeployedContract("newTokenWalletUpgradeable", tokenWalletUpgradeable.address);
+
+    console.log(
+      "retrieved name: ",
+      (await newTokenWalletUpgradeable.methods.getName({ answerId: 0, _name: "alice" }).call()).value0,
+      "\n new token wallet version: ",
+      (await tokenWalletUpgradeable.methods.version({ answerId: 0 }).call({})).value0,
+    );
+
+    // destroy the token wallet
+    // draining the token balance of the wallet
+    await tokenRootUpgradeable.methods
+      .burnTokens({
+        amount: 10 * 10 ** 6,
+        walletOwner: account.address,
+        remainingGasTo: account.address,
+        callbackTo: zeroAddress,
+        payload: "",
+      })
+      .send({ from: account.address, amount: locklift.utils.toNano(2) });
+
+    // confirming that the balance is drained successfully
+    balance = (await tokenWalletUpgradeable.methods.balance({ answerId: 0 }).call({})).value0;
+
+    console.log(`balance after draining: ${balance}`); // >> 0
+    // now its time to destroy the token wallet
+
+    // Time to destroy the token wallet
+    await tokenWalletUpgradeable.methods
+      .destroy({ remainingGasTo: account.address })
+      .send({ from: account.address, amount: locklift.utils.toNano(2) });
+
+    // calling a method on it to ensure its destroyed
+    console.log((await newTokenWalletUpgradeable.methods.getName({ answerId: 0, _name: "alice" }).call()).value0); // >> runLocal: Account not found
   } catch (err: any) {
     console.log(err.message);
   }
 }
+
 main()
   .then(() => process.exit(0))
   .catch(e => {
     // console.log(e);
     process.exit(1);
   });
-
 ````
 
 Then run this command to execute the script:
@@ -170,8 +229,13 @@ The expected output will be:
 ### Step 2: Deploy Token Wallet (Token Wallet Platform)
   We utilized the `deployWallet` function of the root contract to deploy a `TokenWalletPlatform` contract which results deployment of the `TokenWalletUpgradeable` contract.
 
-### Step 3: Interacting with Token Wallet Upgradeable
+### Step 3: Mint Tip-3 Tokens for the Token wallet
+We utilize the mint function on the token root upgradeable contract to mint tip-3 token for the newly deploy token wallet upgradeable contract.
+
+### Step 4: Interacting with Token Wallet Upgradeable
   We called the balance method on the token wallet contract to ensure that its deployed and then minted TIP-3 tokens for it to ensure is typical fungible functionality.
+
+### Step 5: UPgrading the TokenWalletUpgradeable 
 
 
 <script lang="ts" >

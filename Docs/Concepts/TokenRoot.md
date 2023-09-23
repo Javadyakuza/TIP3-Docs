@@ -10,9 +10,8 @@ The standard defines two primary contracts for interaction:
 
 ## Token Root
 
-The Token Root contract is responsible for keeping important information about the token and managing the creation of Token Wallets. It handles various important tasks, such as:
+The Token Root contract is responsible for keeping important information about the token such as `name`, `decimals`, `totalSupply` and `walletCode` and also managing the creation of Token Wallets. It handles various important tasks, such as:
 
-- token root contract stores the general information about the token, e.g.  `name`, `decimals`, `totalSupply` and `walletCode`.
 - Minting tokens.
 - Utilizing the [`burnByRoot`](../../Deployments/External/burn.md) function.
 - Enabling the `disableMint`, `disableBurnByRoot`, and `setBurnPaused` functions, which allow for the disabling of minting, burningByRoot, or pausing the burning of tokens.
