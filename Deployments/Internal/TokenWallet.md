@@ -41,27 +41,25 @@ According to the Multi Wallet contract, it stores the wallet information and its
 
 ````typescript
 
-  // Deploying a TokenWallet contract using the using multi wallet contract
-  await multiWalletContract.methods
+
+  // Deploying a TokenWallet contract using the using multi wallet contract for alice
+  await aliceMultiWalletContract.methods
     .deployWallet({
       _deployWalletBalance: locklift.utils.toNano("3"),
-      _tokenRoot: tokenRootAddress,
+      _tokenRoot: tokenRootContract.address,
     })
-    .sendExternal({ publicKey: signer.publicKey });
+    .sendExternal({ publicKey: signerAlice.publicKey });
 
   // Fetching the newly deployed Token Wallet
-  const tokenWalletData = (await multiWalletContract.methods.wallets().call()).wallets.map(item => {
-    if (item[0].toString() == tokenRootAddress.toString()) {
-      return item[1];
-    }
-  });
+  let tokenWalletData = await getWalletData(aliceMultiWalletContract, tokenRootContract.address);
 
-  const tokenWalletContract: Contract<FactorySource["TokenWallet"]> = locklift.factory.getDeployedContract(
+  const aliceTokenWalletContract: Contract<FactorySource["TokenWallet"]> = locklift.factory.getDeployedContract(
     "TokenWallet",
-    tokenWalletData[0]!.tokenWallet,
+    tokenWalletData.tokenWallet,
   );
 
-  console.log("Token wallet address; ", tokenWalletContract.address.toString());
+  console.log("Alice Token wallet address: ", tokenWalletData.tokenWallet.toString());
+
 
 ````
 

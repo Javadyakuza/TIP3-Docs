@@ -50,70 +50,38 @@ Minting TIP-3 tokens using everscale-inpage-provider is pretty easy as well:
 
 <span  :class="LLdis">
 
-````typescript
-// We use the getWalletData function to extract the token wallet data from the multi wallet contract
-
-/* add this function before the main function */
-async function getWalletData(
-  MWContract: Contract<FactorySource["MultiWalletTIP3"]>,
-  tokenRootAddress: Address,
-): Promise<{ tokenWallet: Address; balance: number }> {
-
-  // Returned value of the wallets mapping on the multi wallet tip-3 contract
-  const walletData = (await MWContract.methods.wallets().call()).wallets.map(item => {
-    if (item[0].toString() == tokenRootAddress.toString()) {
-      return item[1];
-    }
-  });
-  let balance: number = 0;
-  let tokenWallet: Address = zeroAddress;
-  if (walletData.length != 0) {
-    balance = Number(walletData[0]!.balance);
-    tokenWallet = walletData[0]!.tokenWallet;
-  }
-  return { tokenWallet: tokenWallet, balance: balance };
-}
-
-  /*
-   add this to the body of the main function
-  */
-
-  // fetching the balance of the token wallet associated with the token root and determining of its deployed or no
+````typescriptng the balance of the token wallet associated with the token root and determining of its deployed or no
   let deployWalletValue: string = "0";
-  const tokenWalletData = await getWalletData(multiWalletContract, tokenRootAddress);
-
-  if (tokenWalletData.tokenWallet.toString() != zeroAddress.toString()) {
-    tokenWalletContract = locklift.factory.getDeployedContract("TokenWallet", tokenWalletData.tokenWallet);
-    console.log("Token Wallet is deployed, balance before mint: ", Number(tokenWalletData.balance) / 10 ** decimals);
-  } else {
-    console.log("Token Wallet is not deployed, balance before mint: 0");
-    deployWalletValue = locklift.utils.toNano(2);
-  }
 
   // Defining he mint amount
-  const mintAmount: number = 50 * 10 ** decimals;
+  const mintAmount: number = 50 * 10 ** deployRootFromDeployerParams.decimals;
 
+  console.log(
+    "balance before mint:",
+    (await getWalletData(aliceMultiWalletContract, tokenRootContract.address)).balance /
+      10 ** deployRootFromDeployerParams.decimals,
+  );
   // Minting tokens for receiver
   await tokenRootContract.methods
     .mint({
       amount: mintAmount,
-      recipient: multiWalletAddress, // the owner of the token wallet is the MW contract
+      recipient: aliceMultiWalletContract.address, // the owner of the token wallet is the MW contract
       deployWalletValue: deployWalletValue,
       notify: true, // To update the Multi Wallet contract
       payload: "",
-      remainingGasTo: account.address,
+      remainingGasTo: aliceAccount.address,
     })
     .send({
-      from: account.address,
+      from: aliceAccount.address,
       amount: locklift.utils.toNano(5),
-    })
+    });
 
   // confirming that its received
   console.log(
     "balance after mint:",
-    (await getWalletData(multiWalletContract, tokenRootContract.address)).balance / 10 ** decimals,
+    (await getWalletData(aliceMultiWalletContract, tokenRootContract.address)).balance /
+      10 ** deployRootFromDeployerParams.decimals,
   );
-
 
 ````
 

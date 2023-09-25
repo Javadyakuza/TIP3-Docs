@@ -38,68 +38,72 @@ The code sample below follows the same approach but makes the transactions using
 
 
 ````typescript
-
+  // Burning
   // Preparing the burning amount
-  const burnAmount: number = 10 * 10 ** decimals;
+  const burnAmount: number = 10 * 10 ** deployRootFromDeployerParams.decimals;
 
   // Fetching the old balance of the token wallet using multi wallet tpi-3 contract
-  let oldBal: number = (await getWalletData(multiWalletContract, tokenRootContract.address)).balance;
+  let oldBal: number = (await getWalletData(aliceMultiWalletContract, tokenRootContract.address)).balance;
 
   // Burning tip-3 tokens from Bob's wallet(bob's Multi Wallet contract)
-  const { transaction: burnRes } = await multiWalletContract.methods
+  const { transaction: burnRes } = await aliceMultiWalletContract.methods
     .burn({
       _amount: burnAmount,
       _tokenRoot: tokenRootContract.address,
     })
-    .sendExternal({ publicKey: signer.publicKey });
+    .sendExternal({ publicKey: signerAlice.publicKey });
 
   // Confirming tokens are burnt
-  let newBal: number = (await getWalletData(multiWalletContract, tokenRootContract.address)).balance;
+  let newBal: number = (await getWalletData(aliceMultiWalletContract, tokenRootContract.address)).balance;
+
   if (newBal < oldBal) {
     console.log(
-      `${burnAmount / 10 ** decimals} ${symbol}'s burnt successfully \n
-    balance before burn: ${oldBal / 10 ** decimals} \n
-    balance after burn: ${newBal / 10 ** decimals}`,
+      `${burnAmount / 10 ** deployRootFromDeployerParams.decimals} ${
+        deployRootFromDeployerParams.symbol
+      }'s burnt successfully \n
+    Alice balance before burn: ${oldBal / 10 ** deployRootFromDeployerParams.decimals} \n
+    Alice balance after burn: ${newBal / 10 ** deployRootFromDeployerParams.decimals}`,
     );
   } else {
     console.log(`Burning token failed ${(burnRes.exitCode, burnRes.resultCode)}`);
   }
 
-   /*
+  /*
     Using burnByRoot function
   */
 
   // Defining the burn amount to be used in the burnBYRoot function
-  const burnByRootAmount: number = 5 * 10 ** decimals;
+  const burnByRootAmount: number = 5 * 10 ** deployRootFromDeployerParams.decimals;
 
   // Defining the balance of the token wallet before burning
-  oldBal = (await getWalletData(multiWalletContract, tokenRootContract.address)).balance;
+  oldBal = (await getWalletData(aliceMultiWalletContract, tokenRootContract.address)).balance;
 
   // Burning tip-3 tokens from the token root by calling (burnByRoot) on the token root contract
   await tokenRootContract.methods
     .burnTokens({
       amount: burnByRootAmount,
-      remainingGasTo: account.address,
-      walletOwner: multiWalletContract.address,
-      callbackTo: multiWalletContract.address, // important to update the MW state
+      remainingGasTo: aliceAccount.address,
+      walletOwner: aliceMultiWalletContract.address,
+      callbackTo: aliceMultiWalletContract.address, // important to update the MW state
       payload: "",
     })
-    .send({ from: account.address, amount: locklift.utils.toNano("2") });
+    .send({ from: aliceAccount.address, amount: locklift.utils.toNano("2") });
 
   // Fetching the new balance after the burn is done
-  newBal = (await getWalletData(multiWalletContract, tokenRootContract.address)).balance;
+  newBal = (await getWalletData(aliceMultiWalletContract, tokenRootContract.address)).balance;
 
   // Checking if the token are burnt successfully
   if (newBal < oldBal) {
     console.log(
-      `${burnByRootAmount / 10 ** decimals} ${symbol}'s burnt by root successfully \n
-    balance before burnByRoot: ${oldBal / 10 ** decimals} \n
-    balance after burnByRoot: ${newBal / 10 ** decimals}`,
+      `${burnByRootAmount / 10 ** deployRootFromDeployerParams.decimals} ${
+        deployRootFromDeployerParams.symbol
+      }'s burnt by root successfully \n
+    Alice balance before burnByRoot: ${oldBal / 10 ** deployRootFromDeployerParams.decimals} \n
+    Alice balance after burnByRoot: ${newBal / 10 ** deployRootFromDeployerParams.decimals}`,
     );
   } else {
     console.log(`Burning token failed ${(burnRes.exitCode, burnRes.resultCode)}`);
   }
-
 ````
 
 </span>

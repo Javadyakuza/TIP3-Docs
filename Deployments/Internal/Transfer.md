@@ -46,26 +46,27 @@ So if you want the change back into your `account contract` leave the notify `un
 
 ````typescript
 
-  /* Before we proceed to further steps we need to deploy two multi wallet tip3 contract
- for alice and bob using different accounts and signer.
-*/
   // We assume the bob doesn't have a deployed wallet at the first
   console.log(`Alice has token wallet ? ${
-    (await getWalletData(aliceMultiWalletContract, tokenRootAddress)).tokenWallet.toString() == zeroAddress.toString()
+    (await getWalletData(aliceMultiWalletContract, tokenRootContract.address)).tokenWallet.toString() !=
+    zeroAddress.toString()
   } \n
    Alice balance before transfer: ${
-     (await getWalletData(aliceMultiWalletContract, tokenRootAddress)).balance / 10 ** decimals
+     (await getWalletData(aliceMultiWalletContract, tokenRootContract.address)).balance /
+     10 ** deployRootFromDeployerParams.decimals
    }`); // >> true, 200
 
   console.log(`Bob has token wallet ? ${
-    (await getWalletData(bobMultiWalletContract, tokenRootAddress)).tokenWallet.toString() == zeroAddress.toString()
+    (await getWalletData(bobMultiWalletContract, tokenRootContract.address)).tokenWallet.toString() !=
+    zeroAddress.toString()
   } \n
   Bob balance before transfer: ${
-    (await getWalletData(bobMultiWalletContract, tokenRootAddress)).balance / 10 ** decimals
+    (await getWalletData(bobMultiWalletContract, tokenRootContract.address)).balance /
+    10 ** deployRootFromDeployerParams.decimals
   }`); // false, 0
 
   // Amount to transfer
-  const transferAmount: number = 100 * 10 ** decimals;
+  const transferAmount: number = 10 * 10 ** deployRootFromDeployerParams.decimals;
 
   /*
     Transfer with deployment of a wallet for the recipient account.
@@ -75,9 +76,9 @@ So if you want the change back into your `account contract` leave the notify `un
   await aliceMultiWalletContract.methods
     .transfer({
       _amount: transferAmount,
-      _recipient: bobMultiWalletAddress,
+      _recipient: bobMultiWalletContract.address,
       _deployWalletValue: locklift.utils.toNano(2), // We assume bob doesn't have any token wallet
-      _tokenRoot: tokenRootAddress,
+      _tokenRoot: tokenRootContract.address,
     })
     .sendExternal({
       publicKey: signerAlice.publicKey!,
@@ -86,25 +87,27 @@ So if you want the change back into your `account contract` leave the notify `un
   // Fetching the balances after the normal transfer function
   console.log(
     `Alice balance after transfer: ${
-      (await getWalletData(aliceMultiWalletContract, tokenRootAddress)).balance / 10 ** decimals
+      (await getWalletData(aliceMultiWalletContract, tokenRootContract.address)).balance /
+      10 ** deployRootFromDeployerParams.decimals
     }`,
   ); // >> 100
   console.log(
     `Bob balance after transfer: ${
-      (await getWalletData(bobMultiWalletContract, tokenRootAddress)).balance / 10 ** decimals
+      (await getWalletData(bobMultiWalletContract, tokenRootContract.address)).balance /
+      10 ** deployRootFromDeployerParams.decimals
     }`,
   ); // >> 100
 
   /*
      Transfer to deployed token wallet using transferToWallet
   */
-  const transferToWalletAmount: number = 50 * 10 ** decimals;
+  const transferToWalletAmount: number = 15 * 10 ** deployRootFromDeployerParams.decimals;
 
   await aliceMultiWalletContract.methods
     .transferToWallet({
       _amount: transferToWalletAmount,
-      _recipientTokenWallet: (await getWalletData(bobMultiWalletContract, tokenRootAddress)).tokenWallet,
-      _tokenRoot: tokenRootAddress,
+      _recipientTokenWallet: (await getWalletData(bobMultiWalletContract, tokenRootContract.address)).tokenWallet,
+      _tokenRoot: tokenRootContract.address,
     })
     .sendExternal({
       publicKey: signerAlice.publicKey!,
@@ -112,13 +115,16 @@ So if you want the change back into your `account contract` leave the notify `un
 
   console.log(
     `Alice balance after transfer to wallet: ${
-      (await getWalletData(aliceMultiWalletContract, tokenRootAddress)).balance / 10 ** decimals
+      (await getWalletData(aliceMultiWalletContract, tokenRootContract.address)).balance /
+      10 ** deployRootFromDeployerParams.decimals
     }`,
   ); // >> 50
   console.log(
     `Bob balance after transfer to wallet: ${
-      (await getWalletData(bobMultiWalletContract, tokenRootAddress)).balance / 10 ** decimals
+      (await getWalletData(bobMultiWalletContract, tokenRootContract.address)).balance /
+      10 ** deployRootFromDeployerParams.decimals
     }`,
+  );
 
 ````
 

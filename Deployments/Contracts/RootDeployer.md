@@ -172,17 +172,70 @@ We have already learned how to deploy a contract using  `everscale-inpage-provid
  * locklift is a globally declared object
  */
 
-import { Signer } from "locklift";
+import { Address, Contract, Signer, WalletTypes, zeroAddress } from "locklift";
+import { FactorySource } from "../build/factorySource";
 
+async function getWalletData(
+  MWContract: Contract<FactorySource["MultiWalletTIP3"]>,
+  tokenRootAddress: Address,
+): Promise<{ tokenWallet: Address; balance: number }> {
+  // Returned value of the wallets mapping on the multi wallet tip-3 contract
+  const walletData = (await MWContract.methods.wallets().call()).wallets.map(item => {
+    if (item[0].toString() == tokenRootAddress.toString()) {
+      return item[1];
+    }
+  });
+  let balance: number = 0;
+  let tokenWallet: Address = zeroAddress;
+  if (walletData.length != 0) {
+    balance = Number(walletData[0]!.balance);
+    tokenWallet = walletData[0]!.tokenWallet;
+  }
+  return { tokenWallet: tokenWallet, balance: balance };
+}
 async function main() {
-
   // Fetching the signer key pair from locklift.config.ts
-  const signer: Signer = (await locklift.keystore.getSigner("0"))!;
+  const signerAlice: Signer = (await locklift.keystore.getSigner("0"))!;
+  const signerBob: Signer = (await locklift.keystore.getSigner("1"))!;
+
+  // uncomment if deploying a new account
+  // const { contract: account } = await locklift.factory.deployContract({
+  //   contract: "Account",
+  //   publicKey: signer.publicKey,
+  //   constructorParams: {},
+  //   initParams: { _randomNonce: locklift.utils.getRandomNonce() },
+  //   value: locklift.utils.toNano(20),
+  // });
+
+  // Adding an existing SafeMultiSig Account using its address
+  const aliceAccount = await locklift.factory.accounts.addExistingAccount({
+    type: WalletTypes.MsigAccount,
+    address: await deployAcc(signerAlice),
+    mSigType: "SafeMultisig",
+    publicKey: signerAlice.publicKey,
+  });
+
+  // uncomment if deploying a new account
+  // const { contract: account } = await locklift.factory.deployContract({
+  //   contract: "Account",
+  //   publicKey: signer.publicKey,
+  //   constructorParams: {},
+  //   initParams: { _randomNonce: locklift.utils.getRandomNonce() },
+  //   value: locklift.utils.toNano(20),
+  // });
+
+  // Adding an existing SafeMultiSig Account using its address
+  const bobAccount = await locklift.factory.accounts.addExistingAccount({
+    type: WalletTypes.MsigAccount,
+    address: await deployAcc(signerBob),
+    mSigType: "SafeMultisig",
+    publicKey: signerBob.publicKey,
+  });
 
   // Deploying the Root deployer
   const { contract: rootDeployer } = await locklift.factory.deployContract({
     contract: "RootDeployer",
-    publicKey: signer.publicKey,
+    publicKey: signerAlice.publicKey,
     initParams: {
       randomNonce_: locklift.utils.getRandomNonce(),
     },
@@ -194,6 +247,7 @@ async function main() {
   });
 
   console.log(`Root Deployer: ${rootDeployer.address.toString()}`);
+
 }
 
 main()
@@ -202,6 +256,7 @@ main()
     console.log(e);
     process.exit(1);
   });
+
 
 ````
 

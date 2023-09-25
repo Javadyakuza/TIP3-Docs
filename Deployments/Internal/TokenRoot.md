@@ -58,8 +58,7 @@ The parameter `initialSupply` must be set to zero if the `initialSupplyTo` is **
 <span  :class="LLdis">
 
 ````typescript
-
-  // Defining an interface for tokens root deployment using the root deployer contract
+ // Defining an interface for tokens root deployment using the root deployer contract
   interface deployRootParams {
     initialSupplyTo: Address;
     rootOwner: Address;
@@ -84,16 +83,16 @@ The parameter `initialSupply` must be set to zero if the `initialSupplyTo` is **
     deployWalletValue: 0,
     symbol: "TOT",
     mintDisabled: false,
-    rootOwner: account.address,
+    rootOwner: aliceAccount.address,
     randomNonce: locklift.utils.getRandomNonce(),
     burnByRootDisabled: false,
     burnPaused: false,
-    remainingGasTo: account.address,
+    remainingGasTo: aliceAccount.address,
   };
 
   // Deploying the token root utilizing an external message to the root deployer contract
   await rootDeployer.methods.deployTokenRoot(deployRootFromDeployerParams).sendExternal({
-    publicKey: signer.publicKey,
+    publicKey: signerAlice.publicKey,
   });
 
   // Confirming tha that the token root is deployed by calling its name method

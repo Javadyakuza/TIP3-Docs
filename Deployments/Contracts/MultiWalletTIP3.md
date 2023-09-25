@@ -793,39 +793,33 @@ The code samples below demonstrate how to deploy a Multi Wallet TIP3 contract us
 
 
 ````typescript
-/*
- locklift is a globally declared object.
-*/
-
-import { Signer } from "locklift";
-
-async function main() {
-
-  // Setting up the signers and the wallets
-  const signer: Signer = (await locklift.keystore.getSigner("0"))!;
 
   // Deploying two MultiWalletTIP3 contracts
   // We send a bit more Ever than usual since the transaction fees will be spent from the contract balance and all of initiator the tx's are external.
-  const { contract: multiWalletContract } = await locklift.factory.deployContract({
+  const { contract: aliceMultiWalletContract } = await locklift.factory.deployContract({
     contract: "MultiWalletTIP3",
-    publicKey: signer.publicKey,
+    publicKey: signerAlice.publicKey,
     initParams: {
-      _randomNonce: locklift.utils.getRandomNonce(0),
+      _randomNonce: locklift.utils.getRandomNonce(),
     },
     constructorParams: { _walletCode: locklift.factory.getContractArtifacts("TokenWallet").code },
     value: locklift.utils.toNano("20"),
   });
 
-  console.log("Multi Wallet TIP-3 address: ", multiWalletContract.address.toString());
-}
+  console.log("Alice Multi Wallet TIP-3 address: ", aliceMultiWalletContract.address.toString());
 
-main()
-  .then(() => process.exit(0))
-  .catch(e => {
-    console.log(e);
-    process.exit(1);
+  // we need another multi wallet in order to be able to perform the transfer operation
+  const { contract: bobMultiWalletContract } = await locklift.factory.deployContract({
+    contract: "MultiWalletTIP3",
+    publicKey: signerBob.publicKey,
+    initParams: {
+      _randomNonce: locklift.utils.getRandomNonce(),
+    },
+    constructorParams: { _walletCode: locklift.factory.getContractArtifacts("TokenWallet").code },
+    value: locklift.utils.toNano("20"),
   });
 
+  console.log("Bob Multi Wallet TIP-3 address: ", bobMultiWalletContract.address.toString());
 
 ````
 

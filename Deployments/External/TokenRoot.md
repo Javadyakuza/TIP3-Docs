@@ -66,7 +66,7 @@ async function main() {
   // Adding an existing SafeMultiSig Account using its address
   const aliceAccount = await locklift.factory.accounts.addExistingAccount({
     type: WalletTypes.MsigAccount,
-    address: new Address(<"ALICE_ACCOUNT_ADDRESS">),
+    address: new Address("<ALICE_ACCOUNT_ADDRESS>"),
     mSigType: "SafeMultisig",
     publicKey: signerAlice.publicKey,
   });
@@ -83,7 +83,7 @@ async function main() {
   // Adding an existing SafeMultiSig Account using its address
   const bobAccount = await locklift.factory.accounts.addExistingAccount({
     type: WalletTypes.MsigAccount,
-    address: new Address(<"BOB_ACCOUNT_ADDRESS">),
+    address: new Address("<BOB_ACCOUNT_ADDRESS>"),
     mSigType: "SafeMultisig",
     publicKey: signerBob.publicKey,
   });
