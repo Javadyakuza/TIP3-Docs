@@ -58,13 +58,6 @@ Transferring TIP-3 tokens is considered one of the easier steps depended to prev
 
 ````typescript
 
-  // // Fetching the decimals
-
-  const bobTokenWallet: Contract<FactorySource["TokenWallet"]> = locklift.factory.getDeployedContract(
-    "TokenWallet",
-    (await tokenRootContract.methods.walletOf({ answerId: 0, walletOwner: bobAccount.address }).call({})).value0,
-  );
-
   console.log(
     "Bob's balance before transfer: ",
     Number(
@@ -81,7 +74,7 @@ Transferring TIP-3 tokens is considered one of the easier steps depended to prev
 
   console.log("Alice balance before transfer: 0");
   // Amount to transfer
-  const transferAmount: number = 100 * 10 ** decimals;
+  const transferAmount: number = 30 * 10 ** decimals;
 
   /*
     Transfer with the deployment of a wallet for the recipient account.
@@ -162,21 +155,6 @@ Transferring TIP-3 tokens is considered one of the easier steps depended to prev
     });
 
   console.log(
-    "Alice's balance after transfer to wallet: ",
-
-    Number(
-      (
-        await aliceTokenWallet.methods
-          .balance({
-            answerId: 0,
-          })
-          .call()
-      ).value0,
-    ) /
-      10 ** decimals,
-  ); // >> 200
-
-  console.log(
     "Bob's balance after transfer to wallet: ",
     Number(
       (
@@ -190,6 +168,20 @@ Transferring TIP-3 tokens is considered one of the easier steps depended to prev
       10 ** decimals,
   ); // >> 100
 
+  console.log(
+    "Alice's balance after transfer to wallet: ",
+
+    Number(
+      (
+        await aliceTokenWallet.methods
+          .balance({
+            answerId: 0,
+          })
+          .call()
+      ).value0,
+    ) /
+      10 ** decimals,
+  ); // >> 200
 ````
 
 </span>

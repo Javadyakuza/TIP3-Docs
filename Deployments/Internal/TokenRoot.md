@@ -97,7 +97,7 @@ The parameter `initialSupply` must be set to zero if the `initialSupplyTo` is **
   });
 
   // Confirming tha that the token root is deployed by calling its name method
-  const tokenRoot: Contract<FactorySource["TokenRoot"]> = locklift.factory.getDeployedContract(
+  const tokenRootContract: Contract<FactorySource["TokenRoot"]> = locklift.factory.getDeployedContract(
     "TokenRoot",
     (
       await rootDeployer.methods
@@ -113,8 +113,8 @@ The parameter `initialSupply` must be set to zero if the `initialSupplyTo` is **
   );
 
   console.log(
-    `Token Root address : ${tokenRoot.address.toString()} \n Token Root name: ${
-      (await tokenRoot.methods.name({ answerId: 0 }).call()).value0
+    `Token Root address : ${tokenRootContract.address.toString()} \n Token Root name: ${
+      (await tokenRootContract.methods.name({ answerId: 0 }).call()).value0
     }`,
   ); // >> Tip3OnboardingToken
 

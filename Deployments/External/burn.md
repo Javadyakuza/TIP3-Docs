@@ -62,27 +62,15 @@ Before we start to write our scripts we need to make sure that there is a file n
 ````typescript
 
   // Preparing the burn amounts
-  const burnAmount: number = 100 * 10 ** decimals;
-  const burnByRootAmount: number = 50 * 10 ** decimals;
-
-  const tokenWalletContract: Contract<FactorySource["TokenWallet"]> = locklift.factory.getDeployedContract(
-    "TokenWallet",
-    (
-      await tokenRootContract.methods
-        .walletOf({
-          answerId: 0,
-          walletOwner: account.address,
-        })
-        .call()
-    ).value0,
-  );
+  const burnAmount: number = 20 * 10 ** decimals;
+  const burnByRootAmount: number = 10 * 10 ** decimals;
 
   // We assume that alice has 200 tokens
   console.log(
-    "balance before burn: ",
+    "Alice balance before burn: ",
     Number(
       (
-        await tokenWalletContract.methods
+        await aliceTokenWallet.methods
           .balance({
             answerId: 0,
           })
@@ -93,24 +81,24 @@ Before we start to write our scripts we need to make sure that there is a file n
   ); // >> 200
 
   // burning tokens by calling the "burn" method in the alice's token wallet
-  await tokenWalletContract.methods
+  await aliceTokenWallet.methods
     .burn({
       amount: burnAmount,
-      remainingGasTo: account.address,
+      remainingGasTo: aliceAccount.address,
       callbackTo: zeroAddress,
       payload: "",
     })
     .send({
-      from: account.address,
+      from: aliceAccount.address,
       amount: locklift.utils.toNano(3),
     });
 
   // checking if tis burned
   console.log(
-    "balance after burn: ",
+    "Alice balance after burn: ",
     Number(
       (
-        await tokenWalletContract.methods
+        await aliceTokenWallet.methods
           .balance({
             answerId: 0,
           })
@@ -124,20 +112,20 @@ Before we start to write our scripts we need to make sure that there is a file n
   await tokenRootContract.methods
     .burnTokens({
       amount: burnByRootAmount,
-      walletOwner: account.address,
-      remainingGasTo: account.address,
+      walletOwner: aliceAccount.address,
+      remainingGasTo: aliceAccount.address,
       callbackTo: zeroAddress,
       payload: "",
     })
     .send({
-      from: account.address,
+      from: aliceAccount.address,
       amount: locklift.utils.toNano(3),
     });
   console.log(
-    "balance after burn by root: ",
+    "Alice balance after burn by root: ",
     Number(
       (
-        await tokenWalletContract.methods
+        await aliceTokenWallet.methods
           .balance({
             answerId: 0,
           })

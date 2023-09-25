@@ -45,14 +45,14 @@ Using the  `everscale-inpage-provider`  to deploy a token wallet is as easy as a
   /*
     Call the deployWallet method on the TokenRoot contract
   */
-  await tokenRoot.methods
+  await tokenRootContract.methods
     .deployWallet({
       answerId: 0,
-      walletOwner: account.address,
+      walletOwner: aliceAccount.address,
       deployWalletValue: locklift.utils.toNano("2"),
     })
     .send({
-      from: account.address,
+      from: aliceAccount.address,
       amount: locklift.utils.toNano("4"),
     });
 
@@ -60,10 +60,10 @@ Using the  `everscale-inpage-provider`  to deploy a token wallet is as easy as a
     We call the walletOf get method on the token root contract.
   */
   const walletAddress: Address = (
-    await tokenRoot.methods
+    await tokenRootContract.methods
       .walletOf({
         answerId: 0,
-        walletOwner: account.address,
+        walletOwner: aliceAccount.address,
       })
       .call({})
   ).value0;

@@ -46,14 +46,7 @@ Please be aware that if the `notify` parameter is set to true for the transactio
 
 ````typescript
 
-// Adding another existing SafeMultiSig Account using its address
-  const bobAccount = await locklift.factory.accounts.addExistingAccount({
-    type: WalletTypes.MsigAccount,
-    address:  new Address("<BOB_ACCOUNT_ADDRESS>"),
-    mSigType: "SafeMultisig",
-  });
-
-  const mintAmount: number = 10;
+  const mintAmount: number = 100;
   let deployWalletValue: string = "0";
   let txFee: string = "2";
 
@@ -70,13 +63,8 @@ Please be aware that if the `notify` parameter is set to true for the transactio
     txFee = locklift.utils.toNano("5");
   }
 
-  // getting decimals and symbol
-  const [decimals, symbol] = await Promise.all([
-    Number((await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0),
-    (await tokenRootContract.methods.symbol({ answerId: 0 }).call()).value0,
-  ]);
-
   // minting some token for the recipient
+
   await tokenRootContract.methods
     .mint({
       amount: mintAmount * 10 ** decimals,
@@ -90,14 +78,15 @@ Please be aware that if the `notify` parameter is set to true for the transactio
       from: aliceAccount.address,
       amount: txFee,
     });
-
   // Fetching the bobs balance
-  const bobTWCon: Contract<FactorySource["TokenWallet"]> = await locklift.factory.getDeployedContract(
+  const bobTokenWallet: Contract<FactorySource["TokenWallet"]> = await locklift.factory.getDeployedContract(
     "TokenWallet",
     (await tokenRootContract.methods.walletOf({ answerId: 0, walletOwner: bobAccount.address }).call()).value0,
   );
-  const bobBal: number = Number((await bobTWCon.methods.balance({ answerId: 0 }).call()).value0);
+  const bobBal: number = Number((await bobTokenWallet.methods.balance({ answerId: 0 }).call()).value0);
+
   console.log(`bob's ${symbol} balance: ${bobBal / 10 ** decimals}`); // >> 10
+
 
 ````
 

@@ -45,15 +45,14 @@ The parameter `initialSupply` must be set to **zero** if the `initialSupplyTo` i
  * locklift is a globally declared object
  */
 
-import { Address, zeroAddress, Signer, WalletTypes } from "locklift";
+import { Address, zeroAddress, Signer, WalletTypes, Contract } from "locklift";
 import { ContractData } from "locklift/internal/factory";
 import { FactorySource, factorySource } from "../build/factorySource";
 
-
 async function main() {
-
   // Fetching the signer key pair from locklift.config.ts
-  const signer: Signer = (await locklift.keystore.getSigner("0"))!;
+  const signerAlice: Signer = (await locklift.keystore.getSigner("0"))!;
+  const signerBob: Signer = (await locklift.keystore.getSigner("1"))!;
 
   // uncomment if deploying a new account
   // const { contract: account } = await locklift.factory.deployContract({
@@ -64,16 +63,34 @@ async function main() {
   //   value: locklift.utils.toNano(20),
   // });
 
-// Adding an existing SafeMultiSig Account using its address
-  const account = await locklift.factory.accounts.addExistingAccount({
+  // Adding an existing SafeMultiSig Account using its address
+  const aliceAccount = await locklift.factory.accounts.addExistingAccount({
     type: WalletTypes.MsigAccount,
-    address: new Address("<YOUR_ACCOUNT_ADDRESS>"),
+    address: new Address(<"ALICE_ACCOUNT_ADDRESS">),
     mSigType: "SafeMultisig",
+    publicKey: signerAlice.publicKey,
+  });
+
+  // uncomment if deploying a new account
+  // const { contract: account } = await locklift.factory.deployContract({
+  //   contract: "Account",
+  //   publicKey: signer.publicKey,
+  //   constructorParams: {},
+  //   initParams: { _randomNonce: locklift.utils.getRandomNonce() },
+  //   value: locklift.utils.toNano(20),
+  // });
+
+  // Adding an existing SafeMultiSig Account using its address
+  const bobAccount = await locklift.factory.accounts.addExistingAccount({
+    type: WalletTypes.MsigAccount,
+    address: new Address(<"BOB_ACCOUNT_ADDRESS">),
+    mSigType: "SafeMultisig",
+    publicKey: signerBob.publicKey,
   });
 
   // Preparing test params
   const initialSupplyTo: Address = zeroAddress;
-  const rootOwner: Address = zeroAddress;
+  const rootOwner: Address = aliceAccount.address;
   const name: string = "Tip3OnboardingToken";
   const symbol: string = "TOT";
   const decimals: number = 6;
@@ -100,9 +117,9 @@ async function main() {
     * @param burnDisabledByRoot Root can not burn tokens of a token wallet.
     * @param remainingGasTo Address to send the change back.
   */
-  const { contract: tokenRoot } = await locklift.factory.deployContract({
+  const { contract: tokenRootContract } = await locklift.factory.deployContract({
     contract: "TokenRoot",
-    publicKey: signer.publicKey,
+    publicKey: signerAlice.publicKey,
     initParams: {
       deployer_: zeroAddress,
       randomNonce_: locklift.utils.getRandomNonce(),
@@ -115,16 +132,17 @@ async function main() {
     constructorParams: {
       initialSupplyTo: initialSupplyTo,
       initialSupply: initialSupply * 10 ** decimals,
-      deployWalletValue: locklift.utils.toNano(2),
+      deployWalletValue: 0,
       mintDisabled: disableMint,
       burnByRootDisabled: disableBurnByRoot,
       burnPaused: pauseBurn,
-      remainingGasTo: account.address,
+      remainingGasTo: aliceAccount.address,
     },
     value: locklift.utils.toNano(5),
   });
 
-  console.log(`${name} deployed to: ${tokenRoot.address.toString()}`);
+  console.log(`${name} deployed to: ${tokenRootContract.address.toString()}`);
+
 }
 
 main()

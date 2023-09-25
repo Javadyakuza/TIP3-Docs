@@ -51,13 +51,6 @@ Minting TIP-3 tokens using everscale-inpage-provider is pretty easy as well:
 <span  :class="LLdis">
 
 ````typescript
-/**
- * locklift is a globally declared object
- */
-
-import { FactorySource } from "../build/factorySource";
-import { Address, Contract, zeroAddress, Signer, WalletTypes } from "locklift";
-
 // We use the getWalletData function to extract the token wallet data from the multi wallet contract
 
 /* add this function before the main function */
@@ -84,11 +77,6 @@ async function getWalletData(
   /*
    add this to the body of the main function
   */
-
-  // Fetching the decimals and symbol from the token root contract
-
-  // Creating an instance of the token wallet contract
-  let tokenWalletContract: Contract<FactorySource["TokenWallet"]>;
 
   // fetching the balance of the token wallet associated with the token root and determining of its deployed or no
   let deployWalletValue: string = "0";

@@ -46,6 +46,9 @@ So if you want the change back into your `account contract` leave the notify `un
 
 ````typescript
 
+  /* Before we proceed to further steps we need to deploy two multi wallet tip3 contract
+ for alice and bob using different accounts and signer.
+*/
   // We assume the bob doesn't have a deployed wallet at the first
   console.log(`Alice has token wallet ? ${
     (await getWalletData(aliceMultiWalletContract, tokenRootAddress)).tokenWallet.toString() == zeroAddress.toString()
@@ -65,7 +68,7 @@ So if you want the change back into your `account contract` leave the notify `un
   const transferAmount: number = 100 * 10 ** decimals;
 
   /*
-    Transfer with the deployment of a wallet for the recipient account.
+    Transfer with deployment of a wallet for the recipient account.
 
     Don't pay attention to notify and payload yet, we'll get back to them.
   */
