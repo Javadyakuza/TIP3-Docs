@@ -42,9 +42,9 @@ Using the  `everscale-inpage-provider`  to deploy a token wallet is as easy as a
 
 ```typescript
 
-  /*
-    Call the deployWallet method on the TokenRoot contract
-  */
+  /* Deploying a token wallet for alice  */
+
+  // deploying a token wallet using deployWallet method on the token root contract
   await tokenRootContract.methods
     .deployWallet({
       answerId: 0,
@@ -56,9 +56,7 @@ Using the  `everscale-inpage-provider`  to deploy a token wallet is as easy as a
       amount: locklift.utils.toNano("4"),
     });
 
-  /*
-    We call the walletOf get method on the token root contract.
-  */
+  // Fetching the newly deployed token wallet address by calling the walletOf method on the token root
   const walletAddress: Address = (
     await tokenRootContract.methods
       .walletOf({

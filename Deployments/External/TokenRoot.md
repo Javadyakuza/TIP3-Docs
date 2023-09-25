@@ -50,6 +50,7 @@ import { ContractData } from "locklift/internal/factory";
 import { FactorySource, factorySource } from "../build/factorySource";
 
 async function main() {
+
   // Fetching the signer key pair from locklift.config.ts
   const signerAlice: Signer = (await locklift.keystore.getSigner("0"))!;
   const signerBob: Signer = (await locklift.keystore.getSigner("1"))!;

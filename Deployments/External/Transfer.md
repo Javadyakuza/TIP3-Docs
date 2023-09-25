@@ -58,6 +58,8 @@ Transferring TIP-3 tokens is considered one of the easier steps depended to prev
 
 ````typescript
 
+  /* Transferring tip-3 tokens using transfer function */
+
   console.log(
     "Bob's balance before transfer: ",
     Number(
@@ -70,9 +72,10 @@ Transferring TIP-3 tokens is considered one of the easier steps depended to prev
       ).value0,
     ) /
       10 ** decimals,
-  ); // assuming that bob has 300 of this token at the first >> 300
+  );
 
   console.log("Alice balance before transfer: 0");
+
   // Amount to transfer
   const transferAmount: number = 30 * 10 ** decimals;
 
@@ -136,11 +139,10 @@ Transferring TIP-3 tokens is considered one of the easier steps depended to prev
       ).value0,
     ) /
       10 ** decimals,
-  ); // >> 100
+  );
 
-  /*
-     Transfer to deployed token wallet
-  */
+  /* Transferring tip-3 tokens using transferToWallet function */
+
   await bobTokenWallet.methods
     .transferToWallet({
       amount: transferAmount,
@@ -166,7 +168,7 @@ Transferring TIP-3 tokens is considered one of the easier steps depended to prev
       ).value0,
     ) /
       10 ** decimals,
-  ); // >> 100
+  );
 
   console.log(
     "Alice's balance after transfer to wallet: ",
@@ -181,7 +183,7 @@ Transferring TIP-3 tokens is considered one of the easier steps depended to prev
       ).value0,
     ) /
       10 ** decimals,
-  ); // >> 200
+  );
 ````
 
 </span>

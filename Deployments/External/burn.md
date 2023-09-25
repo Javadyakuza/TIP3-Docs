@@ -65,7 +65,6 @@ Before we start to write our scripts we need to make sure that there is a file n
   const burnAmount: number = 20 * 10 ** decimals;
   const burnByRootAmount: number = 10 * 10 ** decimals;
 
-  // We assume that alice has 200 tokens
   console.log(
     "Alice balance before burn: ",
     Number(
@@ -78,7 +77,7 @@ Before we start to write our scripts we need to make sure that there is a file n
       ).value0,
     ) /
       10 ** decimals,
-  ); // >> 200
+  );
 
   // burning tokens by calling the "burn" method in the alice's token wallet
   await aliceTokenWallet.methods
@@ -106,7 +105,7 @@ Before we start to write our scripts we need to make sure that there is a file n
       ).value0,
     ) /
       10 ** decimals,
-  ); // >> 200
+  );
 
   // burning tokens by calling the "burnTokens" on the token root
   await tokenRootContract.methods
@@ -133,7 +132,7 @@ Before we start to write our scripts we need to make sure that there is a file n
       ).value0,
     ) /
       10 ** decimals,
-  ); // >> 50
+  );
 
 ````
 

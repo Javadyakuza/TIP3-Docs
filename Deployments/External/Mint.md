@@ -46,22 +46,12 @@ Please be aware that if the `notify` parameter is set to true for the transactio
 
 ````typescript
 
-  const mintAmount: number = 100;
-  let deployWalletValue: string = "0";
-  let txFee: string = "2";
+  /* Minting tip-3 token for bob */
 
-  // Checking if alice already has a token wallet or no
-  if (
-    !(
-      await locklift.provider.getFullContractState({
-        address: (await tokenRootContract.methods.walletOf({ answerId: 0, walletOwner: bobAccount.address }).call())
-          .value0,
-      })
-    ).state?.isDeployed
-  ) {
-    deployWalletValue = locklift.utils.toNano("3");
-    txFee = locklift.utils.toNano("5");
-  }
+  // Preparing the parameters for minting tip-3 tokens
+  const mintAmount: number = 100;
+  let deployWalletValue: string = locklift.utils.toNano("2");
+  let txFee: string = locklift.utils.toNano("2");
 
   // minting some token for the recipient
 
@@ -78,6 +68,7 @@ Please be aware that if the `notify` parameter is set to true for the transactio
       from: aliceAccount.address,
       amount: txFee,
     });
+
   // Fetching the bobs balance
   const bobTokenWallet: Contract<FactorySource["TokenWallet"]> = await locklift.factory.getDeployedContract(
     "TokenWallet",
