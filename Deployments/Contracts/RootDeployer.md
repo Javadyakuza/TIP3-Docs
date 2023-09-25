@@ -179,6 +179,7 @@ async function getWalletData(
   MWContract: Contract<FactorySource["MultiWalletTIP3"]>,
   tokenRootAddress: Address,
 ): Promise<{ tokenWallet: Address; balance: number }> {
+
   // Returned value of the wallets mapping on the multi wallet tip-3 contract
   const walletData = (await MWContract.methods.wallets().call()).wallets.map(item => {
     if (item[0].toString() == tokenRootAddress.toString()) {

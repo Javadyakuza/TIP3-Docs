@@ -1,4 +1,6 @@
-# Transfer TIP-3 Tokens
+/*
+  Burning tip-4 token using burn method on the Multi Wallet TIP-3 contract
+  */# Transfer TIP-3 Tokens
 
 <div class="transferToken">
 
@@ -45,8 +47,11 @@ So if you want the change back into your `account contract` leave the notify `un
 <span  :class="LLdis">
 
 ````typescript
+  /*
+     Transfer tokens using transfer method
+  */
 
-  // We assume the bob doesn't have a deployed wallet at the first
+  // WE know that bob doesn't have any token wallet of that root since we didn't it
   console.log(`Alice has token wallet ? ${
     (await getWalletData(aliceMultiWalletContract, tokenRootContract.address)).tokenWallet.toString() !=
     zeroAddress.toString()
@@ -54,7 +59,7 @@ So if you want the change back into your `account contract` leave the notify `un
    Alice balance before transfer: ${
      (await getWalletData(aliceMultiWalletContract, tokenRootContract.address)).balance /
      10 ** deployRootFromDeployerParams.decimals
-   }`); // >> true, 200
+   }`);
 
   console.log(`Bob has token wallet ? ${
     (await getWalletData(bobMultiWalletContract, tokenRootContract.address)).tokenWallet.toString() !=
@@ -63,7 +68,7 @@ So if you want the change back into your `account contract` leave the notify `un
   Bob balance before transfer: ${
     (await getWalletData(bobMultiWalletContract, tokenRootContract.address)).balance /
     10 ** deployRootFromDeployerParams.decimals
-  }`); // false, 0
+  }`);
 
   // Amount to transfer
   const transferAmount: number = 10 * 10 ** deployRootFromDeployerParams.decimals;
@@ -99,7 +104,7 @@ So if you want the change back into your `account contract` leave the notify `un
   ); // >> 100
 
   /*
-     Transfer to deployed token wallet using transferToWallet
+     Transfer tokens to deployed token wallet using transferToWallet method
   */
   const transferToWalletAmount: number = 15 * 10 ** deployRootFromDeployerParams.decimals;
 
@@ -113,6 +118,7 @@ So if you want the change back into your `account contract` leave the notify `un
       publicKey: signerAlice.publicKey!,
     });
 
+  // Fetching the balances after utilizing the transferToWallet function
   console.log(
     `Alice balance after transfer to wallet: ${
       (await getWalletData(aliceMultiWalletContract, tokenRootContract.address)).balance /

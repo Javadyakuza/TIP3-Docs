@@ -58,6 +58,9 @@ The parameter `initialSupply` must be set to zero if the `initialSupplyTo` is **
 <span  :class="LLdis">
 
 ````typescript
+
+ /* Deploying Token Root contract using root Deployer */
+
  // Defining an interface for tokens root deployment using the root deployer contract
   interface deployRootParams {
     initialSupplyTo: Address;

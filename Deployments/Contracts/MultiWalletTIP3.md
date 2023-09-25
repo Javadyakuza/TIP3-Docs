@@ -794,7 +794,8 @@ The code samples below demonstrate how to deploy a Multi Wallet TIP3 contract us
 
 ````typescript
 
-  // Deploying two MultiWalletTIP3 contracts
+   /* Deploying two MultiWalletTIP3 contract */
+
   // We send a bit more Ever than usual since the transaction fees will be spent from the contract balance and all of initiator the tx's are external.
   const { contract: aliceMultiWalletContract } = await locklift.factory.deployContract({
     contract: "MultiWalletTIP3",
@@ -808,7 +809,7 @@ The code samples below demonstrate how to deploy a Multi Wallet TIP3 contract us
 
   console.log("Alice Multi Wallet TIP-3 address: ", aliceMultiWalletContract.address.toString());
 
-  // we need another multi wallet in order to be able to perform the transfer operation
+  // We need another multi wallet in order to be able to perform the transfer operation
   const { contract: bobMultiWalletContract } = await locklift.factory.deployContract({
     contract: "MultiWalletTIP3",
     publicKey: signerBob.publicKey,

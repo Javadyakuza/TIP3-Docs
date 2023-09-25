@@ -38,7 +38,10 @@ The code sample below follows the same approach but makes the transactions using
 
 
 ````typescript
-  // Burning
+  /*
+  Burning tip-3 tokens using burn method on the Multi Wallet TIP-3 contract
+  */
+
   // Preparing the burning amount
   const burnAmount: number = 10 * 10 ** deployRootFromDeployerParams.decimals;
 
@@ -69,16 +72,16 @@ The code sample below follows the same approach but makes the transactions using
   }
 
   /*
-    Using burnByRoot function
+    Burning tip-3 tokens using burnByRoot function on the token root contract
   */
 
-  // Defining the burn amount to be used in the burnBYRoot function
+  // Defining the burn amount to be used in the burnByRoot function
   const burnByRootAmount: number = 5 * 10 ** deployRootFromDeployerParams.decimals;
 
   // Defining the balance of the token wallet before burning
   oldBal = (await getWalletData(aliceMultiWalletContract, tokenRootContract.address)).balance;
 
-  // Burning tip-3 tokens from the token root by calling (burnByRoot) on the token root contract
+  // Burning tip-3 tokens using burnByRoot
   await tokenRootContract.methods
     .burnTokens({
       amount: burnByRootAmount,
@@ -104,6 +107,7 @@ The code sample below follows the same approach but makes the transactions using
   } else {
     console.log(`Burning token failed ${(burnRes.exitCode, burnRes.resultCode)}`);
   }
+
 ````
 
 </span>

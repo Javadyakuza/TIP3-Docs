@@ -41,8 +41,10 @@ According to the Multi Wallet contract, it stores the wallet information and its
 
 ````typescript
 
+  /* Deploying Token Wallet contract using Multi Wallet TIP-3 */
 
   // Deploying a TokenWallet contract using the using multi wallet contract for alice
+  // We will deploy another token wallet for bob at the time of transferring he tokens
   await aliceMultiWalletContract.methods
     .deployWallet({
       _deployWalletBalance: locklift.utils.toNano("3"),

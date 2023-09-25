@@ -50,10 +50,11 @@ Minting TIP-3 tokens using everscale-inpage-provider is pretty easy as well:
 
 <span  :class="LLdis">
 
-````typescriptng the balance of the token wallet associated with the token root and determining of its deployed or no
-  let deployWalletValue: string = "0";
+````typescript
 
-  // Defining he mint amount
+   /* Minting TIP-3 tokens using multi wallet contract */
+
+  // Defining the parameters for minting tip-3 tokens
   const mintAmount: number = 50 * 10 ** deployRootFromDeployerParams.decimals;
 
   console.log(
@@ -61,12 +62,13 @@ Minting TIP-3 tokens using everscale-inpage-provider is pretty easy as well:
     (await getWalletData(aliceMultiWalletContract, tokenRootContract.address)).balance /
       10 ** deployRootFromDeployerParams.decimals,
   );
+
   // Minting tokens for receiver
   await tokenRootContract.methods
     .mint({
       amount: mintAmount,
       recipient: aliceMultiWalletContract.address, // the owner of the token wallet is the MW contract
-      deployWalletValue: deployWalletValue,
+      deployWalletValue: 0,
       notify: true, // To update the Multi Wallet contract
       payload: "",
       remainingGasTo: aliceAccount.address,
@@ -76,7 +78,7 @@ Minting TIP-3 tokens using everscale-inpage-provider is pretty easy as well:
       amount: locklift.utils.toNano(5),
     });
 
-  // confirming that its received
+  // confirming that its minted
   console.log(
     "balance after mint:",
     (await getWalletData(aliceMultiWalletContract, tokenRootContract.address)).balance /
