@@ -41,39 +41,6 @@ Using the  `everscale-inpage-provider`  to deploy a token wallet is as easy as a
 <span  :class="LLdis">
 
 ```typescript
-/**
- * locklift is a globally declared object
- */
-
-import { Address, Contract, Signer, WalletTypes } from "locklift";
-import { FactorySource } from "../build/factorySource";
-
-async function main() {
-
-  // uncomment if deploying a new account
-  // const { contract: account } = await locklift.factory.deployContract({
-  //   contract: "Account",
-  //   publicKey: signer.publicKey,
-  //   constructorParams: {},
-  //   initParams: { _randomNonce: locklift.utils.getRandomNonce() },
-  //   value: locklift.utils.toNano(20),
-  // });
-
-// Adding an existing SafeMultiSig Account using its address
-  const account = await locklift.factory.accounts.addExistingAccount({
-    type: WalletTypes.MsigAccount,
-    address: new Address("<YOUR_ACCOUNT_ADDRESS>"),
-    mSigType: "SafeMultisig",
-  });
-
-  /*
-    Get instance of already deployed TOken Root contract
-  */
-  const tokenRootAddress: Address = new Address("<YOUR_TOKEN_ROOT_ADDRESS>");
-  const tokenRoot: Contract<FactorySource["TokenRoot"]> = locklift.factory.getDeployedContract(
-    "TokenRoot",
-    tokenRootAddress,
-  );
 
   /*
     Call the deployWallet method on the TokenRoot contract
@@ -102,14 +69,6 @@ async function main() {
   ).value0;
 
   console.log(`TIP3 Wallet deployed at: ${walletAddress.toString()}`);
-}
-
-main()
-  .then(() => process.exit(0))
-  .catch(e => {
-    console.log(e);
-    process.exit(1);
-  });
 
 ```
 

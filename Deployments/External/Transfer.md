@@ -57,55 +57,6 @@ Transferring TIP-3 tokens is considered one of the easier steps depended to prev
 <span  :class="LLdis">
 
 ````typescript
-/**
- * locklift is a globally declared object
- */
-
-import { Address, Contract, Signer, WalletTypes } from "locklift";
-import { FactorySource } from "../build/factorySource";
-
-async function main() {
-
-  // Preparing the token root address
-  const tokenRootAddress: Address = new Address("<YOUR_TOKEN_ROOT_ADDRESS>");
-
-  // uncomment if deploying a new account
-  // const { contract: aliceAccount } = await locklift.factory.deployContract({
-  //   contract: "Account",
-  //   publicKey: aliceSigner.publicKey,
-  //   constructorParams: {},
-  //   initParams: { _randomNonce: locklift.utils.getRandomNonce() },
-  //   value: locklift.utils.toNano(20),
-  // });
-
-// Adding an existing SafeMultiSig Account using its address
-  const aliceAccount = await locklift.factory.accounts.addExistingAccount({
-    type: WalletTypes.MsigAccount,
-    address: new Address("<ALICE_ACCOUNT_ADDRESS>"),
-    mSigType: "SafeMultisig",
-  });
-
-  // uncomment if deploying a new account
-  // const { contract: bobAccount } = await locklift.factory.deployContract({
-  //   contract: "Account",
-  //   publicKey: bobSigner.publicKey,
-  //   constructorParams: {},
-  //   initParams: { _randomNonce: locklift.utils.getRandomNonce() },
-  //   value: locklift.utils.toNano(20),
-  // });
-
-// Adding an existing SafeMultiSig Account using its address
-  const bobAccount = await locklift.factory.accounts.addExistingAccount({
-    type: WalletTypes.MsigAccount,
-    address: new Address("<BOB_ACCOUNT_ADDRESS>"),
-    mSigType: "SafeMultisig",
-  });
-
-  // Creating the target contract instance
-  const tokenRootContract: Contract<FactorySource["TokenRoot"]> = locklift.factory.getDeployedContract(
-    "TokenRoot",
-    tokenRootAddress,
-  );
 
   // // Fetching the decimals
   const decimals = Number((await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0);
@@ -239,14 +190,6 @@ async function main() {
     ) /
       10 ** decimals,
   ); // >> 100
-}
-
-main()
-  .then(() => process.exit(0))
-  .catch(e => {
-    console.log(e);
-    process.exit(1);
-  });
 
 ````
 

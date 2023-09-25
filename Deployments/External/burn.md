@@ -60,39 +60,6 @@ Before we start to write our scripts we need to make sure that there is a file n
 <span  :class="LLdis">
 
 ````typescript
-/**
- * locklift is a globally declared object
- */
-
-import { Address, WalletTypes, zeroAddress, Signer, Contract } from "locklift";
-import { FactorySource, factorySource } from "../build/factorySource";
-
-async function main() {
-
-  // uncomment if deploying a new account
-  // const { contract: account } = await locklift.factory.deployContract({
-  //   contract: "Account",
-  //   publicKey: signer.publicKey,
-  //   constructorParams: {},
-  //   initParams: { _randomNonce: locklift.utils.getRandomNonce() },
-  //   value: locklift.utils.toNano(20),
-  // });
-
-// Adding an existing SafeMultiSig Account using its address
-  const account = await locklift.factory.accounts.addExistingAccount({
-    type: WalletTypes.MsigAccount,
-    address: new Address("<YOUR_ACCOUNT_ADDRESS>"),
-    mSigType: "SafeMultisig",
-  });
-
-  // Preparing the params
-  const tokenRootAddress: Address = new Address("<YOUR_TOKEN_ROOT_ADDRESS>");
-
-  // Fetching the token root contract
-  const tokenRootContract: Contract<FactorySource["TokenRoot"]> = locklift.factory.getDeployedContract(
-    "TokenRoot",
-    tokenRootAddress,
-  );
 
   // getting decimals and symbol
   const [decimals, symbol] = await Promise.all([
@@ -185,7 +152,6 @@ async function main() {
     ) /
       10 ** decimals,
   ); // >> 50
-}
 
 ````
 

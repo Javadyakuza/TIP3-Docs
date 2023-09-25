@@ -45,55 +45,13 @@ Please be aware that if the `notify` parameter is set to true for the transactio
 
 
 ````typescript
-/**
- * locklift is a globally declared object
- */
 
-import { Address, Contract, Signer, WalletTypes } from "locklift";
-import { FactorySource } from "../build/factorySource";
-
-async function main() {
-
-  // uncomment if deploying a new account
-  // const { contract: aliceAccount } = await locklift.factory.deployContract({
-  //   contract: "Account",
-  //   publicKey: aliceSigner.publicKey,
-  //   constructorParams: {},
-  //   initParams: { _randomNonce: locklift.utils.getRandomNonce() },
-  //   value: locklift.utils.toNano(20),
-  // });
-
-// Adding an existing SafeMultiSig Account using its address
-  const aliceAccount = await locklift.factory.accounts.addExistingAccount({
-    type: WalletTypes.MsigAccount,
-    address:  new Address("<ALICE_ACCOUNT_ADDRESS>"),
-    mSigType: "SafeMultisig",
-  });
-
-  // uncomment if deploying a new account
-  // const { contract: bobAccount } = await locklift.factory.deployContract({
-  //   contract: "Account",
-  //   publicKey: bobSigner.publicKey,
-  //   constructorParams: {},
-  //   initParams: { _randomNonce: locklift.utils.getRandomNonce() },
-  //   value: locklift.utils.toNano(20),
-  // });
-
-// Adding an existing SafeMultiSig Account using its address
+// Adding another existing SafeMultiSig Account using its address
   const bobAccount = await locklift.factory.accounts.addExistingAccount({
     type: WalletTypes.MsigAccount,
     address:  new Address("<BOB_ACCOUNT_ADDRESS>"),
     mSigType: "SafeMultisig",
   });
-
-  // preparing the parameters
-  const tokenRootAddress: Address = new Address("<YOUR_TOKEN_ROOT_ADDRESS>");
-
-  // Fetching the token root contract
-  const tokenRootContract: Contract<FactorySource["TokenRoot"]> = locklift.factory.getDeployedContract(
-    "TokenRoot",
-    tokenRootAddress,
-  );
 
   const mintAmount: number = 10;
   let deployWalletValue: string = "0";
@@ -140,13 +98,6 @@ async function main() {
   );
   const bobBal: number = Number((await bobTWCon.methods.balance({ answerId: 0 }).call()).value0);
   console.log(`bob's ${symbol} balance: ${bobBal / 10 ** decimals}`); // >> 10
-}
-main()
-  .then(() => process.exit(0))
-  .catch(e => {
-    // console.log(e);
-    process.exit(1);
-  });
 
 ````
 
@@ -238,7 +189,7 @@ async function main() {
       ) /
       10 ** decimals;
 
-    // Checking if the desired amount is minted for the receiver 
+    // Checking if the desired amount is minted for the receiver
     if (recipientBal >= amount) {
       console.log(`${amount} ${symbol}'s successfully minted for recipient`);
 
