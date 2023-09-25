@@ -45,67 +45,6 @@ So if you want the change back into your `account contract` leave the notify `un
 <span  :class="LLdis">
 
 ````typescript
-/**
- * locklift is a globally declared object
- */
-
-import { Address, Contract, Signer, zeroAddress } from "locklift";
-import { FactorySource } from "../build/factorySource";
-
-/**
- * We develope a method that retrieves the data of the token wallet from the relevant multi wallet contract
- */
-
-// This function will extract the wallet data recorded in the multi wallet tip-3 contract
-async function getWalletData(
-  MWContract: Contract<FactorySource["MultiWalletTIP3"]>,
-  tokenRootAddress: Address,
-): Promise<{ tokenWallet: Address; balance: number }> {
-  const walletData = (await MWContract.methods.wallets().call()).wallets.map(item => {
-    if (item[0].toString() == tokenRootAddress.toString()) {
-      return item[1];
-    }
-  });
-  let balance: number = 0;
-  let tokenWallet: Address = zeroAddress;
-  if (walletData.length != 0) {
-    balance = Number(walletData[0]!.balance);
-    tokenWallet = walletData[0]!.tokenWallet;
-  }
-  return { tokenWallet: tokenWallet, balance: balance };
-}
-
-async function main() {
-
-  // Required contracts Abi's
-  const tokenRootAddress: Address = new Address("<YOUR_TOKEN_ROOT_ADDRESS>");
-  const aliceMultiWalletAddress: Address = new Address("<SENDER_MULTI_WALLET_ADDRESS>");
-  const bobMultiWalletAddress: Address = new Address("<RECEIVER_MULTI_WALLET_ADDRESS>");
-
-  // Fetching the first signer as alice
-  const signerAlice: Signer = (await locklift.keystore.getSigner("0"))!;
-
-  // Creating the target contracts instances
-  const tokenRootContract: Contract<FactorySource["TokenRoot"]> = await locklift.factory.getDeployedContract(
-    "TokenRoot",
-    tokenRootAddress,
-  );
-
-  const aliceMultiWalletContract: Contract<FactorySource["MultiWalletTIP3"]> = locklift.factory.getDeployedContract(
-    "MultiWalletTIP3",
-    aliceMultiWalletAddress,
-  );
-
-  const bobMultiWalletContract: Contract<FactorySource["MultiWalletTIP3"]> = await locklift.factory.getDeployedContract(
-    "MultiWalletTIP3",
-    bobMultiWalletAddress,
-  );
-
-  // Fetching the decimals and symbol
-  const [decimals, symbol] = await Promise.all([
-    Number((await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0),
-    (await tokenRootContract.methods.symbol({ answerId: 0 }).call()).value0,
-  ]);
 
   // We assume the bob doesn't have a deployed wallet at the first
   console.log(`Alice has token wallet ? ${
@@ -177,15 +116,6 @@ async function main() {
     `Bob balance after transfer to wallet: ${
       (await getWalletData(bobMultiWalletContract, tokenRootAddress)).balance / 10 ** decimals
     }`,
-  ); // >> 150
-}
-
-main()
-  .then(() => process.exit(0))
-  .catch(e => {
-    console.log(e);
-    process.exit(1);
-  });
 
 ````
 

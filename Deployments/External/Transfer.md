@@ -59,7 +59,6 @@ Transferring TIP-3 tokens is considered one of the easier steps depended to prev
 ````typescript
 
   // // Fetching the decimals
-  const decimals = Number((await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0);
 
   const bobTokenWallet: Contract<FactorySource["TokenWallet"]> = locklift.factory.getDeployedContract(
     "TokenWallet",

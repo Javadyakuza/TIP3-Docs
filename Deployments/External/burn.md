@@ -61,12 +61,6 @@ Before we start to write our scripts we need to make sure that there is a file n
 
 ````typescript
 
-  // getting decimals and symbol
-  const [decimals, symbol] = await Promise.all([
-    Number((await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0),
-    (await tokenRootContract.methods.symbol({ answerId: 0 }).call()).value0,
-  ]);
-
   // Preparing the burn amounts
   const burnAmount: number = 100 * 10 ** decimals;
   const burnByRootAmount: number = 50 * 10 ** decimals;

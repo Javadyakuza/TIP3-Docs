@@ -38,75 +38,6 @@ The code sample below follows the same approach but makes the transactions using
 
 
 ````typescript
-/**
- * locklift is a globally declared object
- */
-
-import { Contract, Signer, zeroAddress, Address, WalletTypes } from "locklift";
-import { FactorySource } from "../build/factorySource";
-
-// We use the getWalletData function to extract the token wallet's data from the multi wallet contract
-async function getWalletData(
-  MWContract: Contract<FactorySource["MultiWalletTIP3"]>,
-  tokenRootAddress: Address,
-): Promise<{ tokenWallet: Address; balance: number }> {
-
-  // Fetching the wallet data from wallets mapping from the multi wallet tip-3 contract
-  const walletData = (await MWContract.methods.wallets().call()).wallets.map(item => {
-    if (item[0].toString() == tokenRootAddress.toString()) {
-      return item[1];
-    }
-  });
-  let balance: number = 0;
-  let tokenWallet: Address = zeroAddress;
-  if (walletData.length != 0) {
-    balance = Number(walletData[0]!.balance);
-    tokenWallet = walletData[0]!.tokenWallet;
-  }
-  return { tokenWallet: tokenWallet, balance: balance };
-}
-
-async function main() {
-
-  // Preparing the required contracts addresses
-  const tokenRootAddress: Address = new Address("<YOUR_TOKEN_ROOT_ADDRESS>");
-  const multiWalletAddress: Address = new Address("<YOUR_MULTI_WALLET_ADDRESS>");
-
-  // Creating an instance of the required contracts
-  const tokenRootContract: Contract<FactorySource["TokenRoot"]> = locklift.factory.getDeployedContract(
-    "TokenRoot",
-    tokenRootAddress,
-  );
-
-  const multiWalletContract: Contract<FactorySource["MultiWalletTIP3"]> = locklift.factory.getDeployedContract(
-    "MultiWalletTIP3",
-    multiWalletAddress,
-  );
-
-  // Setting up the signer and the account
-  const signer: Signer = (await locklift.keystore.getSigner("0"))!;
-
-  // uncomment if deploying a new account
-  // const { contract: account } = await locklift.factory.deployContract({
-  //   contract: "Account",
-  //   publicKey: signer.publicKey,
-  //   constructorParams: {},
-  //   initParams: { _randomNonce: locklift.utils.getRandomNonce() },
-  //   value: locklift.utils.toNano(20),
-  // });
-
-// Adding an existing SafeMultiSig Account using its address
-  const account = await locklift.factory.accounts.addExistingAccount({
-    type: WalletTypes.MsigAccount,
-    address: new Address("<YOUR_ACCOUNT_ADDRESS>"),
-    mSigType: "SafeMultisig",
-  });
-
-  // Fetching the decimals and the symbol
-  const [decimals, symbol] = await Promise.all([
-    Number((await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0),
-    (await tokenRootContract.methods.symbol({ answerId: 0 }).call()).value0,
-  ]);
 
   // Preparing the burning amount
   const burnAmount: number = 10 * 10 ** decimals;
@@ -168,14 +99,6 @@ async function main() {
   } else {
     console.log(`Burning token failed ${(burnRes.exitCode, burnRes.resultCode)}`);
   }
-}
-
-main()
-  .then(() => process.exit(0))
-  .catch(e => {
-    console.log(e);
-    process.exit(1);
-  });
 
 ````
 

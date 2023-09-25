@@ -59,6 +59,8 @@ import { FactorySource } from "../build/factorySource";
 import { Address, Contract, zeroAddress, Signer, WalletTypes } from "locklift";
 
 // We use the getWalletData function to extract the token wallet data from the multi wallet contract
+
+/* add this function before the main function */
 async function getWalletData(
   MWContract: Contract<FactorySource["MultiWalletTIP3"]>,
   tokenRootAddress: Address,
@@ -79,39 +81,11 @@ async function getWalletData(
   return { tokenWallet: tokenWallet, balance: balance };
 }
 
-async function main() {
-
-  // uncomment if deploying a new account
-  // const { contract: account } = await locklift.factory.deployContract({
-  //   contract: "Account",
-  //   publicKey: signer.publicKey,
-  //   constructorParams: {},
-  //   initParams: { _randomNonce: locklift.utils.getRandomNonce() },
-  //   value: locklift.utils.toNano(20),
-  // });
-
-// Adding an existing SafeMultiSig Account using its address
-  const account = await locklift.factory.accounts.addExistingAccount({
-    type: WalletTypes.MsigAccount,
-    address: new Address("<YOUR_ACCOUNT_ADDRESS>"),
-    mSigType: "SafeMultisig",
-  });
-
-  // Preparing the required contracts addresses
-  const tokenRootAddress: Address = new Address("0:fbc4a3db3df3d3b03f1752ab05d6ba3155865f906af4b5653b324d1a2519b03d");
-  const multiWalletAddress: Address = new Address("0:154a511d61b2a0ac92841e4e8c319ab5390d665db650533c512f0661277df045");
-
-  // Creating an instance of the required contracts
-  const [tokenRootContract, multiWalletContract] = await Promise.all([
-    await locklift.factory.getDeployedContract("TokenRoot", tokenRootAddress),
-    await locklift.factory.getDeployedContract("MultiWalletTIP3", multiWalletAddress),
-  ]);
+  /*
+   add this to the body of the main function
+  */
 
   // Fetching the decimals and symbol from the token root contract
-  const [decimals, symbol] = await Promise.all([
-    Number((await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0),
-    (await tokenRootContract.methods.symbol({ answerId: 0 }).call()).value0,
-  ]);
 
   // Creating an instance of the token wallet contract
   let tokenWalletContract: Contract<FactorySource["TokenWallet"]>;
@@ -151,14 +125,7 @@ async function main() {
     "balance after mint:",
     (await getWalletData(multiWalletContract, tokenRootContract.address)).balance / 10 ** decimals,
   );
-}
 
-main()
-  .then(() => process.exit(0))
-  .catch(e => {
-    console.log(e);
-    process.exit(1);
-  });
 
 ````
 

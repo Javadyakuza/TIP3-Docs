@@ -40,25 +40,6 @@ According to the Multi Wallet contract, it stores the wallet information and its
 <span  :class="LLdis">
 
 ````typescript
-import { FactorySource } from "../build/factorySource";
-import { Address, Signer, Contract } from "locklift";
-
-async function main() {
-
-  // Setting up the signers and the accounts
-  const signer: Signer = (await locklift.keystore.getSigner("0"))!;
-
-  // Required contracts addresses
-  const tokenRootAddress: Address = new Address("<YOUR_TOKEN_ROOT_ADDReSS>");
-  const multiWalletAddress: Address = new Address("<YOUR_MULTI_WALLET_ADDRESS>");
-
-  // Creating an instance of the multi wallet tip-3 contract
-  const multiWalletContract: Contract<FactorySource["MultiWalletTIP3"]> = await locklift.factory.getDeployedContract(
-    "MultiWalletTIP3",
-    multiWalletAddress,
-  );
-
-  console.log("Multi Wallet TIP-3 address: ", multiWalletContract.address.toString());
 
   // Deploying a TokenWallet contract using the using multi wallet contract
   await multiWalletContract.methods
@@ -81,13 +62,6 @@ async function main() {
   );
 
   console.log("Token wallet address; ", tokenWalletContract.address.toString());
-}
-
-main()
-  .then(() => process.exit(0))
-  .catch(e => {
-    process.exit(1);
-  });
 
 ````
 

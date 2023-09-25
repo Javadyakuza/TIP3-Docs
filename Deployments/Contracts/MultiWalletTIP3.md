@@ -806,7 +806,7 @@ async function main() {
 
   // Deploying two MultiWalletTIP3 contracts
   // We send a bit more Ever than usual since the transaction fees will be spent from the contract balance and all of initiator the tx's are external.
-  const { contract: multiWalletTip3Contract } = await locklift.factory.deployContract({
+  const { contract: multiWalletContract } = await locklift.factory.deployContract({
     contract: "MultiWalletTIP3",
     publicKey: signer.publicKey,
     initParams: {
@@ -816,7 +816,7 @@ async function main() {
     value: locklift.utils.toNano("20"),
   });
 
-  console.log("Multi Wallet TIP-3 address: ", multiWalletTip3Contract.address.toString());
+  console.log("Multi Wallet TIP-3 address: ", multiWalletContract.address.toString());
 }
 
 main()

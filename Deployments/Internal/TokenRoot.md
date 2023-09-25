@@ -58,41 +58,6 @@ The parameter `initialSupply` must be set to zero if the `initialSupplyTo` is **
 <span  :class="LLdis">
 
 ````typescript
-/**
- * locklift is a globally declared object
- */
-
-import { Address, zeroAddress, Signer, Contract, WalletTypes } from "locklift";
-import { FactorySource } from "../build/factorySource";
-
-async function main() {
-
-  // Setting up the signer and account
-  const signer: Signer = (await locklift.keystore.getSigner("0"))!;
-
-  // uncomment if deploying a new account
-  // const { contract: account } = await locklift.factory.deployContract({
-  //   contract: "Account",
-  //   publicKey: signer.publicKey,
-  //   constructorParams: {},
-  //   initParams: { _randomNonce: locklift.utils.getRandomNonce() },
-  //   value: locklift.utils.toNano(20),
-  // });
-
-// Adding an existing SafeMultiSig Account using its address
-  const account = await locklift.factory.accounts.addExistingAccount({
-    type: WalletTypes.MsigAccount,
-    address: new Address("<YOUR_ACCOUNT_ADDRESS>"),
-    mSigType: "SafeMultisig",
-  });
-
-  // Creating an instance of the target token root
-  const rootDeployerAddress: Address = new Address("<YOUR_ROOT_DEPLOYER_ADDRESS>");
-
-  const rootDeployerContract: Contract<FactorySource["RootDeployer"]> = locklift.factory.getDeployedContract(
-    "RootDeployer",
-    rootDeployerAddress,
-  );
 
   // Defining an interface for tokens root deployment using the root deployer contract
   interface deployRootParams {
@@ -127,7 +92,7 @@ async function main() {
   };
 
   // Deploying the token root utilizing an external message to the root deployer contract
-  await rootDeployerContract.methods.deployTokenRoot(deployRootFromDeployerParams).sendExternal({
+  await rootDeployer.methods.deployTokenRoot(deployRootFromDeployerParams).sendExternal({
     publicKey: signer.publicKey,
   });
 
@@ -135,7 +100,7 @@ async function main() {
   const tokenRoot: Contract<FactorySource["TokenRoot"]> = locklift.factory.getDeployedContract(
     "TokenRoot",
     (
-      await rootDeployerContract.methods
+      await rootDeployer.methods
         .getExpectedTokenRootAddress({
           name: deployRootFromDeployerParams.name,
           decimals: deployRootFromDeployerParams.decimals,
@@ -152,14 +117,6 @@ async function main() {
       (await tokenRoot.methods.name({ answerId: 0 }).call()).value0
     }`,
   ); // >> Tip3OnboardingToken
-}
-
-main()
-  .then(() => process.exit(0))
-  .catch(e => {
-    console.log(e);
-    process.exit(1);
-  });
 
 ````
 
