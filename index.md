@@ -4,13 +4,13 @@ TIP-3 is the technical standard for all fungible tokens of the [TVM(Threaded vir
 
 # Differences with ERC-20
 
-The suggested standard differs considerably from Ethereum ERC20 and other smart contract token standards with single registry due to its distributed nature related to TVM based blockchains particularities. Given that these blockchains has a storage fee, using an existing ERC20 standard design would cause excessive maintenance costs. Also, ERC20 is somewhat incompatible with the sharding architecture. Therefore, a Distributed Token standard is preferable.
+The suggested standard differs considerably from Ethereum ERC20 and other smart contract token standards with single registry due to its distributed nature related to these blockchains particularities. Given that these blockchains has a storage fee, using an existing ERC20 standard design would cause excessive maintenance costs. Also, ERC20 is somewhat incompatible with the sharding architecture. Therefore, a Distributed Token standard is preferable.
 
 The ERC20 sharding implementation (with an idea to simply shard its registry) has drawbacks mainly related to complicated and expansive management. TIP-3 is fully distributed and implies separate storage of each user’s balance.
 
 ## What's Inside
 
-In this onboarding, we will get acquainted with TVM based blockchains smart contracts. We take the [TIP-3](https://github.com/broxus/tip3) token and look at two ways to interact with the TIP-3 Token.
+In this onboarding, we will get acquainted with these blockchains smart contracts. We take the [TIP-3](https://github.com/broxus/tip3) token and look at two ways to interact with the TIP-3 Token.
 
 We will use default Account and TypeScript. And in the second case, we will write our custom smart contract which can handle the  the TIP-3 Token deployment.
 

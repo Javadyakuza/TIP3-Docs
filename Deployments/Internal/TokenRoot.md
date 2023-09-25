@@ -2,7 +2,7 @@
 
 <div class="DeployTokenRoot">
 
-In this section, we will learn a little more about the memory structure and StateInit in the Threaded Virtual Machine (TVM), and deploy our token root contract through a smart contract.
+In this section, we will learn a little more about the memory structure and StateInit in the TVM (Threaded Virtual Machine), and deploy our token root contract through a smart contract.
 
 ## Memory structure and State init
 

@@ -12,7 +12,7 @@ This flexibility of the smart contract code provides a broad range of authentica
 
 ## Usage
 
-This documentation covers the usage of two tools for deploying and interacting with the contract on the TVm based network:
+This documentation covers the usage of two tools for deploying and interacting with the contract on the these blockchains.
 
 -  `locklift`
 -  `everscale-inpage-provider`
