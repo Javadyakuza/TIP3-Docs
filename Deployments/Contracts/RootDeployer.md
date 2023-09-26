@@ -211,7 +211,7 @@ async function main() {
   // Adding an existing SafeMultiSig Account using its address
   const aliceAccount = await locklift.factory.accounts.addExistingAccount({
     type: WalletTypes.MsigAccount,
-    address: await deployAcc(signerAlice),
+    address: new Address("<ALICE_ACCOUNT_ADDRESS>"),
     mSigType: "SafeMultisig",
     publicKey: signerAlice.publicKey,
   });
@@ -228,7 +228,7 @@ async function main() {
   // Adding an existing SafeMultiSig Account using its address
   const bobAccount = await locklift.factory.accounts.addExistingAccount({
     type: WalletTypes.MsigAccount,
-    address: await deployAcc(signerBob),
+    address: new Address("<BOB_ACCOUNT_ADDRESS>"),
     mSigType: "SafeMultisig",
     publicKey: signerBob.publicKey,
   });
@@ -379,7 +379,7 @@ Let's run our script using locklift
 ```` shell
 npx locklift run -s ./scripts/01-deploy-root-deployer.ts -n local
 ````
-<ImgContainer src= '/deployRootDeployer.png' width="100%" altText="deployRootDeployerOutput" />
+<ImgContainer src= '/01-deploy-root-deployer.png' width="100%" altText="deployRootDeployerOutput" />
 
 Congratulations, you have deployed a Root Deployer contract 🎉
 

@@ -8,10 +8,10 @@ In this section, we will explore an important aspect of deploying the TIP-3 stan
 ## Step 1: Write Deployment Script
 <span  :class="LLdis"  >
 
-We can utilize the code sample below to deploy a token wallet and retrieve its address from the multi wallet contract with help of the locklift tool.
+We can utilize the code sample below to deploy a token wallet and retrieve its address from the multi wallet contract with help of the locklift tool and the stats of the previously written script from the [deploy token root](./TokenRoot.md#step-1-write-deployment-script) section .
 
 ::: info
-Before we start to write our scripts we need to make sure that there is a file named `03-deploy-wallet.ts` in the `script` folder in the project root.
+Before we start to write our scripts we need to make sure that there is a file named `04-deploy-wallet.ts` in the `script` folder in the project root.
 :::
 
 </span>
@@ -176,9 +176,9 @@ async function main() {
 Use this command and deploy token wallet
 
 ```shell
-npx locklift run -s ./scripts/02-deploy-wallet.ts -n local
+npx locklift run -s ./scripts/04-deploy-wallet.ts -n local
 ```
-<ImgContainer src= '/deployTokenWalletFromMW.png' width="100%" altText="buildStructure" />
+<ImgContainer src= '/04-deploy-wallet.png' width="100%" altText="buildStructure" />
 
 Congratulations, you have deployed a TIP3 Token Wallet from the Multi Wallet TIP-3 contract 🎉
 

@@ -9,10 +9,12 @@ It is important to note that the multi wallet contract only supports transaction
 
 <span  :class="LLdis">
 
-The code sample below utilizes both burn functions with the help of the locklift but checks the balance on the multi wallet TIP-3 contract:
+The code sample below utilizes both burn functions with the help of the locklift but checks the balance on the multi wallet TIP-3 contract.
+
+We use the previously written script stats from the [transfer tip3 tokens](./Transfer.md#step-1-write-transfer-script) section for the following script.
 
 ::: info
-Before we start to write our scripts we need to make sure that there is a file named `05-burn-tip3.ts` in the `script` folder in the project root.
+Before we start to write our scripts we need to make sure that there is a file named `07-burn-tip3.ts` in the `script` folder in the project root.
 :::
 
 </span>
@@ -305,9 +307,9 @@ async function main() {
 Use this command to burn TIP-3 tokens:
 
 ```shell
-npx locklift run -s ./scripts/05-burn-tip3.ts -n local
+npx locklift run -s ./scripts/07-burn-tip3.ts -n local
 ```
-<ImgContainer src= '/burnTokensFromMW.png' width="100%" altText="buildStructure" />
+<ImgContainer src= '/07-burn-tip3.png' width="100%" altText="buildStructure" />
 
 Congratulations, you have successfully burned TIP-3 tokens using a custom contract 🎉
 

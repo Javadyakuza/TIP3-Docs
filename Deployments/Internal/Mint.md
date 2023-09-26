@@ -19,8 +19,10 @@ There is a callback function named `onAcceptTokensMint` which will be called on 
 
 We can mint TIP-3 tokens for the target Token Wallet, as shown in the code samples below using the locklift tool.
 
+We use the previously written script stats from the [deploy token wallet](./TokenWallet.md#step-1-write-deployment-script) section for the following script.
+
 ::: info
-- Before we start to write our scripts we need to make sure that there is a file named `03-mint-tip3.ts` in the `script` folder in the project root.
+- Before we start to write our scripts we need to make sure that there is a file named `05-mint-tip3.ts` in the `script` folder in the project root.
 :::
 
 </span>
@@ -216,9 +218,9 @@ async function main() {
 Use this command to mint TIP-3 tokens:
 
 ```shell
-npx locklift run -s ./scripts/03-mint-tip3.ts -n local
+npx locklift run -s ./scripts/05-mint-tip3.ts -n local
 ```
-<ImgContainer src= '/mintForTWFromMW.png' width="100%" altText="buildStructure" />
+<ImgContainer src= '/05-mint-tip3.png' width="100%" altText="buildStructure" />
 
 Congratulations, you have successfully minted TIP-3 tokens for a token wallet deployed by a custom contract 🎉
 

@@ -27,7 +27,7 @@ TVM memory and persistent storage consist of cells. Remember that the TVM memory
 Follow the instructions below to deploy a `TokenRoot` using the `rootDeployer` contract with the locklift tool:
 
 ::: info
-Before we start to write our scripts we need to make sure that there is a file named `01-deploy-token.ts` in the `script` folder in the project root.
+Before we start to write our scripts we need to make sure that there is a file named `03-deploy-token.ts` in the `script` folder in the project root.
 :::
 
 </span>
@@ -257,9 +257,9 @@ async function main() {
 Let's run our script using locklift
 
 ```` shell
-npx locklift run -s ./scripts/01-deploy-root-deployer.ts -n local
+npx locklift run -s ./scripts/03-deploy-token.ts -n local
 ````
-<ImgContainer src= '/image(101).png' width="100%" altText="buildStructure" />
+<ImgContainer src= '/01-deploy-token-contract.png' width="100%" altText="buildStructure" />
 
 Congratulations, you have deployed a TIP3 Token Root through the Root Deployer contract 🎉
 

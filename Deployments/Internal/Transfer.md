@@ -10,10 +10,12 @@ Now that we have minted TIP-3 tokens, it's time to transfer them. As explained i
 
 <span  :class="LLdis"  >
 
-In the code sample below, we will demonstrate how to utilize both if the transfer functions of the TIP-3 standard using `locklift` tool and MultiWalletTIP3 contract:
+In the code sample below, we will demonstrate how to utilize both if the transfer functions of the TIP-3 standard using `locklift` tool and MultiWalletTIP3 contract.
+
+We use the previously written script stats from the [mint tip3 tokens](./Mint.md#step-1-write-minting-script) section for the following script.
 
 ::: info
-Before we start to write our scripts we need to make sure that there is a file named `04-transfer-tip3.ts` in the `script` folder in the project root.
+Before we start to write our scripts we need to make sure that there is a file named `06-transfer-tip3.ts` in the `script` folder in the project root.
 :::
 
 </span>
@@ -333,9 +335,9 @@ async function main() {
 Use this command to transfer TIP-3 tokens:
 
 ```shell
-npx locklift run -s ./scripts/04-transfer-tip3.ts -n local
+npx locklift run -s ./scripts/06-transfer-tip3.ts -n local
 ```
-<ImgContainer src= '/transferTokenFromMW.png' width="100%" altText="buildStructure" />
+<ImgContainer src= '/06-transfer-tip3.png' width="100%" altText="buildStructure" />
 
 Congratulations, you have successfully transferred TIP-3 tokens from one to another Wallet using a custom contract 🎉
 

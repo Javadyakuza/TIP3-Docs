@@ -764,7 +764,7 @@ contract MultiWalletTIP3 is CheckPubKey, ExternalOwner, RandomNonce {
 
 <span  :class="LLdis"  >
 
-We can utilize the code sample below to deploy a `MultiWalletTIP3` contract:
+We can utilize the code sample below to deploy a `MultiWalletTIP3` contract using previously written script stats from the [deploy root deployer](./RootDeployer.md#step-1-write-deployment-script) section and the locklift tool:
 
 ::: info
 Before we start to write our scripts we need to make sure that there is file named `02-deploy-multi-wallet-tip3.ts` in the `script` folder in the project root.
@@ -948,7 +948,7 @@ Use this command and deploy MultiWalletTIP3 contract
 ```shell
 npx locklift run -s ./scripts/02-deploy-multi-wallet-tip3.ts -n local
 ```
-<ImgContainer src= '/deployMVTip3.png' width="100%" altText="deployMWOutput" />
+<ImgContainer src= '/01-deploy-token-contract.png' width="100%" altText="deployMWOutput" />
 
 
 Congratulations, you have deployed a Multi Wallet TIP3 contract 🎉
