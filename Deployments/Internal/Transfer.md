@@ -1,8 +1,7 @@
-/*
-  Burning tip-4 token using burn method on the Multi Wallet TIP-3 contract
-  */# Transfer TIP-3 Tokens
 
 <div class="transferToken">
+
+# Transfer TIP-3 Tokens
 
 Now that we have minted TIP-3 tokens, it's time to transfer them. As explained in the [Transfer Using an Account](../External/Transfer.md) section, the TIP-3 standard has two implementations for the transfer concept, both of which we will cover. It's worth noting that both of these methods are implemented within the MultiWalletTIP-3 contract, so we will be exploring them in detail.
 

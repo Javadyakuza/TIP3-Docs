@@ -4,7 +4,7 @@
 
 In the EVM (Ethereum Virtual Machine), to enable upgradeability for a specific A1, you must deploy at least one additional A2 for that A1. Each upgrade will necessitate the deployment of a new account. This widely accepted approach is known as the _Upgradeable Proxy Pattern_.
 
-In the TVM (Threaded Virtual Machine), there is an instruction called  `SETCODE`  that allows an account to upgrade itself using a code obtained from an inbound message or its own storage. The account's address remains unchanged, and the upgrade does not require any additional deployments.
+In the TVM (Ton Virtual Machine), there is an instruction called  `SETCODE`  that allows an account to upgrade itself using a code obtained from an inbound message or its own storage. The account's address remains unchanged, and the upgrade does not require any additional deployments.
 
 ::: tip
 For a better understanding of this instruction, you can also refer to the TVM API documentation at the following link:

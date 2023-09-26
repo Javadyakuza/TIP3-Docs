@@ -1,6 +1,6 @@
 # Introduction
 
-As you are aware, the TIP-3 Standard is utilized for fungible tokens in the [TVM (Threaded Virtual Machine)](https://everkit.org/en/articles/the-virtual-machine-tvm-1) based blockchains. It possesses a distinct architecture when compared to other network standards like ERC-20, among others.
+As you are aware, the TIP-3 Standard is utilized for fungible tokens in the [TVM (Ton Virtual Machine)](https://everkit.org/en/articles/the-virtual-machine-tvm-1) based blockchains. It possesses a distinct architecture when compared to other network standards like ERC-20, among others.
 
 This standard facilitates a more efficient approach to the storage and management of token balances, allowing users to avoid the high maintenance costs often associated with registry sharding. Moreover, it aligns with the fiscal policies of these blockchains, where data storage incurs fees, promoting both efficiency and economy in network operations.
 

@@ -1,6 +1,6 @@
 # TIP-3 Standard
 
-TIP-3 is the technical standard for all fungible tokens of the [TVM(Threaded virtual machine)](https://everkit.org/en/articles/the-virtual-machine-tvm-1) based blockchains.
+TIP-3 is the technical standard for all fungible tokens of the [TVM(Ton Virtual Machine)](https://everkit.org/en/articles/the-virtual-machine-tvm-1) based blockchains.
 
 # Differences with ERC-20
 

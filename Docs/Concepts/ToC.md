@@ -1,6 +1,6 @@
 # Concepts
 
-In this section, we will explore the commonly used terms and ideas in TVM (Threaded Virtual Machine) based networks. We will break them down in a simpler manner for better understanding.
+In this section, we will explore the commonly used terms and ideas in TVM (Ton Virtual Machine) based networks. We will break them down in a simpler manner for better understanding.
 
 **This section includes following topics:**
 

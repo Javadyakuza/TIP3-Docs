@@ -4,7 +4,7 @@
 
 In this section, we will provide a simple, step-by-step guide on deploying the token root contract.
 
-## Step 1: Write Deployment script
+## Step 1: Write Deployment Script
 <span  :class="LLdis" >
 
 To deploy the token root using the [locklift](https://docs.locklift.io/) tool, which provides a straightforward approach. The following code sample demonstrates the deployment process:

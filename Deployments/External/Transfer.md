@@ -17,7 +17,7 @@ TIP-3 Token Wallet has 2 transfer methods:
 In the code sample provided below, we assume that Alice does not have a token wallet. Therefore, we begin by deploying a token wallet for Alice which will be accomplished when using the  `transfer`  function. Subsequently, we can employ the  `transferToWallet`  function to transfer a certain amount of TIP3 tokens to Alice.
 :::
 
-## Step 1: Write transfer script
+## Step 1: Write Transfer Script
 
 <span  :class="LLdis"  >
 
@@ -338,7 +338,7 @@ async function main() {
 
 <div class="action">
 
-## Step 2: Transfer TIP-3 tokens
+## Step 2: Transfer TIP-3 Tokens
 <div :class="llAction">
 
 Use this command to transfer TIP-3 tokens:

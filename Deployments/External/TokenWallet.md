@@ -10,7 +10,7 @@ TON Solidity compiler allows specifying different parameters of the outbound int
 **Note:** if `value` isn't set, then the default value is equal to 0.01 ever, or 10^7 nanoever. It's equal to 10\_000 units of gas in workchain. If the callee function returns some value and marked as `responsible` then `callback` option must be set. This callback function will be called by another contract. Remote function will pass its return values as function arguments for the callback function. That's why types of return values of the callee function must be equal to function arguments of the callback function. If the function marked as `responsible` then field `answerId` appears in the list of input parameters of the function in `*abi.json` file. `answerId` is function id that will be called.
 :::
 
-## Step 1: Write Deployment script
+## Step 1: Write Deployment Script
 <span  :class="LLdis">
 
 Now lets write the scripts to deploy a Token Wallet using locklift and previously written script [stats](./TokenRoot.md#step-1-write-deployment-script).

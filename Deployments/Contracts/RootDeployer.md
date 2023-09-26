@@ -370,6 +370,7 @@ async function main() {
 
 </div>
 
+## Step 2: Deploy Root Deployer
 
 <div class="action">
 <div :class="llAction">
@@ -387,7 +388,6 @@ Congratulations, you have deployed a Root Deployer contract 🎉
 
 <div :class="eipAction" >
 
-## Step 2: Deploy Root Deployer
 
 <button @click="deployRootDeployer" class="DeployRootDeployerBut" >Deploy root deployer</button>
 

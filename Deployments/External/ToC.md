@@ -1,5 +1,5 @@
 
-# Deployment Using Account 
+# Deployment Using Account
 In this section, we will explore the utilization of **Account** smart contracts to deploy TIP-3 standard smart contracts and interact with them.
 
 ::: danger

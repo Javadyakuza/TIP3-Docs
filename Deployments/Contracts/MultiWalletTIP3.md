@@ -116,7 +116,7 @@ function deployWallet(
 
 <br/>
 
-### Transfer TIP-3 tokens
+### Transfer TIP-3 Tokens
 
 **As we learned earlier from [here](../External/Transfer.md), TIP-3 has two implementations of the transfer.**
 <details>
@@ -939,6 +939,7 @@ async function main() {
 
 </div>
 
+## Step 2: Deploy Multi Wallet TIP-3
 
 <div class="action">
 <div :class="llAction">
@@ -956,7 +957,6 @@ Congratulations, you have deployed a Multi Wallet TIP3 contract 🎉
 
 <div :class="eipAction" >
 
-## Step 2: Deploy Multi Wallet Tip3
 
 
 <button @click="deployMultiWallet" class="DeployMultiWalletTip3But" >Deploy Multi Wallet Tip3</button>

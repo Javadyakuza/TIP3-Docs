@@ -1,4 +1,4 @@
-# Locklift config setting
+# Locklift Config Setting
 
 In this section we will learn how to use the TIP-3 contracts inside of our locklift project
 

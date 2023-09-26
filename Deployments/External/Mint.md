@@ -8,7 +8,7 @@ In this section we will learn the how to mint TIP-3 tokens for a token wallet.
 
 To mint TIP-3 tokens we simply need to invoke the  `mint`  function within the token root contract. Subsequently, the  `acceptMint`  function will be triggered on the token wallet, resulting in the minting of tokens for the designated recipient token wallet.
 
-## Step 1: Write Minting script
+## Step 1: Write Minting Script
 <span  :class="LLdis"  >
 
 Utilize the code sample below to mint TIP-3 tokens using locklift tool and previously written script in the [deploy token wallet](./TokenWallet.md#step-1-write-deployment-script) section .

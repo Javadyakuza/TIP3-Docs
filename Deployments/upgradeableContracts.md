@@ -229,13 +229,13 @@ The expected output will be:
 ### Step 2: Deploy Token Wallet (Token Wallet Platform)
   We utilized the `deployWallet` function of the root contract to deploy a `TokenWalletPlatform` contract which results deployment of the `TokenWalletUpgradeable` contract.
 
-### Step 3: Mint Tip-3 Tokens for the Token wallet
+### Step 3: Mint TIP-3 Tokens for the Token wallet
 We utilize the mint function on the token root upgradeable contract to mint tip-3 token for the newly deploy token wallet upgradeable contract.
 
 ### Step 4: Interacting with Token Wallet Upgradeable
   We called the balance method on the token wallet contract to ensure that its deployed and then minted TIP-3 tokens for it to ensure is typical fungible functionality.
 
-### Step 5: UPgrading the TokenWalletUpgradeable 
+### Step 5: Upgrading the Token Wallet Upgradeable
 
 
 <script lang="ts" >

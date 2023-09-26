@@ -42,7 +42,7 @@ You can also refer to the [everscale-inpage-provider Docs](https://provider-docs
 
 ### Step 1: Create the module
 
-create a file named `useProvider.ts`.
+Create a file named `useProvider.ts`.
 
 ### Step 2: Add Scripts
 

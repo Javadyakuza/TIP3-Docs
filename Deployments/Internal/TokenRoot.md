@@ -2,9 +2,9 @@
 
 <div class="DeployTokenRoot">
 
-In this section, we will learn a little more about the memory structure and StateInit in the TVM (Threaded Virtual Machine), and deploy our token root contract through a smart contract.
+In this section, we will learn a little more about the memory structure and StateInit in the [TVM (Ton Virtual Machine)](https://everkit.org/en/articles/the-virtual-machine-tvm-1), and deploy our token root contract through a smart contract.
 
-## Memory structure and State init
+## Memory Structure and State Init
 
 TVM memory and persistent storage consist of cells. Remember that the TVM memory and persistent storage consist of (TVM) cells.
 
