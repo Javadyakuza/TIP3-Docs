@@ -11,8 +11,9 @@ TON Solidity compiler allows specifying different parameters of the outbound int
 :::
 
 ## Step 1: Write Deployment script
-<span  :class="LLdis"  >
-Now lets write the scripts to deploy a Token Wallet using locklift .
+<span  :class="LLdis">
+
+Now lets write the scripts to deploy a Token Wallet using locklift and previously written script [stats](./TokenRoot.md#step-1-write-deployment-script).
 
 ::: info
 Before we start to write our scripts we need to make sure that there is a file named `02-deploy-wallet.ts` in the `script` folder in the project root.
@@ -163,7 +164,7 @@ Use this command and deploy token wallet
 ```shell
 npx locklift run -s ./scripts/02-deploy-wallet.ts -n local
 ```
-<ImgContainer src= '/image(17).png' width="100%" altText="deployTokenWalletOutput" />
+<ImgContainer src= '/02-deploy-wallet.png' width="100%" altText="deployTokenWalletOutput" />
 
 Congratulations, you have deployed your first TIP3 Token Wallet 🎉
 

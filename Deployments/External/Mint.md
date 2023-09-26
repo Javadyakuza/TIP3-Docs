@@ -11,7 +11,7 @@ To mint TIP-3 tokens we simply need to invoke the  `mint`  function within the t
 ## Step 1: Write Minting script
 <span  :class="LLdis"  >
 
-Utilize the code sample below tomint TIP-3 tokens using locklift tool.
+Utilize the code sample below to mint TIP-3 tokens using locklift tool and previously written script in the [deploy token wallet](./TokenWallet.md#step-1-write-deployment-script) section .
 
 ::: info
 Before we start to write our scripts we need to make sure that there is a file named `03-mint-tip3.ts` in the `script` folder in the project root.
@@ -51,7 +51,7 @@ Please be aware that if the `notify` parameter is set to true for the transactio
   // Preparing the parameters for minting tip-3 tokens
   const mintAmount: number = 100;
   let deployWalletValue: string = locklift.utils.toNano("2");
-  let txFee: string = locklift.utils.toNano("2");
+  let txFee: string = locklift.utils.toNano("5");
 
   // minting some token for the recipient
 
@@ -76,7 +76,7 @@ Please be aware that if the `notify` parameter is set to true for the transactio
   );
   const bobBal: number = Number((await bobTokenWallet.methods.balance({ answerId: 0 }).call()).value0);
 
-  console.log(`bob's ${symbol} balance: ${bobBal / 10 ** decimals}`); // >> 10
+  console.log(`bob's ${symbol} balance: ${bobBal / 10 ** decimals}`);
 
 
 ````
@@ -206,7 +206,7 @@ Use this command to mint TIP-3 tokens:
 ```shell
 npx locklift run -s ./scripts/03-mint-tip3.ts -n local
 ```
-<ImgContainer src= '/tip3Mint.png' width="100%" altText="mintTip3Output" />
+<ImgContainer src= '/03-mint-tip3.png' width="100%" altText="mintTip3Output" />
 
 Congratulations, you have successfully minted TIP-3 tokens for a token wallet 🎉
 

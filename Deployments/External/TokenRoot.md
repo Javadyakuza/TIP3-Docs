@@ -314,9 +314,11 @@ async function main() {
 Let's run our script using locklift:
 
 ```` shell
-npx locklift run -s ./scripts/01-deploy-token.ts -n `
+npx locklift run -s ./scripts/01-deploy-token.ts -n local
+
 ````
-<ImgContainer src= '/image(15).png' width="100%" altText="deployTokenRootOutput" />
+
+<ImgContainer src= '/01-deploy-token.png' width="100%" altText="deployTokenRootOutput" />
 
 
 Congratulations, you have deployed your first TIP3 Token Root 🎉

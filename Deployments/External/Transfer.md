@@ -23,6 +23,8 @@ In the code sample provided below, we assume that Alice does not have a token wa
 
 In the code sample below, we will demonstrate how to transfer TIP-3 tokens using locklift:
 
+Notice that we utilize the stats of the previously written script in the [mint tip-3](./Mint.md#step-1-write-minting-script) section.
+
 ::: info
 Before we start to write our scripts we need to make sure that there is a file named `04-transfer-tip3.ts` in the `script` folder in the project root.
 :::
@@ -344,7 +346,7 @@ Use this command to transfer TIP-3 tokens:
 ```shell
 npx locklift run -s ./scripts/04-transfer-tip3.ts -n local
 ```
-<ImgContainer src= '/transferTip3.png' width="100%" altText="transferTip3Output" />
+<ImgContainer src= '/04-transfer-tip3.png' width="100%" altText="transferTip3Output" />
 
 Congratulations, you have successfully transferred TIP-3 tokens from one to another Wallet 🎉
 
