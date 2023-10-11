@@ -26,7 +26,7 @@ Furthermore, it is important to note that only the owner of the root contract ha
 ## Step 1: Write Burning Script
 <span  :class="LLdis"  >
 
-Utilize the code sample below to burn TIP- tokens using locklift and the stats of the previously written script in the [transfer tip-3](./transfer.md#step-1-write-transfer-script) section:
+Utilize the code sample below to burn TIP- tokens using locklift and the stats of the previously written script in the [transfer tip-3](/guides/tokenOperations/usingAccount/transfer.md#step-1-write-transfer-script) section:
 
 ::: info
 Before we start to write our scripts we need to make sure that there is a file named `05-burn-tip3.ts` in the `script` folder in the project root.

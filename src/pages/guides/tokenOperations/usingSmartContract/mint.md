@@ -19,7 +19,7 @@ There is a callback function named `onAcceptTokensMint` which will be called on 
 
 We can mint TIP-3 tokens for the target Token Wallet, as shown in the code samples below using the locklift tool.
 
-We use the previously written script stats from the [deploy token wallet](../../deployingContracts/usingSmartContract/tokenWallet.md) section for the following script.
+We use the previously written script stats from the [deploy token wallet](/guides/deployingContracts/usingSmartContract/tokenWallet.md) section for the following script.
 
 ::: info
 - Before we start to write our scripts we need to make sure that there is a file named `05-mint-tip3.ts` in the `script` folder in the project root.

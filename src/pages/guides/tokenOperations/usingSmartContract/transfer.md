@@ -3,7 +3,7 @@
 
 # Transfer TIP-3 Tokens
 
-Now that we have minted TIP-3 tokens, it's time to transfer them. As explained in the [transfer Using an Account](../usingAccount/transfer.md) section, the TIP-3 standard has two implementations for the transfer concept, both of which we will cover. It's worth noting that both of these methods are implemented within the MultiWalletTIP-3 contract, so we will be exploring them in detail.
+Now that we have minted TIP-3 tokens, it's time to transfer them. As explained in the [transfer Using an Account](/guides/tokenOperations/usingAccount/transfer.md) section, the TIP-3 standard has two implementations for the transfer concept, both of which we will cover. It's worth noting that both of these methods are implemented within the MultiWalletTIP-3 contract, so we will be exploring them in detail.
 
 ## Step 1: Write Transfer Script
 
@@ -11,7 +11,7 @@ Now that we have minted TIP-3 tokens, it's time to transfer them. As explained i
 
 In the code sample below, we will demonstrate how to utilize both if the transfer functions of the TIP-3 standard using `locklift` tool and MultiWalletTIP3 contract.
 
-We use the previously written script stats from the [mint tip3 tokens](./mint.md#step-1-write-minting-script) section for the following script.
+We use the previously written script stats from the [mint tip3 tokens](/guides/tokenOperations/usingSmartContract/mint.md#step-1-write-minting-script) section for the following script.
 
 ::: info
 Before we start to write our scripts we need to make sure that there is a file named `06-transfer-tip3.ts` in the `script` folder in the project root.

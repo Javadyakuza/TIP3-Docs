@@ -11,7 +11,7 @@ To mint TIP-3 tokens we simply need to invoke the  `mint`  function within the t
 ## Step 1: Write Minting Script
 <span  :class="LLdis"  >
 
-Utilize the code sample below to mint TIP-3 tokens using locklift tool and previously written script in the [deploy token wallet](../../deployingContracts/usingAccount/tokenWallet.md#step-1-write-deployment-script) section .
+Utilize the code sample below to mint TIP-3 tokens using locklift tool and previously written script in the [deploy token wallet](/guides/deployingContracts/usingAccount/tokenWallet.md#step-1-write-deployment-script) section .
 
 ::: info
 Before we start to write our scripts we need to make sure that there is a file named `03-mint-tip3.ts` in the `script` folder in the project root.

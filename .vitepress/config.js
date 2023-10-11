@@ -27,7 +27,6 @@ const NAV = [
 module.exports = {
   title: 'TIP-3 Docs',
   base: '/',
-  title: 'TIP-3 Docs',
 
   plugins: [vue()],
   rewrites: {
@@ -45,7 +44,7 @@ module.exports = {
     'src/pages/quickStart/deployAccount.md': 'quickStart/deployAccount.md',
     'src/pages/guides/prerequisites/prerequisites.md': 'guides/prerequisites/prerequisites.md',
     'src/pages/guides/prerequisites/rootDeployer.md': 'guides/prerequisites/rootDeployer.md',
-    'src/pages/guides/prerequisites/multiWalletTip3.md': 'guides/prerequisites/multiWalletTip3.md',
+    'src/pages/guides/prerequisites/multiWalletTIP3.md': 'guides/prerequisites/multiWalletTIP3.md',
     'src/pages/guides/deployingContracts/toc.md': 'guides/deployingContracts/toc.md',
     'src/pages/guides/deployingContracts/usingAccount/tokenRoot.md':
       'guides/deployingContracts/usingAccount/tokenRoot.md',
@@ -59,21 +58,19 @@ module.exports = {
       'guides/deployingContracts/usingSmartContract/tokenWallet.md',
     'src/pages/guides/tokenOperations/toc.md': 'guides/tokenOperations/toc.md',
     'src/pages/guides/tokenOperations/usingAccount/mint.md':
-      'guides/tokenOperations/usingAccount/minting.md',
+      'guides/tokenOperations/usingAccount/mint.md',
     'src/pages/guides/tokenOperations/usingAccount/transfer.md':
-      'guides/tokenOperations/usingAccount/transferring.md',
+      'guides/tokenOperations/usingAccount/transfer.md',
     'src/pages/guides/tokenOperations/usingAccount/burn.md':
-      'guides/tokenOperations/usingAccount/burning.md',
+      'guides/tokenOperations/usingAccount/burn.md',
     'src/pages/guides/tokenOperations/usingSmartContract/mint.md':
-      'guides/tokenOperations/usingSmartContract/minting.md',
+      'guides/tokenOperations/usingSmartContract/mint.md',
     'src/pages/guides/tokenOperations/usingSmartContract/transfer.md':
-      'guides/tokenOperations/usingSmartContract/transferring.md',
+      'guides/tokenOperations/usingSmartContract/transfer.md',
     'src/pages/guides/tokenOperations/usingSmartContract/burn.md':
-      'guides/tokenOperations/usingSmartContract/burning.md',
-    'src/pages/guides/working-with-transport.md': 'guides/working-with-transport.md',
-    'src/pages/guides/working-with-transactions.md': 'guides/working-with-transactions.md',
-    'src/pages/guides/working-with-transport.md': 'guides/working-with-transport.md',
+      'guides/tokenOperations/usingSmartContract/burn.md',
   },
+  ignoreDeadLinks: true,
   themeConfig: {
     search: {
       provider: 'local',
@@ -90,35 +87,35 @@ module.exports = {
       {
         text: 'Concepts',
         collapsable: false,
-        link: '/src/pages/concepts/toc.md',
+        link: '/concepts/toc.md',
         items: [
           {
             text: 'Token Root',
             collapsable: false,
-            link: '/src/pages/concepts/tokenRoot.md',
+            link: '/concepts/tokenRoot.md',
           },
           {
             text: 'Token Wallet',
             collapsable: false,
-            link: '/src/pages/concepts/tokenWallet.md',
+            link: '/concepts/tokenWallet.md',
           },
           {
             text: 'Accounts',
             collapsable: false,
-            link: '/src/pages/concepts/accounts.md',
+            link: '/concepts/accounts.md',
           },
-          { text: 'TIP-6.1', collapsable: false, link: '/src/pages/concepts/tip6.md' },
+          { text: 'TIP-6.1', collapsable: false, link: '/concepts/tip6.md' },
           {
-            text: 'Upgradable Contracts',
+            text: 'upgradeable Contracts',
             collapsable: false,
-            link: '/src/pages/concepts/upgradeableContracts.md',
+            link: '/concepts/upgradeableContracts.md',
           },
         ],
       },
       {
         text: 'Quick Start',
         collapsable: false,
-        link: '/src/pages/quickStart/toc.md',
+        link: '/quickStart/toc.md',
         items: [
           {
             text: 'Setup',
@@ -127,24 +124,24 @@ module.exports = {
               {
                 text: 'Basic Project Setup',
                 collapsable: false,
-                link: '/src/pages/quickStart/basicProjectSetup.md',
+                link: '/quickStart/basicProjectSetup.md',
               },
               {
                 text: 'Locklift Config Setup',
                 collapsable: false,
-                link: '/src/pages/quickStart/lockliftConfigSetting.md',
+                link: '/quickStart/lockliftConfigSetting.md',
               },
             ],
           },
           {
             text: 'Local Environment',
             collapsable: false,
-            link: '/src/pages/quickStart/localEnvironment.md',
+            link: '/quickStart/localEnvironment.md',
           },
           {
             text: 'Deploy Account',
             collapsable: false,
-            link: '/src/pages/quickStart/deployAccount.md',
+            link: '/quickStart/deployAccount.md',
           },
         ],
       },
@@ -155,17 +152,17 @@ module.exports = {
           {
             text: 'Prerequisites',
             collapsable: false,
-            link: '/src/pages/guides/prerequisites/prerequisites.md',
+            link: '/guides/prerequisites/prerequisites.md',
             items: [
               {
                 text: 'Root Deployer',
                 collapsable: false,
-                link: '/src/pages/guides/prerequisites/rootDeployer.md',
+                link: '/guides/prerequisites/rootDeployer.md',
               },
               {
                 text: 'Multi Wallet Tip3',
                 collapsable: false,
-                link: '/src/pages/guides/prerequisites/multiWalletTIP3.md',
+                link: '/guides/prerequisites/multiWalletTIP3.md',
               },
             ],
           },
@@ -173,7 +170,7 @@ module.exports = {
           {
             text: 'Deploying Contracts',
             collapsable: false,
-            link: '/src/pages/guides/deployingContracts/toc.md',
+            link: '/guides/deployingContracts/toc.md',
             items: [
               {
                 text: 'Using Account',
@@ -182,17 +179,17 @@ module.exports = {
                   {
                     text: 'Deploying Token Root',
                     collapsable: false,
-                    link: '/src/pages/guides/deployingContracts/usingAccount/tokenRoot.md',
+                    link: '/guides/deployingContracts/usingAccount/tokenRoot.md',
                   },
                   {
                     text: 'Deploying Token Wallet',
                     collapsable: false,
-                    link: '/src/pages/guides/deployingContracts/usingAccount/tokenWallet.md',
+                    link: '/guides/deployingContracts/usingAccount/tokenWallet.md',
                   },
                   {
-                    text: 'Deploying Upgradable',
+                    text: 'Deploying upgradeable',
                     collapsable: false,
-                    link: '/src/pages/guides/deployingContracts/usingAccount/upgradeableContracts.md',
+                    link: '/guides/deployingContracts/usingAccount/upgradeableContracts.md',
                   },
                 ],
               },
@@ -203,12 +200,12 @@ module.exports = {
                   {
                     text: 'Deploying Token Root',
                     collapsable: false,
-                    link: '/src/pages/guides/deployingContracts/usingSmartContract/tokenRoot.md',
+                    link: '/guides/deployingContracts/usingSmartContract/tokenRoot.md',
                   },
                   {
                     text: 'Deploying Token Wallet',
                     collapsable: false,
-                    link: '/src/pages/guides/deployingContracts/usingSmartContract/tokenWallet.md',
+                    link: '/guides/deployingContracts/usingSmartContract/tokenWallet.md',
                   },
                 ],
               },
@@ -217,7 +214,7 @@ module.exports = {
           {
             text: 'Token Operations',
             collapsable: false,
-            link: '/src/pages/guides/tokenOperations/toc.md',
+            link: '/guides/tokenOperations/toc.md',
             items: [
               {
                 text: 'Using Account',
@@ -226,17 +223,17 @@ module.exports = {
                   {
                     text: 'Minting Tokens',
                     collapsable: false,
-                    link: '/src/pages/guides/tokenOperations/usingAccount/mint.md',
+                    link: '/guides/tokenOperations/usingAccount/mint.md',
                   },
                   {
                     text: 'Transferring Tokens',
                     collapsable: false,
-                    link: '/src/pages/guides/tokenOperations/usingAccount/transfer.md',
+                    link: '/guides/tokenOperations/usingAccount/transfer.md',
                   },
                   {
                     text: 'Burning Tokens',
                     collapsable: false,
-                    link: '/src/pages/guides/tokenOperations/usingAccount/burn.md',
+                    link: '/guides/tokenOperations/usingAccount/burn.md',
                   },
                 ],
               },
@@ -247,17 +244,17 @@ module.exports = {
                   {
                     text: 'Minting Tokens',
                     collapsable: false,
-                    link: '/src/pages/guides/tokenOperations/usingSmartContract/mint.md',
+                    link: '/guides/tokenOperations/usingSmartContract/mint.md',
                   },
                   {
                     text: 'Transferring Tokens',
                     collapsable: false,
-                    link: '/src/pages/guides/tokenOperations/usingSmartContract/transfer.md',
+                    link: '/guides/tokenOperations/usingSmartContract/transfer.md',
                   },
                   {
                     text: 'Burning Tokens',
                     collapsable: false,
-                    link: '/src/pages/guides/tokenOperations/usingSmartContract/burn.md',
+                    link: '/guides/tokenOperations/usingSmartContract/burn.md',
                   },
                 ],
               },

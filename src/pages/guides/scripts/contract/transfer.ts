@@ -8,7 +8,6 @@ import {
 import * as tip3Artifacts from 'tip3-docs-artifacts';
 
 import { toast } from '../../../../helpers/toast';
-
 import { extractPubkey } from '../helpers/extractPubkey';
 import { getWalletData } from '../helpers/getTWDataFromMW';
 import isValidEverAddress from '../helpers/isValideverAddress';

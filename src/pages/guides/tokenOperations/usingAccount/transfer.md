@@ -23,7 +23,7 @@ In the code sample provided below, we assume that Alice does not have a token wa
 
 In the code sample below, we will demonstrate how to transfer TIP-3 tokens using locklift:
 
-Notice that we utilize the stats of the previously written script in the [mint tip-3](./mint.md#step-1-write-minting-script) section.
+Notice that we utilize the stats of the previously written script in the [mint tip-3](/guides/tokenOperations/usingAccount/mint.md#step-1-write-minting-script) section.
 
 ::: info
 Before we start to write our scripts we need to make sure that there is a file named `04-transfer-tip3.ts` in the `script` folder in the project root.

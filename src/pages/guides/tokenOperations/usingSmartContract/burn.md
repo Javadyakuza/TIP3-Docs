@@ -2,7 +2,7 @@
 
 <div class="burnToken">
 
-Now that we have gained knowledge on deploying custom contracts and minting/transferring tokens using them, we can proceed to explore the burning of TIP-3 tokens through the multi wallet TIP-3 contract. As discussed earlier in the [Burn Tokens Using an Account](../usingAccount/burn.md) section, the TIP-3 standard offers two implementations for the burn functionality.
+Now that we have gained knowledge on deploying custom contracts and minting/transferring tokens using them, we can proceed to explore the burning of TIP-3 tokens through the multi wallet TIP-3 contract. As discussed earlier in the [Burn Tokens Using an Account](/guides/tokenOperations/usingAccount/burn.md) section, the TIP-3 standard offers two implementations for the burn functionality.
 It is important to note that the multi wallet contract only supports transactions utilizing the  `burn`  function, as the  `burnByRoot`  function can only be called on the `token root contract`. In order to understand how the multi wallet contract updates its state, we will cover both implementations.
 
 ## Step 1: Write Burn Script
@@ -11,7 +11,7 @@ It is important to note that the multi wallet contract only supports transaction
 
 The code sample below utilizes both burn functions with the help of the locklift but checks the balance on the multi wallet TIP-3 contract.
 
-We use the previously written script stats from the [transfer tip3 tokens](./transfer.md#step-1-write-transfer-script) section for the following script.
+We use the previously written script stats from the [transfer tip3 tokens](/guides/tokenOperations/usingSmartContract/transfer.md#step-1-write-transfer-script) section for the following script.
 
 ::: info
 Before we start to write our scripts we need to make sure that there is a file named `07-burn-tip3.ts` in the `script` folder in the project root.

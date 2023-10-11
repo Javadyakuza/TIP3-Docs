@@ -1,4 +1,4 @@
-# Deploy Upgradable Contracts
+# Deploy upgradeable Contracts
 
 In this section, we will guide you through the process of deploying TIP-3 standard upgradeable tokens and interacting with them using the Locklift tool.
 
@@ -98,7 +98,7 @@ async function main() {
     // ensure its deployed
     console.log(`Token Root name: ${(await tokenRootUpgradeable.methods.name({ answerId: 0 }).call()).value0}`); // >> Tip3OnboardingToken
 
-    // Deploying the TokenWalletPlatform via the TokenRootContract which results deploying the TokenWalletUpgradable contract
+    // Deploying the TokenWalletPlatform via the TokenRootContract which results deploying the TokenWalletupgradeable contract
     await tokenRootUpgradeable.methods
       .deployWallet({
         answerId: 0,
@@ -125,7 +125,7 @@ async function main() {
 
     let balance: string = (await tokenWalletUpgradeable.methods.balance({ answerId: 0 }).call({})).value0;
 
-    console.log(`The token wallet upgradable balance: ${balance}`); // >> 0
+    console.log(`The token wallet upgradeable balance: ${balance}`); // >> 0
 
     // Minting some token for that token wallet
     await tokenRootUpgradeable.methods
@@ -145,7 +145,7 @@ async function main() {
     let version = (await tokenWalletUpgradeable.methods.version({ answerId: 0 }).call({})).value0;
 
     console.log(
-      `The token wallet upgradable balance: ${Number(balance) / 10 ** 6}
+      `The token wallet upgradeable balance: ${Number(balance) / 10 ** 6}
        token Wallet version: ${version}`,
     ); // >> 10 , 1
 

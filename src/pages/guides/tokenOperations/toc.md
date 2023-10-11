@@ -5,7 +5,7 @@ In this section, we will explore the various token operations represented by the
 - Burning
 - Transferring
 
-We will cover these operations using an  `Account`  smart contract, as well as through other smart contracts such as the [RootDeployer](../prerequisites/rootDeployer.md) and [MultiWalletTip3](../prerequisites/multiWalletTIP3.md) contracts.
+We will cover these operations using an  `Account`  smart contract, as well as through other smart contracts such as the [RootDeployer](/guides/prerequisites/rootDeployer.md) and [MultiWalletTip3](/guides/prerequisites/multiWalletTIP3.md) contracts.
 
 ::: danger
 - It is crucial to exercise caution and carefully manage the numbers and amounts associated with the transactions in this section. Avoid simply copying and pasting the code without thorough review and understanding.
@@ -17,15 +17,15 @@ We will cover these operations using an  `Account`  smart contract, as well as t
 
 <div class="sections-container">
   <div class="bridge-section-row">
-    <a href="/src/pages/guides/tokenOperations/usingAccount/mint.html">
+    <a href="/guides/tokenOperations/usingAccount/mint.html">
       <span class="bridge-section">Minting Tokens</span>
     </a>
-    <a href="/src/pages/guides/tokenOperations/usingAccount/transfer.html">
+    <a href="/guides/tokenOperations/usingAccount/transfer.html">
       <span class="bridge-section">Transferring Tokens</span>
     </a>
   </div>
     <div class="bridge-section-row">
-    <a href="/src/pages/guides/tokenOperations/usingAccount/burn.html">
+    <a href="/guides/tokenOperations/usingAccount/burn.html">
       <span class="bridge-section">Burning Tokens</span>
     </a>
   </div>
@@ -35,15 +35,15 @@ We will cover these operations using an  `Account`  smart contract, as well as t
 ## TIP3 Operations with Smart contract
 <div class="sections-container">
   <div class="bridge-section-row">
-    <a href="/src/pages/guides/tokenOperations/usingSmartContract/mint.html">
+    <a href="/guides/tokenOperations/usingSmartContract/mint.html">
       <span class="bridge-section">Minting Tokens</span>
     </a>
-    <a href="/src/pages/guides/tokenOperations/usingSmartContract/transfer.html">
+    <a href="/guides/tokenOperations/usingSmartContract/transfer.html">
       <span class="bridge-section">Transferring Tokens</span>
     </a>
   </div>
   <div class="bridge-section-row">
-    <a href="/src/pages/guides/tokenOperations/usingSmartContract/burn.html">
+    <a href="/guides/tokenOperations/usingSmartContract/burn.html">
       <span class="bridge-section">Burning Tokens</span>
     </a>
   </div>

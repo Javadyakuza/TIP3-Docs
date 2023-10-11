@@ -6,24 +6,24 @@ In this section, we will explore the commonly used terms and ideas in TVM (Ton V
 
 <div class="sections-container">
   <div class="bridge-section-row">
-    <a href="/src/pages/concepts/tokenRoot.html">
+    <a href="/concepts/tokenRoot.html">
       <span class="bridge-section">Token Root</span>
     </a>
-    <a href="/src/pages/concepts/tokenWallet.html">
+    <a href="/concepts/tokenWallet.html">
       <span class="bridge-section">Token Wallet</span>
     </a>
   </div>
   <div class="bridge-section-row">
-    <a href="/src/pages/concepts/accounts.html">
+    <a href="/concepts/accounts.html">
       <span class="bridge-section">Accounts</span>
     </a>
-    <a href="/src/pages/concepts/tip6.html">
+    <a href="/concepts/tip6.html">
       <span class="bridge-section">TIP-6.1 Standard</span>
     </a>
   </div>
     <div class="bridge-section-row">
-    <a href="/src/pages/concepts/upgradableContracts.html">
-      <span class="bridge-section">Upgradable Contracts</span>
+    <a href="/concepts/upgradeableContracts.html">
+      <span class="bridge-section">Upgradeable Contracts</span>
     </a>
   </div>
 </div>

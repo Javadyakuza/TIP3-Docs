@@ -10,7 +10,6 @@ import {
 import * as tip3Artifacts from 'tip3-docs-artifacts';
 
 import { toast } from '../../../../helpers/toast';
-
 import { useProviderInfo } from '../helpers/useWalletsData';
 
 export async function deployRootDeployerCon(): Promise<

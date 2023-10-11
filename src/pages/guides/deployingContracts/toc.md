@@ -8,7 +8,7 @@ In this section, we will delve into the deployment process of the TIP3 standard 
 - UpgradeableTokenRoot
 - UpgradeableTokenWallet
 
-Additionally, we will discuss deploying them through other smart contracts, specifically the [ `RootDeployer` ](../prerequisites/rootDeployer.md) and [ `MultiWalletTip3` ](../prerequisites/multiWalletTIP3.md) contracts.
+Additionally, we will discuss deploying them through other smart contracts, specifically the [ `RootDeployer` ](/guides/prerequisites/rootDeployer.md) and [ `MultiWalletTip3` ](/guides/prerequisites/multiWalletTIP3.md) contracts.
 
 
 ::: danger
@@ -23,15 +23,15 @@ Additionally, we will discuss deploying them through other smart contracts, spec
 
 <div class="sections-container">
   <div class="bridge-section-row">
-    <a href="/src/pages/guides/deployingContracts/usingAccount/tokenRoot.html">
+    <a href="/guides/deployingContracts/usingAccount/tokenRoot.html">
       <span class="bridge-section">Deploying Token Root</span>
     </a>
-    <a href="/src/pages/guides/deployingContracts/usingAccount/tokenWallet.html">
+    <a href="/guides/deployingContracts/usingAccount/tokenWallet.html">
       <span class="bridge-section">Deploying Token Wallet</span>
     </a>
   </div>
   <div class="bridge-section-row">
-    <a href="/src/pages/guides/deployingContracts/usingAccount/upgradeableContracts.html">
+    <a href="/guides/deployingContracts/usingAccount/upgradeableContracts.html">
       <span class="bridge-section">Deploying Upgradeable</span>
     </a>
   </div>
@@ -41,10 +41,10 @@ Additionally, we will discuss deploying them through other smart contracts, spec
 
 <div class="sections-container">
   <div class="bridge-section-row">
-    <a href="/src/pages/guides/deployingContracts/usingSmartContract/tokenRoot.html">
+    <a href="/guides/deployingContracts/usingSmartContract/tokenRoot.html">
       <span class="bridge-section">Deploy Token Root</span>
     </a>
-    <a href="/src/pages/guides/deployingContracts/usingSmartContract/tokenWallet.html">
+    <a href="/guides/deployingContracts/usingSmartContract/tokenWallet.html">
       <span class="bridge-section">Deploy Token Wallet</span>
     </a>
   </div>
