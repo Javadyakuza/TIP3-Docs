@@ -36,3 +36,10 @@ export default defineComponent({
 });
 </script>
 
+
+<style>
+.textContainer {
+    font-size: .9rem;
+    font-weight: 600;
+}
+</style>

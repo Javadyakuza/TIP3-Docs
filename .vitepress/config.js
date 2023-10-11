@@ -30,6 +30,50 @@ module.exports = {
   title: 'TIP-3 Docs',
 
   plugins: [vue()],
+  rewrites: {
+    'src/pages/index.md': 'index.md',
+    'src/pages/concepts/toc.md': 'concepts/toc.md',
+    'src/pages/concepts/tokenRoot.md': 'concepts/tokenRoot.md',
+    'src/pages/concepts/tokenWallet.md': 'concepts/tokenWallet.md',
+    'src/pages/concepts/accounts.md': 'concepts/accounts.md',
+    'src/pages/concepts/tip6.md': 'concepts/tip6.md',
+    'src/pages/concepts/upgradeableContracts.md': 'concepts/upgradeableContracts.md',
+    'src/pages/quickStart/toc.md': 'quickStart/toc.md',
+    'src/pages/quickStart/basicProjectSetup.md': 'quickStart/basicProjectSetup.md',
+    'src/pages/quickStart/lockliftConfigSetting.md': 'quickStart/lockliftConfigSetting.md',
+    'src/pages/quickStart/localEnvironment.md': 'quickStart/localEnvironment.md',
+    'src/pages/quickStart/deployAccount.md': 'quickStart/deployAccount.md',
+    'src/pages/guides/prerequisites/prerequisites.md': 'guides/prerequisites/prerequisites.md',
+    'src/pages/guides/prerequisites/rootDeployer.md': 'guides/prerequisites/rootDeployer.md',
+    'src/pages/guides/prerequisites/multiWalletTip3.md': 'guides/prerequisites/multiWalletTip3.md',
+    'src/pages/guides/deployingContracts/toc.md': 'guides/deployingContracts/toc.md',
+    'src/pages/guides/deployingContracts/usingAccount/tokenRoot.md':
+      'guides/deployingContracts/usingAccount/tokenRoot.md',
+    'src/pages/guides/deployingContracts/usingAccount/tokenWallet.md':
+      'guides/deployingContracts/usingAccount/tokenWallet.md',
+    'src/pages/guides/deployingContracts/usingAccount/upgradeableContracts.md':
+      'guides/deployingContracts/usingAccount/upgradeableContracts.md',
+    'src/pages/guides/deployingContracts/usingSmartContract/tokenRoot.md':
+      'guides/deployingContracts/usingSmartContract/tokenRoot.md',
+    'src/pages/guides/deployingContracts/usingSmartContract/tokenWallet.md':
+      'guides/deployingContracts/usingSmartContract/tokenWallet.md',
+    'src/pages/guides/tokenOperations/toc.md': 'guides/tokenOperations/toc.md',
+    'src/pages/guides/tokenOperations/usingAccount/mint.md':
+      'guides/tokenOperations/usingAccount/minting.md',
+    'src/pages/guides/tokenOperations/usingAccount/transfer.md':
+      'guides/tokenOperations/usingAccount/transferring.md',
+    'src/pages/guides/tokenOperations/usingAccount/burn.md':
+      'guides/tokenOperations/usingAccount/burning.md',
+    'src/pages/guides/tokenOperations/usingSmartContract/mint.md':
+      'guides/tokenOperations/usingSmartContract/minting.md',
+    'src/pages/guides/tokenOperations/usingSmartContract/transfer.md':
+      'guides/tokenOperations/usingSmartContract/transferring.md',
+    'src/pages/guides/tokenOperations/usingSmartContract/burn.md':
+      'guides/tokenOperations/usingSmartContract/burning.md',
+    'src/pages/guides/working-with-transport.md': 'guides/working-with-transport.md',
+    'src/pages/guides/working-with-transactions.md': 'guides/working-with-transactions.md',
+    'src/pages/guides/working-with-transport.md': 'guides/working-with-transport.md',
+  },
   themeConfig: {
     search: {
       provider: 'local',
@@ -46,35 +90,35 @@ module.exports = {
       {
         text: 'Concepts',
         collapsable: false,
-        link: '/Docs/Concepts/ToC.md',
+        link: '/src/pages/concepts/toc.md',
         items: [
           {
             text: 'Token Root',
             collapsable: false,
-            link: '/Docs/Concepts/TokenRoot.md',
+            link: '/src/pages/concepts/tokenRoot.md',
           },
           {
             text: 'Token Wallet',
             collapsable: false,
-            link: '/Docs/Concepts/TokenWallet.md',
+            link: '/src/pages/concepts/tokenWallet.md',
           },
           {
             text: 'Accounts',
             collapsable: false,
-            link: '/Docs/Concepts/Accounts.md',
+            link: '/src/pages/concepts/accounts.md',
           },
-          { text: 'TIP-6.1', collapsable: false, link: '/Docs/Concepts/tip6.md' },
+          { text: 'TIP-6.1', collapsable: false, link: '/src/pages/concepts/tip6.md' },
           {
             text: 'Upgradable Contracts',
             collapsable: false,
-            link: '/Docs/Concepts/UpgradableContracts.md',
+            link: '/src/pages/concepts/upgradeableContracts.md',
           },
         ],
       },
       {
         text: 'Quick Start',
         collapsable: false,
-        link: '/Docs/QuickStart/ToC.md',
+        link: '/src/pages/quickStart/toc.md',
         items: [
           {
             text: 'Setup',
@@ -83,122 +127,137 @@ module.exports = {
               {
                 text: 'Basic Project Setup',
                 collapsable: false,
-                link: '/Docs/QuickStart/BasicProjectSetup.md',
+                link: '/src/pages/quickStart/basicProjectSetup.md',
               },
               {
                 text: 'Locklift Config Setup',
                 collapsable: false,
-                link: '/Docs/QuickStart/LockliftConfigSetting.md',
+                link: '/src/pages/quickStart/lockliftConfigSetting.md',
               },
             ],
           },
           {
             text: 'Local Environment',
             collapsable: false,
-            link: '/Docs/QuickStart/HelperScripts.md',
+            link: '/src/pages/quickStart/localEnvironment.md',
           },
           {
             text: 'Deploy Account',
             collapsable: false,
-            link: '/Docs/QuickStart/DeployAccount.md',
+            link: '/src/pages/quickStart/deployAccount.md',
           },
         ],
       },
       {
-        text: 'TIP-3 Token Deployment',
+        text: 'Guides',
         collapsable: false,
         items: [
           {
             text: 'Prerequisites',
             collapsable: false,
-            link: '/Deployments/EIP.md',
-          },
-          {
-            text: 'Deploy Upgradable Contracts',
-            collapsable: false,
-            link: '/Deployments/upgradeableContracts.md',
-          },
-          {
-            text: 'Using Account',
-            collapsable: false,
-            link: '/Deployments/External/ToC.md',
+            link: '/src/pages/guides/prerequisites/prerequisites.md',
             items: [
               {
-                text: 'Deploy Token Root',
+                text: 'Root Deployer',
                 collapsable: false,
-                link: '/Deployments/External/TokenRoot.md',
+                link: '/src/pages/guides/prerequisites/rootDeployer.md',
               },
               {
-                text: 'Deploy Token Wallet',
+                text: 'Multi Wallet Tip3',
                 collapsable: false,
-                link: '/Deployments/External/TokenWallet.md',
-              },
-              {
-                text: 'Mint TIP-3 Tokens',
-                collapsable: false,
-                link: '/Deployments/External/Mint.md',
-              },
-              {
-                text: 'Transfer TIP-3 Tokens',
-                collapsable: false,
-                link: '/Deployments/External/Transfer.md',
-              },
-              {
-                text: 'Burn TIP-3 Tokens',
-                collapsable: false,
-                link: '/Deployments/External/burn.md',
+                link: '/src/pages/guides/prerequisites/multiWalletTIP3.md',
               },
             ],
           },
+
           {
-            text: 'Using Smart-Contract',
+            text: 'Deploying Contracts',
             collapsable: false,
-            link: '/Deployments/Internal/ToC.md',
+            link: '/src/pages/guides/deployingContracts/toc.md',
             items: [
               {
-                text: 'Smart Contracts',
+                text: 'Using Account',
                 collapsable: false,
                 items: [
                   {
-                    text: 'Root Deployer',
+                    text: 'Deploying Token Root',
                     collapsable: false,
-                    link: '/Deployments/Contracts/RootDeployer.md',
+                    link: '/src/pages/guides/deployingContracts/usingAccount/tokenRoot.md',
                   },
                   {
-                    text: 'Multi Wallet Tip3',
+                    text: 'Deploying Token Wallet',
                     collapsable: false,
-                    link: '/Deployments/Contracts/MultiWalletTIP3.md',
+                    link: '/src/pages/guides/deployingContracts/usingAccount/tokenWallet.md',
+                  },
+                  {
+                    text: 'Deploying Upgradable',
+                    collapsable: false,
+                    link: '/src/pages/guides/deployingContracts/usingAccount/upgradeableContracts.md',
                   },
                 ],
               },
               {
-                text: 'Code Samples',
+                text: 'Using Smart Contract',
                 collapsable: false,
                 items: [
                   {
-                    text: 'Deploy Token Root',
+                    text: 'Deploying Token Root',
                     collapsable: false,
-                    link: '/Deployments/Internal/TokenRoot.md',
+                    link: '/src/pages/guides/deployingContracts/usingSmartContract/tokenRoot.md',
                   },
                   {
-                    text: 'Deploy Token Wallet',
+                    text: 'Deploying Token Wallet',
                     collapsable: false,
-                    link: '/Deployments/Internal/TokenWallet.md',
+                    link: '/src/pages/guides/deployingContracts/usingSmartContract/tokenWallet.md',
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            text: 'Token Operations',
+            collapsable: false,
+            link: '/src/pages/guides/tokenOperations/toc.md',
+            items: [
+              {
+                text: 'Using Account',
+                collapsable: false,
+                items: [
+                  {
+                    text: 'Minting Tokens',
+                    collapsable: false,
+                    link: '/src/pages/guides/tokenOperations/usingAccount/mint.md',
                   },
                   {
-                    text: 'Mint TIP-3 Tokens',
+                    text: 'Transferring Tokens',
                     collapsable: false,
-                    link: '/Deployments/Internal/Mint.md',
+                    link: '/src/pages/guides/tokenOperations/usingAccount/transfer.md',
                   },
                   {
-                    text: 'Transfer TIP-3 Tokens',
+                    text: 'Burning Tokens',
                     collapsable: false,
-                    link: '/Deployments/Internal/Transfer.md',
+                    link: '/src/pages/guides/tokenOperations/usingAccount/burn.md',
+                  },
+                ],
+              },
+              {
+                text: 'Using Smart Contract',
+                collapsable: false,
+                items: [
+                  {
+                    text: 'Minting Tokens',
+                    collapsable: false,
+                    link: '/src/pages/guides/tokenOperations/usingSmartContract/mint.md',
                   },
                   {
-                    text: 'Burn TIP-3 Tokens',
+                    text: 'Transferring Tokens',
                     collapsable: false,
-                    link: '/Deployments/Internal/Burn.md',
+                    link: '/src/pages/guides/tokenOperations/usingSmartContract/transfer.md',
+                  },
+                  {
+                    text: 'Burning Tokens',
+                    collapsable: false,
+                    link: '/src/pages/guides/tokenOperations/usingSmartContract/burn.md',
                   },
                 ],
               },

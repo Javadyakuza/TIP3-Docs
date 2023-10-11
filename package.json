@@ -7,7 +7,8 @@
     "build:docs": "npm run lint && npm run clean:docs && npx vitepress build",
     "lint": "eslint './**/*.{js,ts,jsx,tsx,vue}'",
     "lint:fix": "eslint './**/*.{js,ts,jsx,tsx,vue}' --fix",
-    "dev": "npx vitepress dev"
+    "dev": "npx vitepress dev",
+    "prod": "npx vitepress preview"
   },
   "dependencies": {
     "ethers": "^6.7.1",
