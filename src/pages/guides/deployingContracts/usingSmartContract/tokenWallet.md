@@ -2,10 +2,10 @@
 
 <div class="DeployTokenWallet">
 
-In this section, we will explore an important aspect of deploying the TIP-3 standard contracts, which involves deploying a token wallet from a smart contract other than the token root contract. Specifically, we will focus on deploying a token wallet using the  MultiWalletTIP3  contract.
-
+In this section, we will explore an important aspect of deploying the TIP-3 standard contracts, which involves deploying a token wallet from a smart contract other than the token root contract. Specifically, we will focus on deploying a token wallet using the MultiWalletTIP3 contract.
 
 ## Step 1: Write Deployment Script
+
 <span  :class="LLdis"  >
 
 We can utilize the code sample below to deploy a token wallet and retrieve its address from the multi wallet contract with help of the locklift tool and the stats of the previously written script from the [deploy token root](./tokenRoot.md#step-1-write-deployment-script) section .
@@ -39,39 +39,48 @@ According to the Multi Wallet contract, it stores the wallet information and its
 
 <span  :class="LLdis">
 
-````typescript
+```typescript
+/* Deploying Token Wallet contract using Multi Wallet TIP-3 */
 
-  /* Deploying Token Wallet contract using Multi Wallet TIP-3 */
+// Deploying a TokenWallet contract using the using multi wallet contract for alice
+// We will deploy another token wallet for bob at the time of transferring he tokens
+await aliceMultiWalletContract.methods
+  .deployWallet({
+    _deployWalletBalance: locklift.utils.toNano('3'),
+    _tokenRoot: tokenRootContract.address,
+  })
+  .sendExternal({ publicKey: signerAlice.publicKey });
 
-  // Deploying a TokenWallet contract using the using multi wallet contract for alice
-  // We will deploy another token wallet for bob at the time of transferring he tokens
-  await aliceMultiWalletContract.methods
-    .deployWallet({
-      _deployWalletBalance: locklift.utils.toNano("3"),
-      _tokenRoot: tokenRootContract.address,
-    })
-    .sendExternal({ publicKey: signerAlice.publicKey });
+// Fetching the newly deployed Token Wallet
+let tokenWalletData = await getWalletData(
+  aliceMultiWalletContract,
+  tokenRootContract.address
+);
 
-  // Fetching the newly deployed Token Wallet
-  let tokenWalletData = await getWalletData(aliceMultiWalletContract, tokenRootContract.address);
+const aliceTokenWalletContract: Contract<
+  FactorySource['TokenWallet']
+> = locklift.factory.getDeployedContract(
+  'TokenWallet',
+  tokenWalletData.tokenWallet
+);
 
-  const aliceTokenWalletContract: Contract<FactorySource["TokenWallet"]> = locklift.factory.getDeployedContract(
-    "TokenWallet",
-    tokenWalletData.tokenWallet,
-  );
-
-  console.log("Alice Token wallet address: ", tokenWalletData.tokenWallet.toString());
-
-
-````
+console.log(
+  'Alice Token wallet address: ',
+  tokenWalletData.tokenWallet.toString()
+);
+```
 
 </span>
 
 <span  :class="EIPdis">
 
-````typescript
+```typescript
 // Import the following libraries
-import { ProviderRpcClient, Address, FullContractState } from 'everscale-inpage-provider';
+import {
+  ProviderRpcClient,
+  Address,
+  FullContractState,
+} from 'everscale-inpage-provider';
 import * as tip3Artifacts from 'tip3-docs-artifacts';
 import { provider, providerAddress } from './useProvider';
 
@@ -80,24 +89,31 @@ import { provider, providerAddress } from './useProvider';
  */
 
 // This function will extract the public key of the sender
-async function extractPubkey(provider: ProviderRpcClient, senderAddress: Address): Promise<string> {
+async function extractPubkey(
+  provider: ProviderRpcClient,
+  senderAddress: Address
+): Promise<string> {
   // Fetching the user public key
   const accountFullState: FullContractState = (
     await provider.getFullContractState({ address: senderAddress })
   ).state!;
 
-  const senderPublicKey: string = await provider.extractPublicKey(accountFullState.boc);
+  const senderPublicKey: string = await provider.extractPublicKey(
+    accountFullState.boc
+  );
 
   return senderPublicKey;
 }
 
 async function main() {
-
   try {
-
     // Required contracts addresses
-    const tokenRootAddress: Address = new Address('<YOUR_TOKEN_ROOT_ADDRESS>');
-    const multiWalletAddress: Address = new Address('<YOUR_MULTI_WALLET_TIP3_ADDRESS>');
+    const tokenRootAddress: Address = new Address(
+      '<YOUR_TOKEN_ROOT_ADDRESS>'
+    );
+    const multiWalletAddress: Address = new Address(
+      '<YOUR_MULTI_WALLET_TIP3_ADDRESS>'
+    );
 
     // Creating instances of the required contracts
     const tokenRootContract = new provider.Contract(
@@ -111,43 +127,64 @@ async function main() {
     );
 
     // Fetching the symbol
-    const symbol: string = (await tokenRootContract.methods.symbol({ answerId: 0 }).call()).value0;
+    const symbol: string = (
+      await tokenRootContract.methods.symbol({ answerId: 0 }).call()
+    ).value0;
 
     // Checking if the user already doesn't have any wallet of that token root
-    let tokenWalletData = (await MultiWalletContract.methods.wallets().call()).wallets.map(item => {
-      if (item[0].toString() == tokenRootContract.address.toString()) {
+    let tokenWalletData = (
+      await MultiWalletContract.methods.wallets().call()
+    ).wallets.map(item => {
+      if (
+        item[0].toString() == tokenRootContract.address.toString()
+      ) {
         return item[1];
       }
     });
 
-    if (tokenWalletData[0]!.tokenWallet.toString() != tip3Artifacts.zeroAddress.toString()) {
-      throw new Error('Failed, You already have a wallet of this token !');
+    if (
+      tokenWalletData[0]!.tokenWallet.toString() !=
+      tip3Artifacts.zeroAddress.toString()
+    ) {
+      throw new Error(
+        'Failed, You already have a wallet of this token !'
+      );
     }
 
     // Deploying a new token wallet if it doesn't exists before
-    const { transaction: deployWalletRes } = await MultiWalletContract.methods
-      .deployWallet({
-        _deployWalletBalance: 2 * 10 ** 9,
-        _tokenRoot: tokenRootContract.address,
-      })
-      .sendExternal({
-        publicKey: await extractPubkey(provider, providerAddress),
-      });
+    const { transaction: deployWalletRes } =
+      await MultiWalletContract.methods
+        .deployWallet({
+          _deployWalletBalance: 2 * 10 ** 9,
+          _tokenRoot: tokenRootContract.address,
+        })
+        .sendExternal({
+          publicKey: await extractPubkey(provider, providerAddress),
+        });
 
     // Throwing an error if the transaction was aborted
     if (deployWalletRes.aborted) {
       throw new Error(
-        `Transaction aborted ! ${(deployWalletRes.exitCode, deployWalletRes.resultCode)}`
+        `Transaction aborted ! ${
+          (deployWalletRes.exitCode, deployWalletRes.resultCode)
+        }`
       );
     }
 
     // Fetching the new wallet data from the multi wallet contract and check if its deployed successfully or not
-    tokenWalletData = (await MultiWalletContract.methods.wallets().call()).wallets.map(item => {
-      if (item[0].toString() == tokenRootContract.address.toString()) {
+    tokenWalletData = (
+      await MultiWalletContract.methods.wallets().call()
+    ).wallets.map(item => {
+      if (
+        item[0].toString() == tokenRootContract.address.toString()
+      ) {
         return item[1];
       }
     });
-    if (tokenWalletData[0]!.tokenWallet.toString() != tip3Artifacts.zeroAddress.toString()) {
+    if (
+      tokenWalletData[0]!.tokenWallet.toString() !=
+      tip3Artifacts.zeroAddress.toString()
+    ) {
       console.log('Token Wallet successfully deployed !');
 
       return `${symbol}'s token wallet deployed to: ${tokenWalletData[0]!.tokenWallet.toString()}`;
@@ -162,8 +199,8 @@ async function main() {
     throw new Error(`Failed ${e.message}`);
   }
 }
+```
 
-````
 </span>
 
 </div>
@@ -178,6 +215,7 @@ Use this command and deploy token wallet
 ```shell
 npx locklift run -s ./scripts/04-deploy-wallet.ts -n local
 ```
+
 <ImgContainer src= '/04-deploy-wallet.png' width="100%" altText="buildStructure" />
 
 Congratulations, you have deployed a TIP3 Token Wallet from the Multi Wallet TIP-3 contract 🎉
@@ -418,7 +456,7 @@ return {
 }
 
 .container input:checked ~ .checkmark {
-  background-color: var(--light-color-ts-class);
+  background-color: var(--vp-c-brand);
 }
 
 .checkmark:after {

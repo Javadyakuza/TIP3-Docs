@@ -5,6 +5,7 @@
 In this section, we will provide a simple, step-by-step guide on deploying the token root contract.
 
 ## Step 1: Write Deployment Script
+
 <span  :class="LLdis" >
 
 To deploy the token root using the [locklift](https://docs.locklift.io/) tool, which provides a straightforward approach. The following code sample demonstrates the deployment process:
@@ -17,7 +18,7 @@ Before we start to write our scripts we need to make sure that there is a file n
 
 <span  :class="EIPdis" >
 
-Deploying a contract using the  [everscale-inpage-provider](https://provider-docs.broxus.com/)  can be a bit challenging. To ensure a successful contract deployment using this tool, please follow the steps outlined below
+Deploying a contract using the [everscale-inpage-provider](https://provider-docs.broxus.com/) can be a bit challenging. To ensure a successful contract deployment using this tool, please follow the steps outlined below
 
 ::: warning
 
@@ -40,20 +41,26 @@ The parameter `initialSupply` must be set to **zero** if the `initialSupplyTo` i
 
 <span  :class="LLdis">
 
-````typescript
+```typescript
 /**
  * locklift is a globally declared object
  */
 
-import { Address, zeroAddress, Signer, WalletTypes, Contract } from "locklift";
-import { ContractData } from "locklift/internal/factory";
-import { FactorySource, factorySource } from "../build/factorySource";
+import {
+  Address,
+  zeroAddress,
+  Signer,
+  WalletTypes,
+  Contract,
+} from 'locklift';
+import { ContractData } from 'locklift/internal/factory';
+import { FactorySource, factorySource } from '../build/factorySource';
 
 async function main() {
-
   // Fetching the signer key pair from locklift.config.ts
-  const signerAlice: Signer = (await locklift.keystore.getSigner("0"))!;
-  const signerBob: Signer = (await locklift.keystore.getSigner("1"))!;
+  const signerAlice: Signer =
+    (await locklift.keystore.getSigner('0'))!;
+  const signerBob: Signer = (await locklift.keystore.getSigner('1'))!;
 
   // uncomment if deploying a new account
   // const { contract: account } = await locklift.factory.deployContract({
@@ -65,12 +72,13 @@ async function main() {
   // });
 
   // Adding an existing SafeMultiSig Account using its address
-  const aliceAccount = await locklift.factory.accounts.addExistingAccount({
-    type: WalletTypes.MsigAccount,
-    address: new Address("<ALICE_ACCOUNT_ADDRESS>"),
-    mSigType: "SafeMultisig",
-    publicKey: signerAlice.publicKey,
-  });
+  const aliceAccount =
+    await locklift.factory.accounts.addExistingAccount({
+      type: WalletTypes.MsigAccount,
+      address: new Address('<ALICE_ACCOUNT_ADDRESS>'),
+      mSigType: 'SafeMultisig',
+      publicKey: signerAlice.publicKey,
+    });
 
   // uncomment if deploying a new account
   // const { contract: account } = await locklift.factory.deployContract({
@@ -82,18 +90,19 @@ async function main() {
   // });
 
   // Adding an existing SafeMultiSig Account using its address
-  const bobAccount = await locklift.factory.accounts.addExistingAccount({
-    type: WalletTypes.MsigAccount,
-    address: new Address("<BOB_ACCOUNT_ADDRESS>"),
-    mSigType: "SafeMultisig",
-    publicKey: signerBob.publicKey,
-  });
+  const bobAccount =
+    await locklift.factory.accounts.addExistingAccount({
+      type: WalletTypes.MsigAccount,
+      address: new Address('<BOB_ACCOUNT_ADDRESS>'),
+      mSigType: 'SafeMultisig',
+      publicKey: signerBob.publicKey,
+    });
 
   // Preparing test params
   const initialSupplyTo: Address = zeroAddress;
   const rootOwner: Address = aliceAccount.address;
-  const name: string = "Tip3OnboardingToken";
-  const symbol: string = "TOT";
+  const name: string = 'Tip3OnboardingToken';
+  const symbol: string = 'TOT';
   const decimals: number = 6;
   const disableMint: boolean = false;
   const disableBurnByRoot: boolean = false;
@@ -104,7 +113,8 @@ async function main() {
     Returns compilation artifacts based on the .sol file name
       or name from value config.externalContracts[pathToLib].
   */
-  const tokenWallet: ContractData<FactorySource["TokenWallet"]> = locklift.factory.getContractArtifacts("TokenWallet");
+  const tokenWallet: ContractData<FactorySource['TokenWallet']> =
+    locklift.factory.getContractArtifacts('TokenWallet');
 
   /**
     * Deploy the TIP-3 Token Root contract.
@@ -118,32 +128,34 @@ async function main() {
     * @param burnDisabledByRoot Root can not burn tokens of a token wallet.
     * @param remainingGasTo Address to send the change back.
   */
-  const { contract: tokenRootContract } = await locklift.factory.deployContract({
-    contract: "TokenRoot",
-    publicKey: signerAlice.publicKey,
-    initParams: {
-      deployer_: zeroAddress,
-      randomNonce_: locklift.utils.getRandomNonce(),
-      rootOwner_: rootOwner,
-      name_: name,
-      symbol_: symbol,
-      decimals_: decimals,
-      walletCode_: tokenWallet.code,
-    },
-    constructorParams: {
-      initialSupplyTo: initialSupplyTo,
-      initialSupply: initialSupply * 10 ** decimals,
-      deployWalletValue: 0,
-      mintDisabled: disableMint,
-      burnByRootDisabled: disableBurnByRoot,
-      burnPaused: pauseBurn,
-      remainingGasTo: aliceAccount.address,
-    },
-    value: locklift.utils.toNano(5),
-  });
+  const { contract: tokenRootContract } =
+    await locklift.factory.deployContract({
+      contract: 'TokenRoot',
+      publicKey: signerAlice.publicKey,
+      initParams: {
+        deployer_: zeroAddress,
+        randomNonce_: locklift.utils.getRandomNonce(),
+        rootOwner_: rootOwner,
+        name_: name,
+        symbol_: symbol,
+        decimals_: decimals,
+        walletCode_: tokenWallet.code,
+      },
+      constructorParams: {
+        initialSupplyTo: initialSupplyTo,
+        initialSupply: initialSupply * 10 ** decimals,
+        deployWalletValue: 0,
+        mintDisabled: disableMint,
+        burnByRootDisabled: disableBurnByRoot,
+        burnPaused: pauseBurn,
+        remainingGasTo: aliceAccount.address,
+      },
+      value: locklift.utils.toNano(5),
+    });
 
-  console.log(`${name} deployed to: ${tokenRootContract.address.toString()}`);
-
+  console.log(
+    `${name} deployed to: ${tokenRootContract.address.toString()}`
+  );
 }
 
 main()
@@ -152,14 +164,13 @@ main()
     console.log(e);
     process.exit(1);
   });
-
-````
+```
 
 </span>
 
 <span  :class="EIPdis">
 
-````typescript
+```typescript
 // Import the following libraries
 import {
   Address,
@@ -172,7 +183,6 @@ import * as tip3Artifacts from 'tip3-docs-artifacts';
 import { provider, providerAddress } from './useProvider';
 
 async function main() {
-
   // Defining an interface for token root deployment parameters
   interface deployRootParams {
     initialSupplyTo: Address;
@@ -211,10 +221,13 @@ async function main() {
 
   // Setting the deployWalletValue based on the initialSupply
   const deployWalletValue: number =
-    params.initialSupplyTo == tip3Artifacts.zeroAddress ? 2 * 10 ** params.decimals : 0;
+    params.initialSupplyTo == tip3Artifacts.zeroAddress
+      ? 2 * 10 ** params.decimals
+      : 0;
 
   // Amount to attach to the tx
-  const amount: number = params.initialSupplyTo == tip3Artifacts.zeroAddress ? 2 : 4;
+  const amount: number =
+    params.initialSupplyTo == tip3Artifacts.zeroAddress ? 2 : 4;
 
   // Define the deployParams type
   type DeployParams<Abi> = GetExpectedAddressParams<Abi> & {
@@ -225,13 +238,17 @@ async function main() {
   const accountFullState: FullContractState = (
     await provider.getFullContractState({ address: providerAddress })
   ).state!;
-  const senderPublicKey: string = await provider.extractPublicKey(accountFullState.boc!);
+  const senderPublicKey: string = await provider.extractPublicKey(
+    accountFullState.boc!
+  );
 
   /**
    * Preparing deploy params to build the state init with the contract abi
    * @param deployer_ Its important to set this param to zero address when deploying the token root contract whiteout using an smart contract.
    */
-  const deployParams: DeployParams<tip3Artifacts.FactorySource['TokenRoot']> = {
+  const deployParams: DeployParams<
+    tip3Artifacts.FactorySource['TokenRoot']
+  > = {
     tvc: tokenRootArtifacts.tvc,
     workchain: 0,
     publicKey: senderPublicKey,
@@ -247,13 +264,14 @@ async function main() {
   };
 
   // Get the expected contract address
-  const expectedAddress: Address = await provider.getExpectedAddress(tokenRootAbi, deployParams);
-
-  // Get the state init
-  const stateInit: ProviderApiResponse<'getExpectedAddress'> = await provider.getStateInit(
+  const expectedAddress: Address = await provider.getExpectedAddress(
     tokenRootAbi,
     deployParams
   );
+
+  // Get the state init
+  const stateInit: ProviderApiResponse<'getExpectedAddress'> =
+    await provider.getStateInit(tokenRootAbi, deployParams);
 
   // Send the coins to the calculated address
   await provider.sendMessage({
@@ -265,8 +283,9 @@ async function main() {
   });
 
   // Create a contract instance
-  const tokenRootContract: Contract<tip3Artifacts.FactorySource['TokenRoot']> =
-    new provider.Contract(tokenRootAbi, expectedAddress);
+  const tokenRootContract: Contract<
+    tip3Artifacts.FactorySource['TokenRoot']
+  > = new provider.Contract(tokenRootAbi, expectedAddress);
 
   // Call the contract constructor
   const { transaction: deployRes } = await tokenRootContract.methods
@@ -285,48 +304,51 @@ async function main() {
     });
 
   // checking if the token root is deployed successfully by calling its name method
-  const tokenName: string = (await tokenRootContract.methods.name({ answerId: 0 }).call({})).value0;
+  const tokenName: string = (
+    await tokenRootContract.methods.name({ answerId: 0 }).call({})
+  ).value0;
   if (tokenName == params.name) {
-    console.log(`${params.symbol} Token deployed to ${expectedAddress.toString()}`);
+    console.log(
+      `${
+        params.symbol
+      } Token deployed to ${expectedAddress.toString()}`
+    );
     return true;
   } else {
     console.log(
-      `${params.symbol} Token deployment failed ! ${(deployRes.exitCode, deployRes.resultCode)}`
+      `${params.symbol} Token deployment failed ! ${
+        (deployRes.exitCode, deployRes.resultCode)
+      }`
     );
     return false;
   }
 }
-
-````
+```
 
 </span>
 
 </div>
 
-
-
-
 <div class="action">
 
 ## Step 2: Deploy Token Root
+
 <div :class="llAction">
 
 Let's run our script using locklift:
 
-```` shell
+```shell
 npx locklift run -s ./scripts/01-deploy-token.ts -n local
 
-````
+```
 
 <ImgContainer src= '/01-deploy-token.png' width="100%" altText="deployTokenRootOutput" />
-
 
 Congratulations, you have deployed your first TIP3 Token Root 🎉
 
 </div>
 
 <div :class="eipAction" >
-
 
 <p class=actionInName style="margin-bottom: 0;">initialSupplyTo</p>
 <input ref="actionInitialSupplyTo" class="action Ain" type="text"/>
@@ -360,7 +382,6 @@ Congratulations, you have deployed your first TIP3 Token Root 🎉
 <input class="checkboxInput" ref="actionPauseBurn" type="checkbox">
 <span class="checkmark"></span>
 </label>
-
 
 <button @click="deployTokenRoot" class="deployTokenRootBut" >Deploy token root</button>
 
@@ -616,7 +637,7 @@ export default defineComponent({
 }
 
 .container input:checked ~ .checkmark {
-  background-color: var(--light-color-ts-class);
+  background-color: var(--vp-c-brand);
 }
 
 .checkmark:after {

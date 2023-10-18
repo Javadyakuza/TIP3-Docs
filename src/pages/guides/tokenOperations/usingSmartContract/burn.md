@@ -3,7 +3,7 @@
 <div class="burnToken">
 
 Now that we have gained knowledge on deploying custom contracts and minting/transferring tokens using them, we can proceed to explore the burning of TIP-3 tokens through the multi wallet TIP-3 contract. As discussed earlier in the [Burn Tokens Using an Account](/guides/tokenOperations/usingAccount/burn.md) section, the TIP-3 standard offers two implementations for the burn functionality.
-It is important to note that the multi wallet contract only supports transactions utilizing the  `burn`  function, as the  `burnByRoot`  function can only be called on the `token root contract`. In order to understand how the multi wallet contract updates its state, we will cover both implementations.
+It is important to note that the multi wallet contract only supports transactions utilizing the `burn` function, as the `burnByRoot` function can only be called on the `token root contract`. In order to understand how the multi wallet contract updates its state, we will cover both implementations.
 
 ## Step 1: Write Burn Script
 
@@ -38,85 +38,123 @@ The code sample below follows the same approach but makes the transactions using
 
 <span  :class="LLdis">
 
-
-````typescript
-  /*
+```typescript
+/*
   Burning tip-3 tokens using burn method on the Multi Wallet TIP-3 contract
   */
 
-  // Preparing the burning amount
-  const burnAmount: number = 10 * 10 ** deployRootFromDeployerParams.decimals;
+// Preparing the burning amount
+const burnAmount: number =
+  10 * 10 ** deployRootFromDeployerParams.decimals;
 
-  // Fetching the old balance of the token wallet using multi wallet tpi-3 contract
-  let oldBal: number = (await getWalletData(aliceMultiWalletContract, tokenRootContract.address)).balance;
+// Fetching the old balance of the token wallet using multi wallet tpi-3 contract
+let oldBal: number = (
+  await getWalletData(
+    aliceMultiWalletContract,
+    tokenRootContract.address
+  )
+).balance;
 
-  // Burning tip-3 tokens from Bob's wallet(bob's Multi Wallet contract)
-  const { transaction: burnRes } = await aliceMultiWalletContract.methods
+// Burning tip-3 tokens from Bob's wallet(bob's Multi Wallet contract)
+const { transaction: burnRes } =
+  await aliceMultiWalletContract.methods
     .burn({
       _amount: burnAmount,
       _tokenRoot: tokenRootContract.address,
     })
     .sendExternal({ publicKey: signerAlice.publicKey });
 
-  // Confirming tokens are burnt
-  let newBal: number = (await getWalletData(aliceMultiWalletContract, tokenRootContract.address)).balance;
+// Confirming tokens are burnt
+let newBal: number = (
+  await getWalletData(
+    aliceMultiWalletContract,
+    tokenRootContract.address
+  )
+).balance;
 
-  if (newBal < oldBal) {
-    console.log(
-      `${burnAmount / 10 ** deployRootFromDeployerParams.decimals} ${
-        deployRootFromDeployerParams.symbol
-      }'s burnt successfully \n
-    Alice balance before burn: ${oldBal / 10 ** deployRootFromDeployerParams.decimals} \n
-    Alice balance after burn: ${newBal / 10 ** deployRootFromDeployerParams.decimals}`,
-    );
-  } else {
-    console.log(`Burning token failed ${(burnRes.exitCode, burnRes.resultCode)}`);
-  }
+if (newBal < oldBal) {
+  console.log(
+    `${burnAmount / 10 ** deployRootFromDeployerParams.decimals} ${
+      deployRootFromDeployerParams.symbol
+    }'s burnt successfully \n
+    Alice balance before burn: ${
+      oldBal / 10 ** deployRootFromDeployerParams.decimals
+    } \n
+    Alice balance after burn: ${
+      newBal / 10 ** deployRootFromDeployerParams.decimals
+    }`
+  );
+} else {
+  console.log(
+    `Burning token failed ${(burnRes.exitCode, burnRes.resultCode)}`
+  );
+}
 
-  /*
+/*
     Burning tip-3 tokens using burnByRoot function on the token root contract
   */
 
-  // Defining the burn amount to be used in the burnByRoot function
-  const burnByRootAmount: number = 5 * 10 ** deployRootFromDeployerParams.decimals;
+// Defining the burn amount to be used in the burnByRoot function
+const burnByRootAmount: number =
+  5 * 10 ** deployRootFromDeployerParams.decimals;
 
-  // Defining the balance of the token wallet before burning
-  oldBal = (await getWalletData(aliceMultiWalletContract, tokenRootContract.address)).balance;
+// Defining the balance of the token wallet before burning
+oldBal = (
+  await getWalletData(
+    aliceMultiWalletContract,
+    tokenRootContract.address
+  )
+).balance;
 
-  // Burning tip-3 tokens using burnByRoot
-  await tokenRootContract.methods
-    .burnTokens({
-      amount: burnByRootAmount,
-      remainingGasTo: aliceAccount.address,
-      walletOwner: aliceMultiWalletContract.address,
-      callbackTo: aliceMultiWalletContract.address, // important to update the MW state
-      payload: "",
-    })
-    .send({ from: aliceAccount.address, amount: locklift.utils.toNano("2") });
+// Burning tip-3 tokens using burnByRoot
+await tokenRootContract.methods
+  .burnTokens({
+    amount: burnByRootAmount,
+    remainingGasTo: aliceAccount.address,
+    walletOwner: aliceMultiWalletContract.address,
+    callbackTo: aliceMultiWalletContract.address, // important to update the MW state
+    payload: '',
+  })
+  .send({
+    from: aliceAccount.address,
+    amount: locklift.utils.toNano('2'),
+  });
 
-  // Fetching the new balance after the burn is done
-  newBal = (await getWalletData(aliceMultiWalletContract, tokenRootContract.address)).balance;
+// Fetching the new balance after the burn is done
+newBal = (
+  await getWalletData(
+    aliceMultiWalletContract,
+    tokenRootContract.address
+  )
+).balance;
 
-  // Checking if the token are burnt successfully
-  if (newBal < oldBal) {
-    console.log(
-      `${burnByRootAmount / 10 ** deployRootFromDeployerParams.decimals} ${
-        deployRootFromDeployerParams.symbol
-      }'s burnt by root successfully \n
-    Alice balance before burnByRoot: ${oldBal / 10 ** deployRootFromDeployerParams.decimals} \n
-    Alice balance after burnByRoot: ${newBal / 10 ** deployRootFromDeployerParams.decimals}`,
-    );
-  } else {
-    console.log(`Burning token failed ${(burnRes.exitCode, burnRes.resultCode)}`);
-  }
-
-````
+// Checking if the token are burnt successfully
+if (newBal < oldBal) {
+  console.log(
+    `${
+      burnByRootAmount / 10 ** deployRootFromDeployerParams.decimals
+    } ${
+      deployRootFromDeployerParams.symbol
+    }'s burnt by root successfully \n
+    Alice balance before burnByRoot: ${
+      oldBal / 10 ** deployRootFromDeployerParams.decimals
+    } \n
+    Alice balance after burnByRoot: ${
+      newBal / 10 ** deployRootFromDeployerParams.decimals
+    }`
+  );
+} else {
+  console.log(
+    `Burning token failed ${(burnRes.exitCode, burnRes.resultCode)}`
+  );
+}
+```
 
 </span>
 
 <span  :class="EIPdis">
 
-```` typescript
+```typescript
 import {
   ProviderRpcClient,
   Address,
@@ -136,13 +174,14 @@ async function extractPubkey(
   provider: ProviderRpcClient,
   providerAddress: Address
 ): Promise<string> {
-
   // Fetching the user public key
   const accountFullState: FullContractState = (
     await provider.getFullContractState({ address: providerAddress })
   ).state!;
 
-  const senderPublicKey: string = await provider.extractPublicKey(accountFullState.boc);
+  const senderPublicKey: string = await provider.extractPublicKey(
+    accountFullState.boc
+  );
 
   return senderPublicKey;
 }
@@ -153,12 +192,15 @@ interface walletData {
 
 // THis function is utilized to fetch token wallet data from the multi wallet tip-3 contract
 async function getWalletData(
-  MWContract: Contract<tip3Artifacts.FactorySource['MultiWalletTIP3']>,
+  MWContract: Contract<
+    tip3Artifacts.FactorySource['MultiWalletTIP3']
+  >,
   tokenRootAddress: Address
 ): Promise<walletData> {
-
   // returned value of the "wallets" mapping from multi wallet tip-3
-  const walletData = (await MWContract.methods.wallets().call()).wallets.map(item => {
+  const walletData = (
+    await MWContract.methods.wallets().call()
+  ).wallets.map(item => {
     if (item[0].toString() == tokenRootAddress.toString()) {
       return item[1];
     }
@@ -174,35 +216,65 @@ async function getWalletData(
 
 async function main() {
   try {
-
     // Preparing the required contracts addresses
-    const tokenRootAddress: Address = new Address('<YOUR_TOKEN_ROOT_ADDRESS>');
-    const multiWalletAddress: Address = new Address('<YOUR_MULTI_WALLET_ADDRESS>');
+    const tokenRootAddress: Address = new Address(
+      '<YOUR_TOKEN_ROOT_ADDRESS>'
+    );
+    const multiWalletAddress: Address = new Address(
+      '<YOUR_MULTI_WALLET_ADDRESS>'
+    );
 
     // creating an instance of the required contracts
-    const tokenRootContract: Contract<tip3Artifacts.FactorySource['TokenRoot']> =
-      new provider.Contract(tip3Artifacts.factorySource['TokenRoot'], tokenRootAddress);
+    const tokenRootContract: Contract<
+      tip3Artifacts.FactorySource['TokenRoot']
+    > = new provider.Contract(
+      tip3Artifacts.factorySource['TokenRoot'],
+      tokenRootAddress
+    );
 
-    const multiWalletContract: Contract<tip3Artifacts.FactorySource['MultiWalletTIP3']> =
-      new provider.Contract(tip3Artifacts.factorySource['MultiWalletTIP3'], multiWalletAddress);
+    const multiWalletContract: Contract<
+      tip3Artifacts.FactorySource['MultiWalletTIP3']
+    > = new provider.Contract(
+      tip3Artifacts.factorySource['MultiWalletTIP3'],
+      multiWalletAddress
+    );
 
     // Fetching the decimals and symbol
     const [decimals, symbol] = await Promise.all([
-      Number((await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0),
-      (await tokenRootContract.methods.symbol({ answerId: 0 }).call()).value0,
+      Number(
+        (
+          await tokenRootContract.methods
+            .decimals({ answerId: 0 })
+            .call()
+        ).value0
+      ),
+      (await tokenRootContract.methods.symbol({ answerId: 0 }).call())
+        .value0,
     ]);
 
     // Defining the burn amount
     const burnAmount: number = 10 * 10 ** decimals;
 
     // Fetching the balance before burning tokens
-    let oldBal: number = (await getWalletData(multiWalletContract, tokenRootContract.address))
-      .balance;
+    let oldBal: number = (
+      await getWalletData(
+        multiWalletContract,
+        tokenRootContract.address
+      )
+    ).balance;
 
     // Get the senders public key
-    const senderPubkey: string = await extractPubkey(provider, providerAddress);
-    if (senderPubkey != (await multiWalletContract.methods.owner({}).call()).owner) {
-      throw new Error('You are not the owner of the sender multi wallet contract !');
+    const senderPubkey: string = await extractPubkey(
+      provider,
+      providerAddress
+    );
+    if (
+      senderPubkey !=
+      (await multiWalletContract.methods.owner({}).call()).owner
+    ) {
+      throw new Error(
+        'You are not the owner of the sender multi wallet contract !'
+      );
     }
 
     // checking if the user has enough tokens to burn
@@ -226,17 +298,30 @@ async function main() {
     }
 
     // Getting the balance after burning the tokens
-    let newBal = (await getWalletData(multiWalletContract, tokenRootContract.address)).balance;
+    let newBal = (
+      await getWalletData(
+        multiWalletContract,
+        tokenRootContract.address
+      )
+    ).balance;
 
     // Checking if the tokens are successfully burnt
     if (newBal < oldBal) {
-      console.log(`${burnAmount / 10 ** decimals} ${symbol}'s successfully burnt !`);
+      console.log(
+        `${
+          burnAmount / 10 ** decimals
+        } ${symbol}'s successfully burnt !`
+      );
 
       return `Hash: ${burnRes.id.hash} \n
       Balance before burn:  ${oldBal / 10 ** decimals} \n
       Balance after burn: ${newBal / 10 ** decimals}`;
     } else {
-      console.error(`Burning tokens failed !  ${(burnRes.exitCode, burnRes.resultCode)}`);
+      console.error(
+        `Burning tokens failed !  ${
+          (burnRes.exitCode, burnRes.resultCode)
+        }`
+      );
     }
 
     /*
@@ -244,7 +329,12 @@ async function main() {
     */
 
     // Fetching the balance before utilizing the burnByRoot function
-    oldBal = (await getWalletData(multiWalletContract, tokenRootContract.address)).balance;
+    oldBal = (
+      await getWalletData(
+        multiWalletContract,
+        tokenRootContract.address
+      )
+    ).balance;
 
     // Defining the burn amount to be used when calling the burnByRoot function
     const burnByRootAmount: number = 5 * 10 ** decimals;
@@ -255,29 +345,41 @@ async function main() {
     }
 
     // burning tokens from a token wallet by calling the burn method
-    const { transaction: burnByRootRes } = await tokenRootContract.methods
-      .burnTokens({
-        amount: burnByRootAmount,
-        walletOwner: multiWalletContract.address,
-        remainingGasTo: multiWalletContract.address,
-        callbackTo: multiWalletContract.address,
-        payload: '',
-      })
-      .sendExternal({
-        publicKey: await extractPubkey(provider, providerAddress),
-      });
+    const { transaction: burnByRootRes } =
+      await tokenRootContract.methods
+        .burnTokens({
+          amount: burnByRootAmount,
+          walletOwner: multiWalletContract.address,
+          remainingGasTo: multiWalletContract.address,
+          callbackTo: multiWalletContract.address,
+          payload: '',
+        })
+        .sendExternal({
+          publicKey: await extractPubkey(provider, providerAddress),
+        });
 
     // Throwing an error if the transaction was aborted
     if (burnByRootRes.aborted) {
-      throw new Error(`Transaction aborted ! ${burnByRootRes.exitCode}`);
+      throw new Error(
+        `Transaction aborted ! ${burnByRootRes.exitCode}`
+      );
     }
 
     // Getting the balance after burning tokens using token root function
-    newBal = (await getWalletData(multiWalletContract, tokenRootContract.address)).balance;
+    newBal = (
+      await getWalletData(
+        multiWalletContract,
+        tokenRootContract.address
+      )
+    ).balance;
 
     // Checking if the tokens are burnt successfully
     if (newBal < oldBal) {
-      console.log(`${burnByRootAmount / 10 ** decimals} ${symbol}'s successfully burnt By Root!`);
+      console.log(
+        `${
+          burnByRootAmount / 10 ** decimals
+        } ${symbol}'s successfully burnt By Root!`
+      );
 
       return `Hash: ${burnByRootRes.id.hash} \n
       Balance before burnByRoot:  ${oldBal / 10 ** decimals} \n
@@ -290,13 +392,11 @@ async function main() {
     throw new Error(`Failed ${e.message}`);
   }
 }
-
-````
+```
 
 </span>
 
 </div>
-
 
 <div class="action">
 
@@ -309,6 +409,7 @@ Use this command to burn TIP-3 tokens:
 ```shell
 npx locklift run -s ./scripts/07-burn-tip3.ts -n local
 ```
+
 <ImgContainer src= '/07-burn-tip3.png' width="100%" altText="buildStructure" />
 
 Congratulations, you have successfully burned TIP-3 tokens using a custom contract 🎉
@@ -331,6 +432,7 @@ Congratulations, you have successfully burned TIP-3 tokens using a custom contra
 <input ref="actionAmount" class="action Ain" type="text"/>
 
 <button @click="burnTokens" class="burnTokenBut" >burn Tokens</button>
+
 </div>
 <p id="output-p" :class="EIPdis" ref="burnTokenOutput"><loading :text="loadingText"/></p>
 
@@ -348,6 +450,7 @@ Congratulations, you have successfully burned TIP-3 tokens using a custom contra
 <input ref="actionRootAmount" class="action Ain" type="text"/>
 
 <button @click="burnTokensByRoot" class="burnTokenBut" >burn Tokens By Root</button>
+
 </div>
 </div>
 
@@ -624,7 +727,7 @@ return {
 }
 
 .container input:checked ~ .checkmark {
-  background-color: var(--light-color-ts-class);
+  background-color: var(--vp-c-brand);
 }
 
 .checkmark:after {

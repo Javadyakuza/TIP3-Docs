@@ -1,28 +1,27 @@
-
 <div class="DeployRootDeployer">
 
 # Root Deployer
+
 In this section we will learn what is the root deployer contract, its code and how to deploy it using tools like `locklift` or `everscale-inpage-provider`.
 
 ## What is the Root Deployer ?
 
-We have developed a smart contract written in [t-solidity](https://github.com/tonlabs/TON-Solidity-Compiler) that facilitates the deployment of the  `TokenRoot`  contract and enables us to obtain the address of an already deployed  `TokenRoot`  contract.
+We have developed a smart contract written in [t-solidity](https://github.com/tonlabs/TON-Solidity-Compiler) that facilitates the deployment of the `TokenRoot` contract and enables us to obtain the address of an already deployed `TokenRoot` contract.
 
 Deploying a token root contract using this smart contract is easier than deploying it through an Account. Contributors can also customize the contract to suit different needs, such as keeping track of all deployed token roots or implementing other functionalities.
 
-Please note that while the  `RootDeployer`  contract acts as the deployer of the  `TokenRoot`  contract, the ownership of the  `TokenRoot`  can be specified by the user.
+Please note that while the `RootDeployer` contract acts as the deployer of the `TokenRoot` contract, the ownership of the `TokenRoot` can be specified by the user.
 
 ::: warning
 To retrieve the address of your deployed token root via the root deployer's `getExpectedTokenRootAddress` function, it is crucial to remember what was your token root `randomNonce_` value!
 :::
-
 
 ## Contract Code
 
 <details>
 <summary> show code </summary>
 
-```` solidity
+```solidity
 
 pragma ever-solidity >= 0.61.2;
 pragma AbiHeader expire;
@@ -120,7 +119,8 @@ contract RootDeployer {
         );
     }
 }
-````
+```
+
 </details>
 
 ::: tip
@@ -135,12 +135,11 @@ For this reason, we pass callbacks so that the contract returns something.
 
 ## Step 1: Write Deployment Script
 
-
 Now we write scripts to deploy the Root Deployer contract :
 
 <span  :class="LLdis"  >
 
-We have already covered how to deploy a contract using locklift, so deploying  `RootDeployer`  should be a straightforward process:
+We have already covered how to deploy a contract using locklift, so deploying `RootDeployer` should be a straightforward process:
 
 ::: info
 Before we start to write our scripts we need to make sure that there is file named `01-deploy-root-deployer.ts` in the `script` folder in the project root.
@@ -150,7 +149,7 @@ Before we start to write our scripts we need to make sure that there is file nam
 
 <span  :class="EIPdis"  >
 
-We have already learned how to deploy a contract using  `everscale-inpage-provider`  as well, so the process remains the same as before.
+We have already learned how to deploy a contract using `everscale-inpage-provider` as well, so the process remains the same as before.
 
 </span>
 <br/>
@@ -167,21 +166,28 @@ We have already learned how to deploy a contract using  `everscale-inpage-provid
 
 <span  :class="LLdis">
 
-````typescript
+```typescript
 /**
  * locklift is a globally declared object
  */
 
-import { Address, Contract, Signer, WalletTypes, zeroAddress } from "locklift";
-import { FactorySource } from "../build/factorySource";
+import {
+  Address,
+  Contract,
+  Signer,
+  WalletTypes,
+  zeroAddress,
+} from 'locklift';
+import { FactorySource } from '../build/factorySource';
 
 async function getWalletData(
-  MWContract: Contract<FactorySource["MultiWalletTIP3"]>,
-  tokenRootAddress: Address,
+  MWContract: Contract<FactorySource['MultiWalletTIP3']>,
+  tokenRootAddress: Address
 ): Promise<{ tokenWallet: Address; balance: number }> {
-
   // Returned value of the wallets mapping on the multi wallet tip-3 contract
-  const walletData = (await MWContract.methods.wallets().call()).wallets.map(item => {
+  const walletData = (
+    await MWContract.methods.wallets().call()
+  ).wallets.map(item => {
     if (item[0].toString() == tokenRootAddress.toString()) {
       return item[1];
     }
@@ -196,8 +202,9 @@ async function getWalletData(
 }
 async function main() {
   // Fetching the signer key pair from locklift.config.ts
-  const signerAlice: Signer = (await locklift.keystore.getSigner("0"))!;
-  const signerBob: Signer = (await locklift.keystore.getSigner("1"))!;
+  const signerAlice: Signer =
+    (await locklift.keystore.getSigner('0'))!;
+  const signerBob: Signer = (await locklift.keystore.getSigner('1'))!;
 
   // uncomment if deploying a new account
   // const { contract: account } = await locklift.factory.deployContract({
@@ -209,12 +216,13 @@ async function main() {
   // });
 
   // Adding an existing SafeMultiSig Account using its address
-  const aliceAccount = await locklift.factory.accounts.addExistingAccount({
-    type: WalletTypes.MsigAccount,
-    address: new Address("<ALICE_ACCOUNT_ADDRESS>"),
-    mSigType: "SafeMultisig",
-    publicKey: signerAlice.publicKey,
-  });
+  const aliceAccount =
+    await locklift.factory.accounts.addExistingAccount({
+      type: WalletTypes.MsigAccount,
+      address: new Address('<ALICE_ACCOUNT_ADDRESS>'),
+      mSigType: 'SafeMultisig',
+      publicKey: signerAlice.publicKey,
+    });
 
   // uncomment if deploying a new account
   // const { contract: account } = await locklift.factory.deployContract({
@@ -226,29 +234,32 @@ async function main() {
   // });
 
   // Adding an existing SafeMultiSig Account using its address
-  const bobAccount = await locklift.factory.accounts.addExistingAccount({
-    type: WalletTypes.MsigAccount,
-    address: new Address("<BOB_ACCOUNT_ADDRESS>"),
-    mSigType: "SafeMultisig",
-    publicKey: signerBob.publicKey,
-  });
+  const bobAccount =
+    await locklift.factory.accounts.addExistingAccount({
+      type: WalletTypes.MsigAccount,
+      address: new Address('<BOB_ACCOUNT_ADDRESS>'),
+      mSigType: 'SafeMultisig',
+      publicKey: signerBob.publicKey,
+    });
 
   // Deploying the Root deployer
-  const { contract: rootDeployer } = await locklift.factory.deployContract({
-    contract: "RootDeployer",
-    publicKey: signerAlice.publicKey,
-    initParams: {
-      randomNonce_: locklift.utils.getRandomNonce(),
-    },
-    constructorParams: {
-      _rootCode: locklift.factory.getContractArtifacts("TokenRoot").code,
-      _walletCode: locklift.factory.getContractArtifacts("TokenWallet").code,
-    },
-    value: locklift.utils.toNano("5"),
-  });
+  const { contract: rootDeployer } =
+    await locklift.factory.deployContract({
+      contract: 'RootDeployer',
+      publicKey: signerAlice.publicKey,
+      initParams: {
+        randomNonce_: locklift.utils.getRandomNonce(),
+      },
+      constructorParams: {
+        _rootCode:
+          locklift.factory.getContractArtifacts('TokenRoot').code,
+        _walletCode:
+          locklift.factory.getContractArtifacts('TokenWallet').code,
+      },
+      value: locklift.utils.toNano('5'),
+    });
 
   console.log(`Root Deployer: ${rootDeployer.address.toString()}`);
-
 }
 
 main()
@@ -257,15 +268,13 @@ main()
     console.log(e);
     process.exit(1);
   });
-
-
-````
+```
 
 </span>
 
 <span  :class="EIPdis">
 
-````typescript
+```typescript
 import {
   ProviderRpcClient as PRC,
   Address,
@@ -300,10 +309,14 @@ async function main() {
     await provider.getFullContractState({ address: providerAddress })
   ).state!;
 
-  const senderPublicKey: string = await provider.extractPublicKey(accountFullState.boc);
+  const senderPublicKey: string = await provider.extractPublicKey(
+    accountFullState.boc
+  );
 
   // Preparing the deployment params
-  const deployParams: DeployParams<tip3Artifacts.FactorySource['RootDeployer']> = {
+  const deployParams: DeployParams<
+    tip3Artifacts.FactorySource['RootDeployer']
+  > = {
     tvc: rootDeployerArtifacts.tvc,
     workchain: 0,
     publicKey: senderPublicKey,
@@ -313,10 +326,16 @@ async function main() {
   };
 
   // Get the expected address of the root deployer contract
-  const expectedAddress = await provider.getExpectedAddress(rootDeployerAbi, deployParams);
+  const expectedAddress = await provider.getExpectedAddress(
+    rootDeployerAbi,
+    deployParams
+  );
 
   // Get the state init
-  const stateInit = await provider.getStateInit(rootDeployerAbi, deployParams);
+  const stateInit = await provider.getStateInit(
+    rootDeployerAbi,
+    deployParams
+  );
 
   // Send the coins to the address
   await provider.sendMessage({
@@ -331,8 +350,9 @@ async function main() {
   console.log('Fund sent to the Calculated address !');
 
   // Create a instance of the root deployer contract
-  const userRootDeployer: Contract<tip3Artifacts.FactorySource['RootDeployer']> =
-    new provider.Contract(rootDeployerAbi, expectedAddress);
+  const userRootDeployer: Contract<
+    tip3Artifacts.FactorySource['RootDeployer']
+  > = new provider.Contract(rootDeployerAbi, expectedAddress);
 
   console.log('Sending stateInit to the Calculated address ...');
 
@@ -359,12 +379,13 @@ async function main() {
     return `Root Deployer deployed to ${expectedAddress.toString()}`;
   } else {
     throw new Error(
-      `Root Deployer deployment failed !${(deployRes.exitCode, deployRes.resultCode)}`
+      `Root Deployer deployment failed !${
+        (deployRes.exitCode, deployRes.resultCode)
+      }`
     );
   }
 }
-
-````
+```
 
 </span>
 
@@ -377,9 +398,10 @@ async function main() {
 
 Let's run our script using locklift
 
-```` shell
+```shell
 npx locklift run -s ./scripts/01-deploy-root-deployer.ts -n local
-````
+```
+
 <ImgContainer src= '/01-deploy-root-deployer.png' width="100%" altText="deployRootDeployerOutput" />
 
 Congratulations, you have deployed a Root Deployer contract 🎉
@@ -387,7 +409,6 @@ Congratulations, you have deployed a Root Deployer contract 🎉
 </div>
 
 <div :class="eipAction" >
-
 
 <button @click="deployRootDeployer" class="DeployRootDeployerBut" >Deploy root deployer</button>
 
@@ -398,7 +419,6 @@ Congratulations, you have deployed a Root Deployer contract 🎉
 <p id="output-p" :class="EIPdis" ref="DeployRootDeployerOutput"><loading :text="loadingText"/></p>
 
 </div>
-
 
 <script lang="ts" >
 import { defineComponent, ref, onMounted } from "vue";
@@ -601,7 +621,7 @@ details {
 }
 
 .container input:checked ~ .checkmark {
-  background-color: var(--light-color-ts-class);
+  background-color: var(--vp-c-brand);
 }
 
 .checkmark:after {

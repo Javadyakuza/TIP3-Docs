@@ -6,15 +6,14 @@ We have already learned how to send messages to a contract through an account.&#
 
 Therefore, making a transfer is as easy as shelling pears!
 
-
 ::: tip
 
 TIP-3 Token Wallet has 2 transfer methods:
 
-* Transfer - Transfer tokens and optionally deploy TokenWallet for recipient account address.
-* Transfer tokens using another TokenWallet address, that wallet must be deployed previously.
+- Transfer - Transfer tokens and optionally deploy TokenWallet for recipient account address.
+- Transfer tokens using another TokenWallet address, that wallet must be deployed previously.
 
-In the code sample provided below, we assume that Alice does not have a token wallet. Therefore, we begin by deploying a token wallet for Alice which will be accomplished when using the  `transfer`  function. Subsequently, we can employ the  `transferToWallet`  function to transfer a certain amount of TIP3 tokens to Alice.
+In the code sample provided below, we assume that Alice does not have a token wallet. Therefore, we begin by deploying a token wallet for Alice which will be accomplished when using the `transfer` function. Subsequently, we can employ the `transferToWallet` function to transfer a certain amount of TIP3 tokens to Alice.
 :::
 
 ## Step 1: Write Transfer Script
@@ -42,7 +41,6 @@ Transferring TIP-3 tokens is considered one of the easier steps depended to prev
 
 :::
 
-
 </span>
 <br/>
 
@@ -58,53 +56,53 @@ Transferring TIP-3 tokens is considered one of the easier steps depended to prev
 
 <span  :class="LLdis">
 
-````typescript
+```typescript
+/* Transferring tip-3 tokens using transfer function */
 
-  /* Transferring tip-3 tokens using transfer function */
+console.log(
+  "Bob's balance before transfer: ",
+  Number(
+    (
+      await bobTokenWallet.methods
+        .balance({
+          answerId: 0,
+        })
+        .call()
+    ).value0
+  ) /
+    10 ** decimals
+);
 
-  console.log(
-    "Bob's balance before transfer: ",
-    Number(
-      (
-        await bobTokenWallet.methods
-          .balance({
-            answerId: 0,
-          })
-          .call()
-      ).value0,
-    ) /
-      10 ** decimals,
-  );
+console.log('Alice balance before transfer: 0');
 
-  console.log("Alice balance before transfer: 0");
+// Amount to transfer
+const transferAmount: number = 30 * 10 ** decimals;
 
-  // Amount to transfer
-  const transferAmount: number = 30 * 10 ** decimals;
-
-  /*
+/*
     Transfer with the deployment of a wallet for the recipient account.
 
     Don't pay attention to notify and payload yet, we'll get back to them.
   */
-  await bobTokenWallet.methods
-    .transfer({
-      amount: transferAmount,
-      recipient: aliceAccount.address,
-      deployWalletValue: locklift.utils.toNano(2), // assume alice doesn't have any token wallet
-      remainingGasTo: bobAccount.address,
-      notify: false,
-      payload: "",
-    })
-    .send({
-      from: bobAccount.address,
-      amount: locklift.utils.toNano("5"),
-    });
+await bobTokenWallet.methods
+  .transfer({
+    amount: transferAmount,
+    recipient: aliceAccount.address,
+    deployWalletValue: locklift.utils.toNano(2), // assume alice doesn't have any token wallet
+    remainingGasTo: bobAccount.address,
+    notify: false,
+    payload: '',
+  })
+  .send({
+    from: bobAccount.address,
+    amount: locklift.utils.toNano('5'),
+  });
 
-  /*
+/*
      Creating the alice's token wallet and Checking Alice's balance
    */
-  const aliceTokenWallet: Contract<FactorySource["TokenWallet"]> = locklift.factory.getDeployedContract(
-    "TokenWallet",
+const aliceTokenWallet: Contract<FactorySource['TokenWallet']> =
+  locklift.factory.getDeployedContract(
+    'TokenWallet',
     (
       await tokenRootContract.methods
         .walletOf({
@@ -112,87 +110,87 @@ Transferring TIP-3 tokens is considered one of the easier steps depended to prev
           walletOwner: aliceAccount.address,
         })
         .call()
-    ).value0,
+    ).value0
   );
 
-  console.log(
-    "Bob's balance after transfer: ",
-    Number(
-      (
-        await bobTokenWallet.methods
-          .balance({
-            answerId: 0,
-          })
-          .call()
-      ).value0,
-    ) /
-      10 ** decimals,
-  );
+console.log(
+  "Bob's balance after transfer: ",
+  Number(
+    (
+      await bobTokenWallet.methods
+        .balance({
+          answerId: 0,
+        })
+        .call()
+    ).value0
+  ) /
+    10 ** decimals
+);
 
-  console.log(
-    "Alice's balance after transfer: ",
-    Number(
-      (
-        await aliceTokenWallet.methods
-          .balance({
-            answerId: 0,
-          })
-          .call()
-      ).value0,
-    ) /
-      10 ** decimals,
-  );
+console.log(
+  "Alice's balance after transfer: ",
+  Number(
+    (
+      await aliceTokenWallet.methods
+        .balance({
+          answerId: 0,
+        })
+        .call()
+    ).value0
+  ) /
+    10 ** decimals
+);
 
-  /* Transferring tip-3 tokens using transferToWallet function */
+/* Transferring tip-3 tokens using transferToWallet function */
 
-  await bobTokenWallet.methods
-    .transferToWallet({
-      amount: transferAmount,
-      recipientTokenWallet: aliceTokenWallet.address,
-      remainingGasTo: bobAccount.address,
-      notify: false,
-      payload: "",
-    })
-    .send({
-      from: bobAccount.address,
-      amount: locklift.utils.toNano("3"),
-    });
+await bobTokenWallet.methods
+  .transferToWallet({
+    amount: transferAmount,
+    recipientTokenWallet: aliceTokenWallet.address,
+    remainingGasTo: bobAccount.address,
+    notify: false,
+    payload: '',
+  })
+  .send({
+    from: bobAccount.address,
+    amount: locklift.utils.toNano('3'),
+  });
 
-  console.log(
-    "Bob's balance after transfer to wallet: ",
-    Number(
-      (
-        await bobTokenWallet.methods
-          .balance({
-            answerId: 0,
-          })
-          .call()
-      ).value0,
-    ) /
-      10 ** decimals,
-  );
+console.log(
+  "Bob's balance after transfer to wallet: ",
+  Number(
+    (
+      await bobTokenWallet.methods
+        .balance({
+          answerId: 0,
+        })
+        .call()
+    ).value0
+  ) /
+    10 ** decimals
+);
 
-  console.log(
-    "Alice's balance after transfer to wallet: ",
+console.log(
+  "Alice's balance after transfer to wallet: ",
 
-    Number(
-      (
-        await aliceTokenWallet.methods
-          .balance({
-            answerId: 0,
-          })
-          .call()
-      ).value0,
-    ) /
-      10 ** decimals,
-  );
-````
+  Number(
+    (
+      await aliceTokenWallet.methods
+        .balance({
+          answerId: 0,
+        })
+        .call()
+    ).value0
+  ) /
+    10 ** decimals
+);
+```
 
 </span>
 
 <span  :class="EIPdis">
 
-```` typescript
+```typescript
 // Import the required libraries
 import {
   ProviderRpcClient as PRC,
@@ -204,25 +202,37 @@ import * as tip3Artifacts from 'tip3-docs-artifacts';
 import { provider, providerAddress } from './useProvider';
 
 async function main() {
-
   // Preparing the required addresses
-  const tokenRootAddress: Address = new Address('<YOUR_TOKEN_ROOT_ADDRESS>');
-  const recipientAddress: Address = new Address('<RECIPIENT_ACCOUNT_ADDRESS>');
+  const tokenRootAddress: Address = new Address(
+    '<YOUR_TOKEN_ROOT_ADDRESS>'
+  );
+  const recipientAddress: Address = new Address(
+    '<RECIPIENT_ACCOUNT_ADDRESS>'
+  );
 
   // creating an instance of the target token root contract
-  const tokenRootContract: Contract<tip3Artifacts.FactorySource['TokenRoot']> =
-    new provider.Contract(tip3Artifacts.factorySource['TokenRoot'], tokenRootAddress);
+  const tokenRootContract: Contract<
+    tip3Artifacts.FactorySource['TokenRoot']
+  > = new provider.Contract(
+    tip3Artifacts.factorySource['TokenRoot'],
+    tokenRootAddress
+  );
 
   // getting the decimals of the token
   const decimals = Number(
-    (await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0
+    (await tokenRootContract.methods.decimals({ answerId: 0 }).call())
+      .value0
   );
 
   // creating an instance of the sender token wallet contract
-  const tokenWallet: Contract<tip3Artifacts.FactorySource['TokenWallet']> = new provider.Contract(
+  const tokenWallet: Contract<
+    tip3Artifacts.FactorySource['TokenWallet']
+  > = new provider.Contract(
     tip3Artifacts.factorySource['TokenWallet'],
     (
-      await tokenRootContract.methods.walletOf({ answerId: 0, walletOwner: providerAddress }).call()
+      await tokenRootContract.methods
+        .walletOf({ answerId: 0, walletOwner: providerAddress })
+        .call()
     ).value0
   );
 
@@ -230,11 +240,14 @@ async function main() {
    * we will make an instance of the recipient token wallet contract and we assign value to it if the token wallet was already deployed
    * the amount attached to the tx varies based on the mentioned subject.
    */
-  let recipientTokenWallet: Contract<tip3Artifacts.FactorySource['TokenWallet']> | undefined =
-    undefined;
+  let recipientTokenWallet:
+    | Contract<tip3Artifacts.FactorySource['TokenWallet']>
+    | undefined = undefined;
 
   const receiverTokenWalletAddress = (
-    await tokenRootContract.methods.walletOf({ answerId: 0, walletOwner: recipientAddress }).call()
+    await tokenRootContract.methods
+      .walletOf({ answerId: 0, walletOwner: recipientAddress })
+      .call()
   ).value0;
 
   // Defining the transfer parameters
@@ -259,7 +272,13 @@ async function main() {
       receiverTokenWalletAddress
     );
 
-    oldBal = Number((await recipientTokenWallet.methods.balance({ answerId: 0 }).call({})).value0);
+    oldBal = Number(
+      (
+        await recipientTokenWallet.methods
+          .balance({ answerId: 0 })
+          .call({})
+      ).value0
+    );
   }
 
   // Defining the transfer amount
@@ -275,11 +294,19 @@ async function main() {
       notify: false, // true if the change must be sent back to the sender wallet account not the sender token wallet
       payload: '',
     })
-    .send({ from: providerAddress, amount: String(txFee), bounce: true });
+    .send({
+      from: providerAddress,
+      amount: String(txFee),
+      bounce: true,
+    });
 
   // Checking of the transaction is aborted or not
   if (transferRes.aborted) {
-    throw new Error(`Transaction aborted !: ${(transferRes.exitCode, transferRes.resultCode)}`);
+    throw new Error(
+      `Transaction aborted !: ${
+        (transferRes.exitCode, transferRes.resultCode)
+      }`
+    );
   }
 
   // In this case the recipient didn't have any token wallet and one is deployed during the transfer, so we fetch it since we haven't before
@@ -290,7 +317,11 @@ async function main() {
   );
   // recipient balance after transfer
   const newBal: number = Number(
-    (await recipientTokenWallet.methods.balance({ answerId: 0 }).call({})).value0
+    (
+      await recipientTokenWallet.methods
+        .balance({ answerId: 0 })
+        .call({})
+    ).value0
   );
 
   // Checking if the tokens are received successfully
@@ -298,7 +329,9 @@ async function main() {
     console.log('tokens transferred successfully');
   } else {
     throw new Error(
-      ` Transferring tokens failed \n tx Hash: ${(transferRes.exitCode, transferRes.resultCode)}`
+      ` Transferring tokens failed \n tx Hash: ${
+        (transferRes.exitCode, transferRes.resultCode)
+      }`
     );
   }
 
@@ -311,7 +344,11 @@ async function main() {
       notify: false,
       payload: '',
     })
-    .send({ from: providerAddress, amount: String(3 * 10 ** 9), bounce: true });
+    .send({
+      from: providerAddress,
+      amount: String(3 * 10 ** 9),
+      bounce: true,
+    });
 
   // Throwing an error if the transaction was aborted
   if (transferToWalletRes.aborted) {
@@ -320,25 +357,32 @@ async function main() {
 
   // newBal is actually the old balance and its fetched before utilizing the "transferToWallet" the function
   if (
-    Number((await recipientTokenWallet.methods.balance({ answerId: 0 }).call({})).value0) > newBal
+    Number(
+      (
+        await recipientTokenWallet.methods
+          .balance({ answerId: 0 })
+          .call({})
+      ).value0
+    ) > newBal
   ) {
     console.log('tokens transferred successfully');
     return `tx Hash: ${transferRes.id.hash}`;
   } else {
-    throw new Error(`Transferring tokens failed, tx Hash: ${transferRes.id.hash}`);
+    throw new Error(
+      `Transferring tokens failed, tx Hash: ${transferRes.id.hash}`
+    );
   }
 }
-
-````
+```
 
 </span>
 
 </div>
 
-
 <div class="action">
 
 ## Step 2: Transfer TIP-3 Tokens
+
 <div :class="llAction">
 
 Use this command to transfer TIP-3 tokens:
@@ -346,6 +390,7 @@ Use this command to transfer TIP-3 tokens:
 ```shell
 npx locklift run -s ./scripts/04-transfer-tip3.ts -n local
 ```
+
 <ImgContainer src= '/04-transfer-tip3.png' width="100%" altText="transferTip3Output" />
 
 Congratulations, you have successfully transferred TIP-3 tokens from one to another Wallet 🎉
@@ -373,6 +418,7 @@ Congratulations, you have successfully transferred TIP-3 tokens from one to anot
 </label>
 
 <button @click="transferTokens" class="transferTokenBut" >Transfer Tokens</button>
+
 </div>
 <p id="output-p" :class="EIPdis" ref="transferTokenOutput"><loading :text="loadingText"/></p>
 
@@ -392,6 +438,7 @@ Congratulations, you have successfully transferred TIP-3 tokens from one to anot
 </label>
 
 <button @click="transferTokensToWallet" class="transferTokenBut" >Transfer Tokens to Wallet</button>
+
 </div>
 </div>
 
@@ -656,7 +703,7 @@ return {
 }
 
 .container input:checked ~ .checkmark {
-  background-color: var(--light-color-ts-class);
+  background-color: var(--vp-c-brand);
 }
 
 .checkmark:after {

@@ -7,11 +7,12 @@ In previous section we have learned to deploy a token root and wallet using the 
 In this section we will learn the how to mint TIP-3 tokens for a deployed token wallet, it's pretty easy and straight forward, you just need to pay attention to a few small points.
 
 ::: tip
+
 - Notice that the owner of the deployed Token Wallet is the `MultiWalletTIP3` contract that we deployed earlier.
-- the `notify` parameter is always true in `MultiWalletTIP3` in order to receive callback function from the token root  and update the state of the `MultiWalletTIP3` contract.
-- We send the `mint` transaction to the `token root` contract,  so how do we update the `MultiWalletTIP3` contract state ?\
-There is a callback function named `onAcceptTokensMint` which will be called on the `MultiWalletTIP-3` by the token wallet and updates its state when the tokens are minted if we set the parameter `notify` to _true_ !
-:::
+- the `notify` parameter is always true in `MultiWalletTIP3` in order to receive callback function from the token root and update the state of the `MultiWalletTIP3` contract.
+- We send the `mint` transaction to the `token root` contract, so how do we update the `MultiWalletTIP3` contract state ?\
+  There is a callback function named `onAcceptTokensMint` which will be called on the `MultiWalletTIP-3` by the token wallet and updates its state when the tokens are minted if we set the parameter `notify` to _true_ !
+  :::
 
 ## Step 1: Write Minting Script
 
@@ -22,8 +23,9 @@ We can mint TIP-3 tokens for the target Token Wallet, as shown in the code sampl
 We use the previously written script stats from the [deploy token wallet](/guides/deployingContracts/usingSmartContract/tokenWallet.md) section for the following script.
 
 ::: info
+
 - Before we start to write our scripts we need to make sure that there is a file named `05-mint-tip3.ts` in the `script` folder in the project root.
-:::
+  :::
 
 </span>
 
@@ -52,48 +54,57 @@ Minting TIP-3 tokens using everscale-inpage-provider is pretty easy as well:
 
 <span  :class="LLdis">
 
-````typescript
+```typescript
+/* Minting TIP-3 tokens using multi wallet contract */
 
-   /* Minting TIP-3 tokens using multi wallet contract */
+// Defining the parameters for minting tip-3 tokens
+const mintAmount: number =
+  50 * 10 ** deployRootFromDeployerParams.decimals;
 
-  // Defining the parameters for minting tip-3 tokens
-  const mintAmount: number = 50 * 10 ** deployRootFromDeployerParams.decimals;
+console.log(
+  'balance before mint:',
+  (
+    await getWalletData(
+      aliceMultiWalletContract,
+      tokenRootContract.address
+    )
+  ).balance /
+    10 ** deployRootFromDeployerParams.decimals
+);
 
-  console.log(
-    "balance before mint:",
-    (await getWalletData(aliceMultiWalletContract, tokenRootContract.address)).balance /
-      10 ** deployRootFromDeployerParams.decimals,
-  );
+// Minting tokens for receiver
+await tokenRootContract.methods
+  .mint({
+    amount: mintAmount,
+    recipient: aliceMultiWalletContract.address, // the owner of the token wallet is the MW contract
+    deployWalletValue: 0,
+    notify: true, // To update the Multi Wallet contract
+    payload: '',
+    remainingGasTo: aliceAccount.address,
+  })
+  .send({
+    from: aliceAccount.address,
+    amount: locklift.utils.toNano(5),
+  });
 
-  // Minting tokens for receiver
-  await tokenRootContract.methods
-    .mint({
-      amount: mintAmount,
-      recipient: aliceMultiWalletContract.address, // the owner of the token wallet is the MW contract
-      deployWalletValue: 0,
-      notify: true, // To update the Multi Wallet contract
-      payload: "",
-      remainingGasTo: aliceAccount.address,
-    })
-    .send({
-      from: aliceAccount.address,
-      amount: locklift.utils.toNano(5),
-    });
-
-  // confirming that its minted
-  console.log(
-    "balance after mint:",
-    (await getWalletData(aliceMultiWalletContract, tokenRootContract.address)).balance /
-      10 ** deployRootFromDeployerParams.decimals,
-  );
-
-````
+// confirming that its minted
+console.log(
+  'balance after mint:',
+  (
+    await getWalletData(
+      aliceMultiWalletContract,
+      tokenRootContract.address
+    )
+  ).balance /
+    10 ** deployRootFromDeployerParams.decimals
+);
+```
 
 </span>
 
 <span  :class="EIPdis">
 
-````typescript
+```typescript
 import {
   ProviderRpcClient,
   Address,
@@ -105,12 +116,15 @@ import { provider, providerAddress } from './useProvider';
 
 // We use the getWalletData function to extract the token wallet data from the multi wallet contract
 async function getWalletData(
-  MWContract: Contract<tip3Artifacts.FactorySource['MultiWalletTIP3']>,
+  MWContract: Contract<
+    tip3Artifacts.FactorySource['MultiWalletTIP3']
+  >,
   tokenRootAddress: Address
 ): Promise<{ tokenWallet: Address; balance: number }> {
-
   // Returned value of the wallets mapping on the multi wallet tip-3 contract
-  const walletData = (await MWContract.methods.wallets().call()).wallets.map(item => {
+  const walletData = (
+    await MWContract.methods.wallets().call()
+  ).wallets.map(item => {
     if (item[0].toString() == tokenRootAddress.toString()) {
       return item[1];
     }
@@ -125,39 +139,63 @@ async function getWalletData(
 }
 
 async function main() {
-
   // Required contracts addresses
-  const tokenRootAddress: Address = new Address('<YOUR_TOKEN_ROOT_ADDRESS>');
-  const multiWalletAddress: Address = new Address('<YOUR_MULTI_WALLET_ADDRESS>');
+  const tokenRootAddress: Address = new Address(
+    '<YOUR_TOKEN_ROOT_ADDRESS>'
+  );
+  const multiWalletAddress: Address = new Address(
+    '<YOUR_MULTI_WALLET_ADDRESS>'
+  );
 
   try {
-
     // creating an instance of the required contracts
-    const tokenRootContract: Contract<tip3Artifacts.FactorySource['TokenRoot']> =
-      new provider.Contract(tip3Artifacts.factorySource['TokenRoot'], tokenRootAddress);
-    const MultiWalletContract: Contract<tip3Artifacts.FactorySource['MultiWalletTIP3']> =
-      new provider.Contract(tip3Artifacts.factorySource['MultiWalletTIP3'], multiWalletAddress);
+    const tokenRootContract: Contract<
+      tip3Artifacts.FactorySource['TokenRoot']
+    > = new provider.Contract(
+      tip3Artifacts.factorySource['TokenRoot'],
+      tokenRootAddress
+    );
+    const MultiWalletContract: Contract<
+      tip3Artifacts.FactorySource['MultiWalletTIP3']
+    > = new provider.Contract(
+      tip3Artifacts.factorySource['MultiWalletTIP3'],
+      multiWalletAddress
+    );
 
     // Fetching the decimals and symbol
     const [decimals, symbol] = await Promise.all([
-      Number((await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0),
-      (await tokenRootContract.methods.symbol({ answerId: 0 }).call()).value0,
+      Number(
+        (
+          await tokenRootContract.methods
+            .decimals({ answerId: 0 })
+            .call()
+        ).value0
+      ),
+      (await tokenRootContract.methods.symbol({ answerId: 0 }).call())
+        .value0,
     ]);
 
     // Defining the mint amount
     const mintAmount: number = 50 * 10 ** decimals;
 
     // Checking if the user already has a token wallet associated with the token root
-    let tokenWalletData = await getWalletData(MultiWalletContract, tokenRootContract.address);
+    let tokenWalletData = await getWalletData(
+      MultiWalletContract,
+      tokenRootContract.address
+    );
 
     // Defining the deployWalletValue
     let deployWalletValue: number = 0;
 
     // Fetching the balance before minting tokens
-    const oldBal: number = Number(tokenWalletData.balance) / 10 ** decimals;
+    const oldBal: number =
+      Number(tokenWalletData.balance) / 10 ** decimals;
 
     // Checking the if the user already has an token wallet of the target token root and accordingly setting the deployWalletValue to deploy onw for the user if doesn't have any
-    if (tokenWalletData.tokenWallet.toString() == tip3Artifacts.zeroAddress.toString()) {
+    if (
+      tokenWalletData.tokenWallet.toString() ==
+      tip3Artifacts.zeroAddress.toString()
+    ) {
       deployWalletValue = 2 * 10 ** 9;
     }
 
@@ -182,12 +220,20 @@ async function main() {
 
     // Throwing an error if the transaction was aborted
     if (mintRes.aborted) {
-      throw new Error(`Transaction aborted ! ${(mintRes.exitCode, mintRes.resultCode)}`);
+      throw new Error(
+        `Transaction aborted ! ${
+          (mintRes.exitCode, mintRes.resultCode)
+        }`
+      );
     }
 
     // Fetching the wallet data and balance after the mint is done
-    tokenWalletData = await getWalletData(MultiWalletContract, tokenRootContract.address);
-    const newBal: number = Number(tokenWalletData.balance) / 10 ** decimals;
+    tokenWalletData = await getWalletData(
+      MultiWalletContract,
+      tokenRootContract.address
+    );
+    const newBal: number =
+      Number(tokenWalletData.balance) / 10 ** decimals;
 
     // Checking if the tokens are minted successfully for th receiver
     if (newBal >= oldBal) {
@@ -195,19 +241,19 @@ async function main() {
 
       return `Old balance: ${oldBal} \n New balance: ${newBal}`;
     } else {
-      throw new Error(`Failed ${(mintRes.exitCode, mintRes.resultCode)}`);
+      throw new Error(
+        `Failed ${(mintRes.exitCode, mintRes.resultCode)}`
+      );
     }
   } catch (e: any) {
     throw new Error(`Failed ${e.message}`);
   }
 }
-
-````
+```
 
 </span>
 
 </div>
-
 
 <div class="action">
 
@@ -220,6 +266,7 @@ Use this command to mint TIP-3 tokens:
 ```shell
 npx locklift run -s ./scripts/05-mint-tip3.ts -n local
 ```
+
 <ImgContainer src= '/05-mint-tip3.png' width="100%" altText="buildStructure" />
 
 Congratulations, you have successfully minted TIP-3 tokens for a token wallet deployed by a custom contract 🎉
@@ -230,7 +277,6 @@ Congratulations, you have successfully minted TIP-3 tokens for a token wallet de
 
 <div :class="mint">
 
-
 <p class=actionInName style="margin-bottom: 0;">Token Root address</p>
 <input ref="actionTokenRootAddress" class="action Ain" type="text"/>
 
@@ -239,7 +285,6 @@ Congratulations, you have successfully minted TIP-3 tokens for a token wallet de
 
 <p class=actionInName style="margin-bottom: 0;">Amount</p>
 <input ref="actionAmount" class="action Ain" type="text"/>
-
 
 <button @click="mintTokens" class="mintTokenBut" >mint Tokens</button>
 
@@ -251,7 +296,6 @@ Congratulations, you have successfully minted TIP-3 tokens for a token wallet de
 </div>
 
 </div>
-
 
 <script lang="ts" >
 import { defineComponent, ref, onMounted } from "vue";
@@ -482,7 +526,7 @@ return {
 }
 
 .container input:checked ~ .checkmark {
-  background-color: var(--light-color-ts-class);
+  background-color: var(--vp-c-brand);
 }
 
 .checkmark:after {

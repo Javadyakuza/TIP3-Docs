@@ -6,9 +6,10 @@ In previous section we have learned to deploy a token root and wallet using An a
 
 In this section we will learn the how to mint TIP-3 tokens for a token wallet.
 
-To mint TIP-3 tokens we simply need to invoke the  `mint`  function within the token root contract. Subsequently, the  `acceptMint`  function will be triggered on the token wallet, resulting in the minting of tokens for the designated recipient token wallet.
+To mint TIP-3 tokens we simply need to invoke the `mint` function within the token root contract. Subsequently, the `acceptMint` function will be triggered on the token wallet, resulting in the minting of tokens for the designated recipient token wallet.
 
 ## Step 1: Write Minting Script
+
 <span  :class="LLdis"  >
 
 Utilize the code sample below to mint TIP-3 tokens using locklift tool and previously written script in the [deploy token wallet](/guides/deployingContracts/usingAccount/tokenWallet.md#step-1-write-deployment-script) section .
@@ -27,7 +28,6 @@ The code sample below demonstrate minting TIP-3 tokens using everscale provider.
 Please be aware that if the `notify` parameter is set to true for the transaction, the change will be sent back to the sender's `token wallet` contract. Therefore, if you prefer to receive the change back into your `account contract`, please ensure that the `notify` checkbox remains unchecked.
 :::
 
-
 </span>
 <br/>
 
@@ -43,50 +43,53 @@ Please be aware that if the `notify` parameter is set to true for the transactio
 
 <span  :class="LLdis">
 
+```typescript
+/* Minting tip-3 token for bob */
 
-````typescript
+// Preparing the parameters for minting tip-3 tokens
+const mintAmount: number = 100;
+let deployWalletValue: string = locklift.utils.toNano('2');
+let txFee: string = locklift.utils.toNano('5');
 
-  /* Minting tip-3 token for bob */
+// minting some token for the recipient
 
-  // Preparing the parameters for minting tip-3 tokens
-  const mintAmount: number = 100;
-  let deployWalletValue: string = locklift.utils.toNano("2");
-  let txFee: string = locklift.utils.toNano("5");
+await tokenRootContract.methods
+  .mint({
+    amount: mintAmount * 10 ** decimals,
+    deployWalletValue: deployWalletValue,
+    notify: false,
+    recipient: bobAccount.address,
+    remainingGasTo: aliceAccount.address,
+    payload: '',
+  })
+  .send({
+    from: aliceAccount.address,
+    amount: txFee,
+  });
 
-  // minting some token for the recipient
-
-  await tokenRootContract.methods
-    .mint({
-      amount: mintAmount * 10 ** decimals,
-      deployWalletValue: deployWalletValue,
-      notify: false,
-      recipient: bobAccount.address,
-      remainingGasTo: aliceAccount.address,
-      payload: "",
-    })
-    .send({
-      from: aliceAccount.address,
-      amount: txFee,
-    });
-
-  // Fetching the bobs balance
-  const bobTokenWallet: Contract<FactorySource["TokenWallet"]> = await locklift.factory.getDeployedContract(
-    "TokenWallet",
-    (await tokenRootContract.methods.walletOf({ answerId: 0, walletOwner: bobAccount.address }).call()).value0,
+// Fetching the bobs balance
+const bobTokenWallet: Contract<FactorySource['TokenWallet']> =
+  await locklift.factory.getDeployedContract(
+    'TokenWallet',
+    (
+      await tokenRootContract.methods
+        .walletOf({ answerId: 0, walletOwner: bobAccount.address })
+        .call()
+    ).value0
   );
-  const bobBal: number = Number((await bobTokenWallet.methods.balance({ answerId: 0 }).call()).value0);
+const bobBal: number = Number(
+  (await bobTokenWallet.methods.balance({ answerId: 0 }).call())
+    .value0
+);
 
-  console.log(`bob's ${symbol} balance: ${bobBal / 10 ** decimals}`);
-
-
-````
+console.log(`bob's ${symbol} balance: ${bobBal / 10 ** decimals}`);
+```
 
 </span>
 
 <span  :class="EIPdis">
 
-```` typescript
-
+```typescript
 import {
   ProviderRpcClient as PRC,
   Address,
@@ -98,14 +101,21 @@ import { provider, providerAddress } from './useProvider';
 
 async function main() {
   try {
-
     // Required contracts Abi's
-    const tokenRootAddress: Address = new Address('<YOUR_TOKEN_ROOT_ADDRESS>');
-    const recipientAddress: Address = new Address('<RECIPIENT_ADDRESS>');
+    const tokenRootAddress: Address = new Address(
+      '<YOUR_TOKEN_ROOT_ADDRESS>'
+    );
+    const recipientAddress: Address = new Address(
+      '<RECIPIENT_ADDRESS>'
+    );
 
     // Creating an instance of the token root contract
-    const tokenRootContract: Contract<tip3Artifacts.FactorySource['TokenRoot']> =
-      new provider.Contract(tip3Artifacts.factorySource.TokenRoot, tokenRootAddress);
+    const tokenRootContract: Contract<
+      tip3Artifacts.FactorySource['TokenRoot']
+    > = new provider.Contract(
+      tip3Artifacts.factorySource.TokenRoot,
+      tokenRootAddress
+    );
 
     // Fetching the token wallet address
     const recipientTokenWalletAddress: Address = (
@@ -116,8 +126,15 @@ async function main() {
 
     // Fetching the decimals
     const [decimals, symbol] = await Promise.all([
-      Number((await tokenRootContract.methods.decimals({ answerId: 0 }).call()).value0),
-      (await tokenRootContract.methods.symbol({ answerId: 0 }).call()).value0,
+      Number(
+        (
+          await tokenRootContract.methods
+            .decimals({ answerId: 0 })
+            .call()
+        ).value0
+      ),
+      (await tokenRootContract.methods.symbol({ answerId: 0 }).call())
+        .value0,
     ]);
 
     // Defining the mint amount
@@ -159,19 +176,29 @@ async function main() {
     }
 
     // Getting the recipient balance
-    const recipientTokenWalletContract: Contract<tip3Artifacts.FactorySource['TokenWallet']> =
-      new provider.Contract(tip3Artifacts.factorySource.TokenWallet, recipientTokenWalletAddress);
+    const recipientTokenWalletContract: Contract<
+      tip3Artifacts.FactorySource['TokenWallet']
+    > = new provider.Contract(
+      tip3Artifacts.factorySource.TokenWallet,
+      recipientTokenWalletAddress
+    );
 
     // Fetching the new balance of the receiver
     const recipientBal: number =
       Number(
-        (await recipientTokenWalletContract.methods.balance({ answerId: 0 }).call({})).value0
+        (
+          await recipientTokenWalletContract.methods
+            .balance({ answerId: 0 })
+            .call({})
+        ).value0
       ) /
       10 ** decimals;
 
     // Checking if the desired amount is minted for the receiver
     if (recipientBal >= amount) {
-      console.log(`${amount} ${symbol}'s successfully minted for recipient`);
+      console.log(
+        `${amount} ${symbol}'s successfully minted for recipient`
+      );
 
       return `Hash: ${mintRes.id.hash} \n recipient ${symbol} \n balance: ${recipientBal}`;
     } else {
@@ -186,26 +213,24 @@ async function main() {
     return 'Failed';
   }
 }
-
-
-````
+```
 
 </span>
 
 </div>
 
-
 <div class="action">
 
 ## Step 2: Mint TIP-3 tokens
-<div :class="llAction">
 
+<div :class="llAction">
 
 Use this command to mint TIP-3 tokens:
 
 ```shell
 npx locklift run -s ./scripts/03-mint-tip3.ts -n local
 ```
+
 <ImgContainer src= '/03-mint-tip3.png' width="100%" altText="mintTip3Output" />
 
 Congratulations, you have successfully minted TIP-3 tokens for a token wallet ðŸŽ‰
@@ -215,7 +240,6 @@ Congratulations, you have successfully minted TIP-3 tokens for a token wallet ðŸ
 <div :class="eipAction" >
 
 <div :class="mint">
-
 
 ::: info
 In order to be able to mint token for a token wallet you must be the token root owner .
@@ -236,6 +260,7 @@ In order to be able to mint token for a token wallet you must be the token root 
 </label>
 
 <button @click="mintTokens" class="mintTokenBut" >mint Tokens</button>
+
 </div>
 <p id="output-p" :class="EIPdis" ref="mintTokenOutput"><loading :text="loadingText"/></p>
 
@@ -472,7 +497,7 @@ return {
 }
 
 .container input:checked ~ .checkmark {
-  background-color: var(--light-color-ts-class);
+  background-color: var(--vp-c-brand);
 }
 
 .checkmark:after {
